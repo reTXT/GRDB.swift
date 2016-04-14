@@ -3,6 +3,7 @@
     - [ ] XXXType protocol: remove Type. Compare with Sequence vs IteratorProtocol 
     - [ ] Compare FechtedRecordsController.record(at:NSIndexPath) with NSFetchedResultsController
     - [ ] FetchedRecordsController: configure(_ cell: UITableViewCell, at indexPath: NSIndexPath)
+    - [ ] Not sure: row.value(at: 0) (used to be row.value(atIndex: 0))
 - [ ] API diff
 - [ ] What is the SQLITE_OPEN_WAL open flag?
 - [ ] Read https://github.com/ccgus/fmdb/issues/262 and understand https://lists.apple.com/archives/cocoa-dev/2012/Aug/msg00527.html
