@@ -289,14 +289,14 @@ extension TableMapping {
     /// Returns a FetchRequest sorted according to the
     /// provided *sortDescriptors*.
     @warn_unused_result
-    public static func order(sortDescriptors: _SQLSortDescriptorType...) -> FetchRequest<Self> {
+    public static func order(_ sortDescriptors: _SQLSortDescriptorType...) -> FetchRequest<Self> {
         return all().order(sortDescriptors)
     }
     
     /// Returns a FetchRequest sorted according to the
     /// provided *sortDescriptors*.
     @warn_unused_result
-    public static func order(sortDescriptors: [_SQLSortDescriptorType]) -> FetchRequest<Self> {
+    public static func order(_ sortDescriptors: [_SQLSortDescriptorType]) -> FetchRequest<Self> {
         return all().order(sortDescriptors)
     }
     

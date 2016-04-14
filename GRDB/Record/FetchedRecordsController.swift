@@ -105,7 +105,7 @@ import UIKit
 ///
 ///     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 ///         let cell = /* Get the cell */
-///         let record = fetchedRecordsController.recordAtIndexPath(indexPath)
+///         let record = fetchedRecordsController.record(at: indexPath)
 ///         /* Configure the cell */
 ///         return cell
 ///     }
@@ -352,7 +352,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
     ///
     ///     If indexPath does not describe a valid index path in the fetched
     ///     records, a fatal error is raised.
-    public func recordAtIndexPath(indexPath: NSIndexPath) -> Record {
+    public func record(at indexPath: NSIndexPath) -> Record {
         guard let fetchedItems = fetchedItems else {
             fatalError("performFetch() has not been called.")
         }

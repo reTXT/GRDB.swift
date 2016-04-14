@@ -31,7 +31,7 @@ class Person: Record {
             "score": score]
     }
     
-    override func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    override func didInsert(withRowID rowID: Int64, forColumn column: String?) {
         id = rowID
     }
     
