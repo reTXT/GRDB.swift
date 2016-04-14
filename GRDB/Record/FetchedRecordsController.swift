@@ -313,7 +313,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
     /// Updates the fetch request, and notifies the delegate of changes in the
     /// fetched records if delegate is not nil, and performFetch() has been
     /// called.
-    public func setRequest<T>(request: FetchRequest<T>) {
+    public func setRequest<T>(_ request: FetchRequest<T>) {
         // We don't provide a setter for the request property because we need a
         // non-optional request.
         
@@ -325,7 +325,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
     /// Updates the fetch request, and notifies the delegate of changes in the
     /// fetched records if delegate is not nil, and performFetch() has been
     /// called.
-    public func setRequest(sql sql: String, arguments: StatementArguments? = nil) {
+    public func setRequest(sql: String, arguments: StatementArguments? = nil) {
         self.source = DatabaseSource.sql(sql, arguments)
     }
     
@@ -356,7 +356,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
         guard let fetchedItems = fetchedItems else {
             fatalError("performFetch() has not been called.")
         }
-        return fetchedItems[indexPath.indexAtPosition(1)].record
+        return fetchedItems[indexPath.index(atPosition: 1)].record
     }
     
     /// Returns the indexPath of a given record.
@@ -364,7 +364,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
     /// - returns: The index path of *record* in the fetched records, or nil if
     ///   record could not be found.
     public func indexPathForRecord(record: Record) -> NSIndexPath? {
-        guard let fetchedItems = fetchedItems, let index = fetchedItems.indexOf({ isSameRecord($0.record, record) }) else {
+        guard let fetchedItems = fetchedItems, let index = fetchedItems.index(where: { isSameRecord($0.record, record) }) else {
             return nil
         }
         return NSIndexPath(forRow: index, inSection: 0)
@@ -627,17 +627,17 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
         
         // Fill first row and column of insertions and deletions.
         
-        var d: [[[ItemChange<Record>]]] = Array(count: m + 1, repeatedValue: Array(count: n + 1, repeatedValue: []))
+        var d: [[[ItemChange<Record>]]] = Array(repeating: Array(repeating: [], count: n + 1), count: m + 1)
         
         var changes = [ItemChange<Record>]()
-        for (row, item) in s.enumerate() {
+        for (row, item) in s.enumerated() {
             let deletion = ItemChange.Deletion(item: item, indexPath: NSIndexPath(forRow: row, inSection: 0))
             changes.append(deletion)
             d[row + 1][0] = changes
         }
         
         changes.removeAll()
-        for (col, item) in t.enumerate() {
+        for (col, item) in t.enumerated() {
             let insertion = ItemChange.Insertion(item: item, indexPath: NSIndexPath(forRow: col, inSection: 0))
             changes.append(insertion)
             d[0][col + 1] = changes
@@ -680,13 +680,13 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
         }
         
         /// Returns an array where deletion/insertion pairs of the same element are replaced by `.Move` change.
-        func standardizeChanges(changes: [ItemChange<Record>]) -> [ItemChange<Record>] {
+        func standardize(changes: [ItemChange<Record>]) -> [ItemChange<Record>] {
             
             /// Returns a potential .Move or .Update if *change* has a matching change in *changes*:
             /// If *change* is a deletion or an insertion, and there is a matching inverse
             /// insertion/deletion with the same value in *changes*, a corresponding .Move or .Update is returned.
             /// As a convenience, the index of the matched change is returned as well.
-            func mergedChange(change: ItemChange<Record>, inChanges changes: [ItemChange<Record>]) -> (mergedChange: ItemChange<Record>, mergedIndex: Int)? {
+            func mergedChange(_ change: ItemChange<Record>, inChanges changes: [ItemChange<Record>]) -> (mergedChange: ItemChange<Record>, mergedIndex: Int)? {
                 
                 /// Returns the changes between two rows: a dictionary [key: oldValue]
                 /// Precondition: both rows have the same columns
@@ -704,7 +704,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
                 switch change {
                 case .Insertion(let newItem, let newIndexPath):
                     // Look for a matching deletion
-                    for (index, otherChange) in changes.enumerate() {
+                    for (index, otherChange) in changes.enumerated() {
                         guard case .Deletion(let oldItem, let oldIndexPath) = otherChange else { continue }
                         guard isSameRecord(oldItem.record, newItem.record) else { continue }
                         let rowChanges = changedValues(from: oldItem.row, to: newItem.row)
@@ -718,7 +718,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
                     
                 case .Deletion(let oldItem, let oldIndexPath):
                     // Look for a matching insertion
-                    for (index, otherChange) in changes.enumerate() {
+                    for (index, otherChange) in changes.enumerated() {
                         guard case .Insertion(let newItem, let newIndexPath) = otherChange else { continue }
                         guard isSameRecord(oldItem.record, newItem.record) else { continue }
                         let rowChanges = changedValues(from: oldItem.row, to: newItem.row)
@@ -740,7 +740,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
             var updateChanges: [ItemChange<Record>] = []
             for change in changes {
                 if let (mergedChange, mergedIndex) = mergedChange(change, inChanges: mergedChanges) {
-                    mergedChanges.removeAtIndex(mergedIndex)
+                    mergedChanges.remove(at: mergedIndex)
                     switch mergedChange {
                     case .Update:
                         updateChanges.append(mergedChange)
@@ -754,7 +754,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
             return mergedChanges + updateChanges
         }
         
-        return standardizeChanges(d[m][n])
+        return standardize(changes: d[m][n])
     }
 }
 
@@ -817,7 +817,7 @@ public protocol FetchedRecordsControllerDelegate : class {
     ///
     /// - parameter controller: The fetched records controller that sent
     ///   the message.
-    func controllerWillChangeRecords<T>(controller: FetchedRecordsController<T>)
+    func controllerWillChangeRecords<T>(_ controller: FetchedRecordsController<T>)
     
     /// Notifies that a record has been changed due to an add, remove, move,
     /// or update.
@@ -842,25 +842,25 @@ public protocol FetchedRecordsControllerDelegate : class {
     ///     - controller: The fetched records controller that sent the message.
     ///     - record: The record that changed.
     ///     - event: The type of change (see FetchedRecordsEvent).
-    func controller<T>(controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent)
+    func controller<T>(_ controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent)
     
     /// Notifies that the fetched records controller has completed processing
     /// of one or more changes due to an add, remove, move, or update.
     ///
     /// - parameter controller: The fetched records controller that sent
     ///   the message.
-    func controllerDidChangeRecords<T>(controller: FetchedRecordsController<T>)
+    func controllerDidChangeRecords<T>(_ controller: FetchedRecordsController<T>)
 }
 
 public extension FetchedRecordsControllerDelegate {
     /// The default implementation does nothing.
-    func controllerWillChangeRecords<T>(controller: FetchedRecordsController<T>) { }
+    func controllerWillChangeRecords<T>(_ controller: FetchedRecordsController<T>) { }
 
     /// The default implementation does nothing.
-    func controller<T>(controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent) { }
+    func controller<T>(_ controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent) { }
     
     /// The default implementation does nothing.
-    func controllerDidChangeRecords<T>(controller: FetchedRecordsController<T>) { }
+    func controllerDidChangeRecords<T>(_ controller: FetchedRecordsController<T>) { }
 }
 
 
@@ -945,7 +945,7 @@ private enum DatabaseSource<T> {
         case .sql(let sql, let arguments):
             let statement = try db.selectStatement(sql)
             if let arguments = arguments {
-                try statement.validateArguments(arguments)
+                try statement.validate(arguments: arguments)
                 statement.unsafeSetArguments(arguments)
             }
             return statement

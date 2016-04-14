@@ -84,7 +84,7 @@ public struct DatabaseValue {
     /// - returns: An optional *Value*.
     @warn_unused_result
     public func value<Value: DatabaseValueConvertible>() -> Value? {
-        if let value = Value.fromDatabaseValue(self) {
+        if let value = Value.from(databaseValue: self) {
             return value
         }
         guard isNull else {
@@ -101,7 +101,7 @@ public struct DatabaseValue {
     /// - returns: A *Value*.
     @warn_unused_result
     public func value<Value: DatabaseValueConvertible>() -> Value {
-        guard let value = Value.fromDatabaseValue(self) as Value? else {
+        guard let value = Value.from(databaseValue: self) as Value? else {
             fatalError("could not convert \(self) to \(Value.self).")
         }
         return value
@@ -118,7 +118,7 @@ public struct DatabaseValue {
     /// - returns: An optional *Value*.
     @warn_unused_result
     public func failableValue<Value: DatabaseValueConvertible>() -> Value? {
-        return Value.fromDatabaseValue(self)
+        return Value.from(databaseValue: self)
     }
     
     
@@ -142,7 +142,7 @@ public struct DatabaseValue {
             storage = .Double(sqlite3_value_double(sqliteValue))
         case SQLITE_TEXT:
             let cString = UnsafePointer<Int8>(sqlite3_value_text(sqliteValue))
-            storage = .String(Swift.String(validatingUTF8: cString)!)
+            storage = .String(Swift.String(validatingUTF8: cString!)!)
         case SQLITE_BLOB:
             let bytes = sqlite3_value_blob(sqliteValue)
             let length = sqlite3_value_bytes(sqliteValue)
@@ -201,7 +201,7 @@ public func ==(lhs: DatabaseValue, rhs: DatabaseValue) -> Bool {
 
 /// Returns true if i and d hold exactly the same value, and if converting one
 /// type into the other does not lose any information.
-private func int64EqualDouble(i: Int64, _ d: Double) -> Bool {
+private func int64EqualDouble(_ i: Int64, _ d: Double) -> Bool {
     // See http://stackoverflow.com/questions/33719132/how-to-test-for-lossless-double-integer-conversion/33784296#33784296
     return (d >= Double(Int64.min))
         && (d < Double(Int64.max))
@@ -245,7 +245,7 @@ extension DatabaseValue : StatementColumnConvertible {
             storage = .Double(sqlite3_column_double(sqliteStatement, Int32(index)))
         case SQLITE_TEXT:
             let cString = UnsafePointer<Int8>(sqlite3_column_text(sqliteStatement, Int32(index)))
-            storage = .String(String(validatingUTF8: cString)!)
+            storage = .String(String(validatingUTF8: cString!)!)
         case SQLITE_BLOB:
             let bytes = sqlite3_column_blob(sqliteStatement, Int32(index))
             let length = sqlite3_column_bytes(sqliteStatement, Int32(index))

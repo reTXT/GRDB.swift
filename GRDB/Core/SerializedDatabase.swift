@@ -47,7 +47,7 @@ final class SerializedDatabase {
     /// its result.
     ///
     /// This method is *not* reentrant.
-    func performSync<T>(block: (db: Database) throws -> T) rethrows -> T {
+    func performSync<T>(_ block: (db: Database) throws -> T) rethrows -> T {
         // This method is NOT reentrant.
         //
         // Avoiding dispatch_sync and calling block() right away if the specific
@@ -79,7 +79,7 @@ final class SerializedDatabase {
     }
     
     /// Asynchronously executes a block in the serialized dispatch queue.
-    func performAsync(block: (db: Database) -> Void) {
+    func performAsync(_ block: (db: Database) -> Void) {
         dispatch_async(queue) {
             block(db: self.db)
         }
@@ -88,7 +88,7 @@ final class SerializedDatabase {
     /// Executes the block in the current queue.
     ///
     /// - precondition: the current dispatch queue is valid.
-    func perform<T>(block: (db: Database) throws -> T) rethrows -> T {
+    func perform<T>(_ block: (db: Database) throws -> T) rethrows -> T {
         db.preconditionValidQueue()
         return try block(db: db)
     }

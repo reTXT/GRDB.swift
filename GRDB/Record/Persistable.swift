@@ -22,8 +22,8 @@ private func databaseValue(forColumn column: String, inDictionary dictionary: [S
     if let value = dictionary[column] {
         return value?.databaseValue ?? .Null
     }
-    let column = column.lowercased
-    for (key, value) in dictionary where key.lowercased == column {
+    let column = column.lowercased()
+    for (key, value) in dictionary where key.lowercased() == column {
         return value?.databaseValue ?? .Null
     }
     return .Null
@@ -221,7 +221,7 @@ public extension MutablePersistable {
     private func canUpdateInDatabase(_ db: Database) -> Bool {
         // Fail early if database table does not exist.
         let databaseTableName = self.dynamicType.databaseTableName()
-        let primaryKey = try! db.primaryKey(databaseTableName)
+        let primaryKey = try! db.primaryKey(forTableName: databaseTableName)
         
         let persistentDictionary = self.persistentDictionary
         for column in primaryKey.columns where !databaseValue(forColumn: column, inDictionary: persistentDictionary).isNull {
@@ -325,7 +325,7 @@ extension MutablePersistable {
     /// - throws: A DatabaseError if table does not exist.
     static func primaryKeyFunction(_ db: Database) throws -> (Self) -> [String: DatabaseValue] {
         db.preconditionValidQueue()
-        let columns = try db.primaryKey(databaseTableName()).columns
+        let columns = try db.primaryKey(forTableName: databaseTableName()).columns
         return { record in
             let dictionary = record.persistentDictionary
             return Dictionary<String, DatabaseValue>(keys: columns) { databaseValue(forColumn: $0, inDictionary: dictionary) }
@@ -525,7 +525,7 @@ final class DataMapper {
     init(_ db: Database, _ persistable: MutablePersistable) {
         // Fail early if database table does not exist.
         let databaseTableName = persistable.dynamicType.databaseTableName()
-        let primaryKey = try! db.primaryKey(databaseTableName)
+        let primaryKey = try! db.primaryKey(forTableName: databaseTableName)
         
         // Fail early if persistentDictionary is empty
         let persistentDictionary = persistable.persistentDictionary
@@ -554,7 +554,7 @@ final class DataMapper {
         GRDBPrecondition(primaryKeyValues.contains { !$0.isNull }, "invalid primary key in \(persistable)")
         
         // Update everything but primary key
-        var updatedColumns = persistentDictionary.keys.removingElementsOf(primaryKeyColumns)
+        var updatedColumns = persistentDictionary.keys.remove(contentsOf: primaryKeyColumns)
         if updatedColumns.isEmpty {
             // IMPLEMENTATION NOTE
             //

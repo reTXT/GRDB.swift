@@ -768,7 +768,7 @@ extension Database {
         let primaryKey: PrimaryKey
         let pkColumnInfos = columnInfos
             .filter { $0.primaryKeyIndex > 0 }
-            .sort { $0.primaryKeyIndex < $1.primaryKeyIndex }
+            .sorted { $0.primaryKeyIndex < $1.primaryKeyIndex }
         
         switch pkColumnInfos.count {
         case 0:

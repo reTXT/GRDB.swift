@@ -137,7 +137,7 @@ public final class DatabaseQueue {
     /// - param application: The UIApplication that will start a background
     ///   task to let the database queue release its memory when the application
     ///   enters background.
-    public func setupMemoryManagement(application application: UIApplication) {
+    public func setupMemoryManagement(application: UIApplication) {
         self.application = application
         let center = NSNotificationCenter.defaultCenter()
         center.addObserver(self, selector: #selector(DatabaseQueue.applicationDidReceiveMemoryWarning(_:)), name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
@@ -146,13 +146,13 @@ public final class DatabaseQueue {
     
     private var application: UIApplication?
     
-    @objc private func applicationDidEnterBackground(notification: NSNotification) {
+    @objc private func applicationDidEnterBackground(_ notification: NSNotification) {
         guard let application = application else {
             return
         }
         
         var task: UIBackgroundTaskIdentifier! = nil
-        task = application.beginBackgroundTaskWithExpirationHandler(nil)
+        task = application.beginBackgroundTask(expirationHandler: nil)
         
         if task == UIBackgroundTaskInvalid {
             // Perform releaseMemory() synchronously.
@@ -166,7 +166,7 @@ public final class DatabaseQueue {
         }
     }
     
-    @objc private func applicationDidReceiveMemoryWarning(notification: NSNotification) {
+    @objc private func applicationDidReceiveMemoryWarning(_ notification: NSNotification) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             self.releaseMemory()
         }
@@ -252,14 +252,14 @@ extension DatabaseQueue : DatabaseReader {
     ///     dbQueue.inDatabase { db in
     ///         Int.fetchOne(db, "SELECT succ(1)") // 2
     ///     }
-    public func addFunction(function: DatabaseFunction) {
+    public func addFunction(_ function: DatabaseFunction) {
         serializedDatabase.performSync { db in
             db.addFunction(function)
         }
     }
     
     /// Remove an SQL function.
-    public func removeFunction(function: DatabaseFunction) {
+    public func removeFunction(_ function: DatabaseFunction) {
         serializedDatabase.performSync { db in
             db.removeFunction(function)
         }
@@ -277,14 +277,14 @@ extension DatabaseQueue : DatabaseReader {
     ///     try dbQueue.inDatabase { db in
     ///         try db.execute("CREATE TABLE files (name TEXT COLLATE LOCALIZED_STANDARD")
     ///     }
-    public func addCollation(collation: DatabaseCollation) {
+    public func addCollation(_ collation: DatabaseCollation) {
         serializedDatabase.performSync { db in
             db.addCollation(collation)
         }
     }
     
     /// Remove a collation.
-    public func removeCollation(collation: DatabaseCollation) {
+    public func removeCollation(_ collation: DatabaseCollation) {
         serializedDatabase.performSync { db in
             db.removeCollation(collation)
         }

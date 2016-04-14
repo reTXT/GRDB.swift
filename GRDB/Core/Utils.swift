@@ -73,7 +73,7 @@ func dispatchSync<T>(_ queue: dispatch_queue_t, _ block: () throws -> T) rethrow
 
 extension Array {
     /// Removes the first object that matches *predicate*.
-    mutating func removeFirst(@noescape predicate: (Element) throws -> Bool) rethrows {
+    mutating func removeFirst(@noescape _ predicate: (Element) throws -> Bool) rethrows {
         if let index = try index(where: predicate) {
             remove(at: index)
         }
@@ -83,7 +83,7 @@ extension Array {
 extension Dictionary {
     
     /// Create a dictionary with the keys and values in the given sequence.
-    init<S: Sequence where S.Iterator.Element == Iterator.Element>(keyValueSequence: S) {
+    init<S: Sequence where S.Iterator.Element == (Key, Value)>(keyValueSequence: S) {
         // TODO: restore use of underestimateCount when Swift is fixed
 //        self.init(minimumCapacity: keyValueSequence.underestimateCount)
         self.init()
@@ -106,8 +106,8 @@ extension Dictionary {
 extension Sequence where Iterator.Element: Equatable {
     
     /// Filter out elements contained in *removedElements*.
-    func removingElementsOf<S : Sequence where S.Iterator.Element == Self.Iterator.Element>(removedElements: S) -> [Self.Iterator.Element] {
-        return filter { element in !removedElements.contains(element) }
+    func remove<S : Sequence where S.Iterator.Element == Self.Iterator.Element>(contentsOf elements: S) -> [Self.Iterator.Element] {
+        return filter { element in !elements.contains(element) }
     }
 }
 

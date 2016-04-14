@@ -160,13 +160,13 @@ public final class DatabasePool {
     
     private var application: UIApplication!
     
-    @objc private func applicationDidEnterBackground(notification: NSNotification) {
+    @objc private func applicationDidEnterBackground(_ notification: NSNotification) {
         guard let application = application else {
             return
         }
         
         var task: UIBackgroundTaskIdentifier! = nil
-        task = application.beginBackgroundTaskWithExpirationHandler(nil)
+        task = application.beginBackgroundTask(expirationHandler: nil)
         
         if task == UIBackgroundTaskInvalid {
             // Perform releaseMemory() synchronously.
@@ -180,7 +180,7 @@ public final class DatabasePool {
         }
     }
     
-    @objc private func applicationDidReceiveMemoryWarning(notification: NSNotification) {
+    @objc private func applicationDidReceiveMemoryWarning(_ notification: NSNotification) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             self.releaseMemory()
         }
@@ -345,7 +345,7 @@ extension DatabasePool : DatabaseReader {
     ///     dbPool.write { db in
     ///         try db.execute("CREATE TABLE files (name TEXT COLLATE LOCALIZED_STANDARD")
     ///     }
-    public func addCollation(collation: DatabaseCollation) {
+    public func addCollation(_ collation: DatabaseCollation) {
         collations.remove(collation)
         collations.insert(collation)
         writer.performSync { db in db.addCollation(collation) }
@@ -353,7 +353,7 @@ extension DatabasePool : DatabaseReader {
     }
     
     /// Remove a collation.
-    public func removeCollation(collation: DatabaseCollation) {
+    public func removeCollation(_ collation: DatabaseCollation) {
         collations.remove(collation)
         writer.performSync { db in db.removeCollation(collation) }
         readerPool.forEach { $0.performSync { db in db.removeCollation(collation) } }

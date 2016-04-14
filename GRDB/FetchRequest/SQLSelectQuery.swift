@@ -454,7 +454,7 @@ public indirect enum _SQLExpression {
             let sql = try expression.sql(db, &bindings)
             let chars = sql.characters
             if chars.last! == ")" {
-                return String(chars.prefixUpTo(chars.endIndex.predecessor())) + " COLLATE " + collation + ")"
+                return String(chars.prefix(upTo: chars.endIndex.predecessor())) + " COLLATE " + collation + ")"
             } else {
                 return sql + " COLLATE " + collation
             }

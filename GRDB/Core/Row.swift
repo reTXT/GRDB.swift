@@ -38,7 +38,7 @@ public final class Row {
     /// specific one: `row.copy()`.
     @warn_unused_result
     public func copy() -> Row {
-        return impl.copy(self)
+        return impl.copy(row: self)
     }
     
     
@@ -57,7 +57,7 @@ public final class Row {
     ///
     /// The statementRef is released in deinit.
     let statementRef: Unmanaged<SelectStatement>?
-    let sqliteStatement: SQLiteStatement
+    let sqliteStatement: SQLiteStatement?
     
     deinit {
         statementRef?.release()
@@ -356,8 +356,7 @@ extension Row {
     
     @warn_unused_result
     private func fastValue<Value: protocol<DatabaseValueConvertible, StatementColumnConvertible>>(atUncheckedIndex index: Int) -> Value? {
-        let sqliteStatement = self.sqliteStatement
-        guard sqliteStatement != nil else {
+        guard let sqliteStatement = sqliteStatement else {
             return impl.databaseValue(atIndex: index).value()
         }
         guard sqlite3_column_type(sqliteStatement, Int32(index)) != SQLITE_NULL else {
@@ -368,8 +367,7 @@ extension Row {
     
     @warn_unused_result
     private func fastValue<Value: protocol<DatabaseValueConvertible, StatementColumnConvertible>>(atUncheckedIndex index: Int) -> Value {
-        let sqliteStatement = self.sqliteStatement
-        guard sqliteStatement != nil else {
+        guard let sqliteStatement = sqliteStatement else {
             return impl.databaseValue(atIndex: index).value()
         }
         guard sqlite3_column_type(sqliteStatement, Int32(index)) != SQLITE_NULL else {
@@ -566,17 +564,10 @@ extension Row : Collection {
     
     /// The number of columns in the row.
     public var count: Int {
-        let sqliteStatement = self.sqliteStatement
-        guard sqliteStatement != nil else {
+        guard let sqliteStatement = sqliteStatement else {
             return impl.count
         }
         return Int(sqlite3_column_count(sqliteStatement))
-    }
-    
-    /// Returns an *iterator* over (ColumnName, DatabaseValue) pairs, from left
-    /// to right.
-    public func makeIterator() -> IndexingIterator<Row> {
-        return IndexingIterator(self)
     }
     
     /// The index of the first (ColumnName, DatabaseValue) pair.
@@ -654,7 +645,7 @@ public struct RowIndex: ForwardIndex, BidirectionalIndex, RandomAccessIndex {
 
     /// The number of columns between two (ColumnName, DatabaseValue) pairs in
     /// a row.
-    public func distanceTo(other: RowIndex) -> Int { return other.index - index }
+    public func distance(to other: RowIndex) -> Int { return other.index - index }
     
     /// Return `self` offset by `n` steps.
     public func advanced(by n: Int) -> RowIndex { return RowIndex(index + n) }
@@ -701,21 +692,21 @@ private struct DictionaryRowImpl : RowImpl {
     }
     
     func databaseValue(atIndex index: Int) -> DatabaseValue {
-        return dictionary[dictionary.startIndex.advancedBy(index)].1?.databaseValue ?? .Null
+        return dictionary[dictionary.startIndex.advanced(by: index)].1?.databaseValue ?? .Null
     }
     
     func columnName(atIndex index: Int) -> String {
-        return dictionary[dictionary.startIndex.advancedBy(index)].0
+        return dictionary[dictionary.startIndex.advanced(by: index)].0
     }
     
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
     func indexOfColumn(named name: String) -> Int? {
-        let lowercaseName = name.lowercased
-        guard let index = dictionary.indexOf({ (column, value) in column.lowercased == lowercaseName }) else {
+        let lowercaseName = name.lowercased()
+        guard let index = dictionary.index(where: { (column, value) in column.lowercased() == lowercaseName }) else {
             return nil
         }
-        return dictionary.startIndex.distanceTo(index)
+        return dictionary.startIndex.distance(to: index)
     }
     
     func copy(row: Row) -> Row {
@@ -730,8 +721,6 @@ private struct StatementCopyRowImpl : RowImpl {
     let columnNames: [String]
     
     init(sqliteStatement: SQLiteStatement, columnNames: [String]) {
-        assert(sqliteStatement != nil)
-        let sqliteStatement = sqliteStatement
         self.databaseValues = ContiguousArray((0..<sqlite3_column_count(sqliteStatement)).lazy.map { DatabaseValue(sqliteStatement: sqliteStatement, index: $0) })
         self.columnNames = columnNames
     }
@@ -755,8 +744,8 @@ private struct StatementCopyRowImpl : RowImpl {
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
     func indexOfColumn(named name: String) -> Int? {
-        let lowercaseName = name.lowercased
-        return columnNames.indexOf { $0.lowercased == lowercaseName }
+        let lowercaseName = name.lowercased()
+        return columnNames.index { $0.lowercased() == lowercaseName }
     }
     
     func copy(row: Row) -> Row {
@@ -772,12 +761,11 @@ private struct StatementRowImpl : RowImpl {
     let lowercaseColumnIndexes: [String: Int]
     
     init(sqliteStatement: SQLiteStatement, statementRef: Unmanaged<SelectStatement>) {
-        assert(sqliteStatement != nil)
         self.statementRef = statementRef
         self.sqliteStatement = sqliteStatement
         // Optimize row.value(named: "...")
-        let lowercaseColumnNames = (0..<sqlite3_column_count(sqliteStatement)).map { String(validatingUTF8: sqlite3_column_name(sqliteStatement, Int32($0)))!.lowercased }
-        self.lowercaseColumnIndexes = Dictionary(keyValueSequence: lowercaseColumnNames.enumerate().map { ($1, $0) }.reverse())
+        let lowercaseColumnNames = (0..<sqlite3_column_count(sqliteStatement)).map { String(validatingUTF8: sqlite3_column_name(sqliteStatement, Int32($0)))!.lowercased() }
+        self.lowercaseColumnIndexes = Dictionary(keyValueSequence: lowercaseColumnNames.enumerated().map { ($1, $0) }.reversed())
     }
     
     var count: Int {
@@ -807,7 +795,7 @@ private struct StatementRowImpl : RowImpl {
         if let index = lowercaseColumnIndexes[name] {
             return index
         }
-        return lowercaseColumnIndexes[name.lowercased]
+        return lowercaseColumnIndexes[name.lowercased()]
     }
     
     func copy(row: Row) -> Row {

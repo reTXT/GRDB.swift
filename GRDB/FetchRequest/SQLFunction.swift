@@ -112,6 +112,7 @@ extension _SQLDerivedExpressionType {
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
     public func capitalized() -> _SQLExpression {
         // TODO: decide if it should be a property or a function.
+        // TODO: Open a bugs.swift.org issue about String/NSString var/function inconsistencies
         return DatabaseFunction.capitalized.apply(sqlExpression)
     }
 

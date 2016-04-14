@@ -48,15 +48,15 @@ public class Statement {
         var remainingSQL = ""
         sqlCodeUnits.withUnsafeBufferPointer { codeUnits in
             let sqlStart = UnsafePointer<Int8>(codeUnits.baseAddress)!
-            var sqlEnd: UnsafePointer<Int8>! = nil
+            var sqlEnd: UnsafePointer<Int8>? = nil // TODO: Open a bugs.swift.org issue because swift won't let us use IUO. 
             code = sqlite3_prepare_v2(database.sqliteConnection, sqlStart, -1, &sqliteStatement, &sqlEnd)
-            let remainingData = NSData(bytesNoCopy: UnsafeMutablePointer<Void>(sqlEnd!), length: sqlStart + sqlCodeUnits.count - sqlEnd - 1, freeWhenDone: false)
-            remainingSQL = String(data: remainingData, encoding: NSUTF8StringEncoding)!.trimmingCharacters(in: .whitespaceAndNewlineCharacterSet())
+            let remainingData = NSData(bytesNoCopy: UnsafeMutablePointer<Void>(sqlEnd!), length: sqlStart + sqlCodeUnits.count - sqlEnd! - 1, freeWhenDone: false)
+            remainingSQL = String(data: remainingData, encoding: NSUTF8StringEncoding)!.trimmingCharacters(in: .whitespacesAndNewlines())
         }
         
         self.database = database
         self.sql = sql
-        self.sqliteStatement = sqliteStatement
+        self.sqliteStatement = sqliteStatement!
         
         guard code == SQLITE_OK else {
             throw DatabaseError(code: code, message: database.lastErrorMessage, sql: sql)
@@ -106,12 +106,12 @@ public class Statement {
     
     /// Throws a DatabaseError of code SQLITE_ERROR if arguments don't fill all
     /// statement arguments.
-    public func validateArguments(arguments: StatementArguments) throws {
+    public func validate(arguments: StatementArguments) throws {
         _ = try validatedBindings(arguments)
     }
     
     /// Set arguments without any validation. Trades safety for performance.
-    public func unsafeSetArguments(arguments: StatementArguments) {
+    public func unsafeSetArguments(_ arguments: StatementArguments) {
         _arguments = arguments
         argumentsNeedValidation = false
         
@@ -121,14 +121,14 @@ public class Statement {
         
         switch arguments.kind {
         case .Values(let values):
-            for (index, value) in values.enumerate() {
-                try! bindDatabaseValue(value?.databaseValue ?? .Null, atIndex: Int32(index + 1))
+            for (index, value) in values.enumerated() {
+                try! bind(databaseValue: value?.databaseValue ?? .Null, atIndex: Int32(index + 1))
             }
             break
         case .NamedValues(let namedValues):
-            for (index, argumentName) in sqliteArgumentNames.enumerate() {
+            for (index, argumentName) in sqliteArgumentNames.enumerated() {
                 if let argumentName = argumentName, let value = namedValues[argumentName] {
-                    try! bindDatabaseValue(value?.databaseValue ?? .Null, atIndex: Int32(index + 1))
+                    try! bind(databaseValue: value?.databaseValue ?? .Null, atIndex: Int32(index + 1))
                 }
             }
         }
@@ -143,12 +143,12 @@ public class Statement {
         // Apply
         try! reset()
         try! clearBindings()
-        for (index, databaseValue) in bindings.enumerate() {
-            try bindDatabaseValue(databaseValue, atIndex: Int32(index + 1))
+        for (index, databaseValue) in bindings.enumerated() {
+            try bind(databaseValue: databaseValue, atIndex: Int32(index + 1))
         }
     }
     
-    private func bindDatabaseValue(databaseValue: DatabaseValue, atIndex index: Int32) throws {
+    private func bind(databaseValue: DatabaseValue, atIndex index: Int32) throws {
         let code: Int32
         switch databaseValue.storage {
         case .Null:
@@ -231,10 +231,10 @@ public class Statement {
         
         if case let missingKeys = keyValueBindings.filter({ $0.1 == nil }).map({ $0.0 }) where !missingKeys.isEmpty {
             if case let namedMissingKeys = missingKeys.flatMap({ $0 }) where namedMissingKeys.count == missingKeys.count {
-                func caseInsensitiveSort(strings: [String]) -> [String] {
+                func caseInsensitiveSort(_ strings: [String]) -> [String] {
                     return strings
-                        .map { ($0.lowercased, $0) }
-                        .sort { $0.0 < $1.0 }
+                        .map { ($0.lowercased(), $0) }
+                        .sorted { $0.0 < $1.0 }
                         .map { $0.1 }
                 }
                 throw DatabaseError(code: SQLITE_MISUSE, message: "missing statement argument(s): \(caseInsensitiveSort(namedMissingKeys).joined(separator: ", "))", sql: sql, arguments: nil)
@@ -259,7 +259,7 @@ public class Statement {
         if let arguments = arguments {
             try setArgumentsWithValidation(arguments)
         } else if argumentsNeedValidation {
-            try validateArguments(self.arguments)
+            try validate(arguments: self.arguments)
         }
     }
 }
@@ -301,13 +301,13 @@ public final class SelectStatement : Statement {
     
     /// Cache for indexOfColumn(). Keys are lowercase.
     private lazy var columnIndexes: [String: Int] = {
-        return Dictionary(keyValueSequence: self.columnNames.enumerated().map { (key: $1.lowercased(), value: $0) }.reversed())
+        return Dictionary(keyValueSequence: self.columnNames.enumerated().map { ($1.lowercased(), $0) }.reversed())
     }()
     
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
     func indexOfColumn(named name: String) -> Int? {
-        return columnIndexes[name.lowercased]
+        return columnIndexes[name.lowercased()]
     }
     
     /// Creates a DatabaseSequence
@@ -373,7 +373,7 @@ public struct DatabaseSequence<Element>: Sequence {
 /// An iterator of elements fetched from the database.
 public class DatabaseIterator<Element>: IteratorProtocol {
     private let statementRef: Unmanaged<SelectStatement>?
-    private let sqliteStatement: SQLiteStatement
+    private let sqliteStatement: SQLiteStatement?
     private let element: ((SQLiteStatement, Unmanaged<SelectStatement>) -> Element?)?
     
     // Iterator takes ownership of statementRef
@@ -398,8 +398,7 @@ public class DatabaseIterator<Element>: IteratorProtocol {
         guard let element = element else {
             return nil
         }
-        // TODO: use unsafeUnWrap(statementRef)
-        return element(sqliteStatement, statementRef!)
+        return element(sqliteStatement.unsafelyUnwrapped, statementRef.unsafelyUnwrapped)
     }
 }
 
@@ -578,8 +577,19 @@ public struct StatementArguments {
     
     // MARK: Named Arguments
     
-    /// Initializes arguments from a sequence of (key, value) pairs, such as
+    /// Initializes arguments from a sequence of (key, value) dictionary, such as
     /// a dictionary.
+    ///
+    ///     let values: [String: DatabaseValueConvertible?] = ["firstName": nil, "lastName": "Miller"]
+    ///     db.execute("INSERT ... (:firstName, :lastName)", arguments: StatementArguments(values))
+    ///
+    /// - parameter sequence: A sequence of (key, value) pairs
+    /// - returns: A StatementArguments.
+    public init(_ dictionary: [String: DatabaseValueConvertible?]) {
+        kind = .NamedValues(dictionary)
+    }
+    
+    /// Initializes arguments from a sequence of (key, value) pairs.
     ///
     ///     let values: [String: DatabaseValueConvertible?] = ["firstName": nil, "lastName": "Miller"]
     ///     db.execute("INSERT ... (:firstName, :lastName)", arguments: StatementArguments(values))
@@ -588,18 +598,6 @@ public struct StatementArguments {
     /// - returns: A StatementArguments.
     public init<S: Sequence where S.Iterator.Element == (String, DatabaseValueConvertible?)>(_ sequence: S) {
         kind = .NamedValues(Dictionary(keyValueSequence: sequence))
-    }
-    
-    /// Initializes arguments from a sequence of (key, value) pairs, such as
-    /// a dictionary.
-    ///
-    ///     let values: [String: String] = ["firstName": "Arthur", "lastName": "Miller"]
-    ///     db.execute("INSERT ... (:firstName, :lastName)", arguments: StatementArguments(values))
-    ///
-    /// - parameter sequence: A sequence of (key, value) pairs
-    /// - returns: A StatementArguments.
-    public init<S: Sequence, Value: DatabaseValueConvertible where S.Iterator.Element == (String, Value)>(_ sequence: S) {
-        kind = .NamedValues(Dictionary(keyValueSequence: sequence.map { (key, value) in return (key, value as DatabaseValueConvertible?) }))
     }
     
     
