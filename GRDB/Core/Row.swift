@@ -304,7 +304,7 @@ extension Row {
     @warn_unused_result
     public func dataNoCopy(at index: Int) -> NSData? {
         GRDBPrecondition(index >= 0 && index < count, "row index out of range")
-        return impl.dataNoCopy(atIndex: index)
+        return impl.dataNoCopy(at: index)
     }
     
     /// Returns the optional `NSData` at given column.
@@ -323,7 +323,7 @@ extension Row {
         guard let index = impl.indexOfColumn(named: columnName) else {
             return nil
         }
-        return impl.dataNoCopy(atIndex: index)
+        return impl.dataNoCopy(at: index)
     }
     
     
@@ -584,7 +584,7 @@ extension Row : Collection {
     /// Accesses the (ColumnName, DatabaseValue) pair at given index.
     public subscript(index: RowIndex) -> (String, DatabaseValue) {
         return (
-            impl.columnName(atIndex: index.index),
+            impl.columnName(at: index.index),
             impl.databaseValue(at: index.index))
     }
 }
