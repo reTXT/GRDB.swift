@@ -268,9 +268,9 @@ struct _SQLLimit {
 }
 
 
-// MARK: - _SQLExpressionType
+// MARK: - _SQLExpressible
 
-public protocol _SQLExpressionType {
+public protocol _SQLExpressible {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.
@@ -279,7 +279,7 @@ public protocol _SQLExpressionType {
     var sqlExpression: _SQLExpression { get }
 }
 
-// Conformance to _SQLExpressionType
+// Conformance to _SQLExpressible
 extension DatabaseValueConvertible {
     
     /// This property is an implementation detail of the query interface.
@@ -295,11 +295,20 @@ extension DatabaseValueConvertible {
 /// Do not use it directly.
 ///
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
-public protocol _SQLDerivedExpressionType : _SQLExpressionType, _SQLSortDescriptorType, _SQLSelectable {
+public protocol _PrivateSQLExpressible : _SQLExpressible, _SQLSortDescriptorType, _SQLSelectable {
+    // _SQLExpressible can be adopted by Swift standard types, and user types,
+    // through the DatabaseValueConvertible protocol, which inherits
+    // from _SQLExpressible.
+    //
+    // For example, Int adopts DatabaseValueConvertible.
+    //
+    // _PrivateSQLExpressible, on the other side, is not adopted by any
+    // Swift standard type or any user type. It is only adopted by GRDB
+    // types, such as SQLColumn, _SQLExpression and _SQLLiteral.
 }
 
 // Conformance to _SQLSortDescriptorType
-extension _SQLDerivedExpressionType {
+extension _PrivateSQLExpressible {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.
@@ -319,7 +328,7 @@ extension _SQLDerivedExpressionType {
 }
 
 // Conformance to _SQLSelectable
-extension _SQLDerivedExpressionType {
+extension _PrivateSQLExpressible {
     
     /// This method is an implementation detail of the query interface.
     /// Do not use it directly.
@@ -346,7 +355,7 @@ extension _SQLDerivedExpressionType {
     }
 }
 
-extension _SQLDerivedExpressionType {
+extension _PrivateSQLExpressible {
     
     /// Returns a value that can be used as an argument to FetchRequest.order()
     ///
@@ -572,7 +581,7 @@ public indirect enum _SQLExpression {
     }
 }
 
-extension _SQLExpression : _SQLDerivedExpressionType {
+extension _SQLExpression : _PrivateSQLExpressible {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.
@@ -654,7 +663,7 @@ struct _SQLLiteral {
     }
 }
 
-extension _SQLLiteral : _SQLDerivedExpressionType {
+extension _SQLLiteral : _PrivateSQLExpressible {
     var sqlExpression: _SQLExpression {
         return .literal(sql)
     }
@@ -684,7 +693,7 @@ public struct SQLColumn {
     }
 }
 
-extension SQLColumn : _SQLDerivedExpressionType {
+extension SQLColumn : _PrivateSQLExpressible {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.

@@ -63,7 +63,7 @@ extension FetchRequest {
     /// Returns a new FetchRequest with the provided *predicate* added to the
     /// eventual set of already applied predicates.
     @warn_unused_result
-    public func filter(_ predicate: _SQLExpressionType) -> FetchRequest<T> {
+    public func filter(_ predicate: _SQLExpressible) -> FetchRequest<T> {
         var query = self.query
         if let whereExpression = query.whereExpression {
             query.whereExpression = .infixOperator("AND", whereExpression, predicate.sqlExpression)
@@ -82,13 +82,13 @@ extension FetchRequest {
     
     /// Returns a new FetchRequest grouped according to *expressions*.
     @warn_unused_result
-    public func group(_ expressions: _SQLExpressionType...) -> FetchRequest<T> {
+    public func group(_ expressions: _SQLExpressible...) -> FetchRequest<T> {
         return group(expressions)
     }
     
     /// Returns a new FetchRequest grouped according to *expressions*.
     @warn_unused_result
-    public func group(_ expressions: [_SQLExpressionType]) -> FetchRequest<T> {
+    public func group(_ expressions: [_SQLExpressible]) -> FetchRequest<T> {
         var query = self.query
         query.groupByExpressions = expressions.map { $0.sqlExpression }
         return FetchRequest(query: query)
@@ -103,7 +103,7 @@ extension FetchRequest {
     /// Returns a new FetchRequest with the provided *predicate* added to the
     /// eventual set of already applied predicates.
     @warn_unused_result
-    public func having(_ predicate: _SQLExpressionType) -> FetchRequest<T> {
+    public func having(_ predicate: _SQLExpressible) -> FetchRequest<T> {
         var query = self.query
         if let havingExpression = query.havingExpression {
             query.havingExpression = (havingExpression && predicate).sqlExpression
@@ -182,7 +182,7 @@ extension FetchRequest {
     
     /// Returns an SQL expression that checks the inclusion of a value in
     /// the results of another request.
-    public func contains(_ element: _SQLExpressionType) -> _SQLExpression {
+    public func contains(_ element: _SQLExpressible) -> _SQLExpression {
         return .inSubQuery(query, element.sqlExpression)
     }
     
@@ -276,7 +276,7 @@ extension TableMapping {
     
     /// Returns a FetchRequest with the provided *predicate*.
     @warn_unused_result
-    public static func filter(predicate: _SQLExpressionType) -> FetchRequest<Self> {
+    public static func filter(predicate: _SQLExpressible) -> FetchRequest<Self> {
         return all().filter(predicate)
     }
     
