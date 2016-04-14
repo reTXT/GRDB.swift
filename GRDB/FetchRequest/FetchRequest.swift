@@ -586,8 +586,8 @@ extension Row {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(idColumn, nameColumn)
     ///     for row in Row.fetch(db, request) {
-    ///         let id: Int64 = row.value(atIndex: 0)
-    ///         let name: String = row.value(atIndex: 1)
+    ///         let id: Int64 = row.value(at: 0)
+    ///         let name: String = row.value(at: 1)
     ///     }
     ///
     /// Fetched rows are reused during the sequence iteration: don't wrap a row
