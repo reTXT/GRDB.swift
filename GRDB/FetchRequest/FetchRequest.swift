@@ -120,24 +120,24 @@ extension FetchRequest {
         return having(_SQLLiteral(sql))
     }
     
-    /// Returns a new FetchRequest with the provided *sortDescriptors* added to
-    /// the eventual set of already applied sort descriptors.
+    /// Returns a new FetchRequest with the provided *orderings* added to
+    /// the eventual set of already applied orderings.
     @warn_unused_result
-    public func order(_ sortDescriptors: _SQLSortDescriptorType...) -> FetchRequest<T> {
-        return order(sortDescriptors)
+    public func order(_ orderings: _SQLOrdering...) -> FetchRequest<T> {
+        return order(orderings)
     }
     
-    /// Returns a new FetchRequest with the provided *sortDescriptors* added to
-    /// the eventual set of already applied sort descriptors.
+    /// Returns a new FetchRequest with the provided *orderings* added to
+    /// the eventual set of already applied orderings.
     @warn_unused_result
-    public func order(_ sortDescriptors: [_SQLSortDescriptorType]) -> FetchRequest<T> {
+    public func order(_ orderings: [_SQLOrdering]) -> FetchRequest<T> {
         var query = self.query
-        query.sortDescriptors.append(contentsOf: sortDescriptors)
+        query.orderings.append(contentsOf: orderings)
         return FetchRequest(query: query)
     }
     
     /// Returns a new FetchRequest with the provided *sql* added to the
-    /// eventual set of already applied sort descriptors.
+    /// eventual set of already applied orderings.
     @warn_unused_result
     public func order(sql: String) -> FetchRequest<T> {
         return order([_SQLLiteral(sql)])
@@ -287,17 +287,17 @@ extension TableMapping {
     }
     
     /// Returns a FetchRequest sorted according to the
-    /// provided *sortDescriptors*.
+    /// provided *orderings*.
     @warn_unused_result
-    public static func order(_ sortDescriptors: _SQLSortDescriptorType...) -> FetchRequest<Self> {
-        return all().order(sortDescriptors)
+    public static func order(_ orderings: _SQLOrdering...) -> FetchRequest<Self> {
+        return all().order(orderings)
     }
     
     /// Returns a FetchRequest sorted according to the
-    /// provided *sortDescriptors*.
+    /// provided *orderings*.
     @warn_unused_result
-    public static func order(_ sortDescriptors: [_SQLSortDescriptorType]) -> FetchRequest<Self> {
-        return all().order(sortDescriptors)
+    public static func order(_ orderings: [_SQLOrdering]) -> FetchRequest<Self> {
+        return all().order(orderings)
     }
     
     /// Returns a FetchRequest sorted according to *sql*.

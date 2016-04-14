@@ -12,7 +12,7 @@ public struct _SQLSelectQuery {
     var source: _SQLSource?
     var whereExpression: _SQLExpression?
     var groupByExpressions: [_SQLExpression]
-    var sortDescriptors: [_SQLSortDescriptorType]
+    var orderings: [_SQLOrdering]
     var reversed: Bool
     var havingExpression: _SQLExpression?
     var limit: _SQLLimit?
@@ -23,7 +23,7 @@ public struct _SQLSelectQuery {
         from source: _SQLSource? = nil,
         filter whereExpression: _SQLExpression? = nil,
         groupBy groupByExpressions: [_SQLExpression] = [],
-        orderBy sortDescriptors: [_SQLSortDescriptorType] = [],
+        orderBy orderings: [_SQLOrdering] = [],
         reversed: Bool = false,
         having havingExpression: _SQLExpression? = nil,
         limit: _SQLLimit? = nil)
@@ -33,7 +33,7 @@ public struct _SQLSelectQuery {
         self.source = source
         self.whereExpression = whereExpression
         self.groupByExpressions = groupByExpressions
-        self.sortDescriptors = sortDescriptors
+        self.orderings = orderings
         self.reversed = reversed
         self.havingExpression = havingExpression
         self.limit = limit
@@ -65,22 +65,22 @@ public struct _SQLSelectQuery {
             sql += try " HAVING " + havingExpression.sql(db, &bindings)
         }
         
-        var sortDescriptors = self.sortDescriptors
+        var orderings = self.orderings
         if reversed {
-            if sortDescriptors.isEmpty {
+            if orderings.isEmpty {
                 guard let source = source, case .table(let tableName, let alias) = source else {
                     throw DatabaseError(message: "can't reverse without a source table")
                 }
                 guard case let columns = try db.primaryKey(forTableName: tableName).columns where !columns.isEmpty else {
                     throw DatabaseError(message: "can't reverse a table without primary key")
                 }
-                sortDescriptors = columns.map { _SQLSortDescriptor.desc(_SQLExpression.identifier(identifier: $0, sourceName: alias)) }
+                orderings = columns.map { _SQLExpression.identifier(identifier: $0, sourceName: alias).desc }
             } else {
-                sortDescriptors = sortDescriptors.map { $0.reversedSortDescriptor }
+                orderings = orderings.map { $0.reversedOrdering }
             }
         }
-        if !sortDescriptors.isEmpty {
-            sql += try " ORDER BY " + sortDescriptors.map { try $0.orderingSQL(db, &bindings) }.joined(separator: ", ")
+        if !orderings.isEmpty {
+            sql += try " ORDER BY " + orderings.map { try $0.orderingSQL(db, &bindings) }.joined(separator: ", ")
         }
         
         if let limit = limit {
@@ -171,7 +171,7 @@ public struct _SQLSelectQuery {
     private var unorderedQuery: _SQLSelectQuery {
         var query = self
         query.reversed = false
-        query.sortDescriptors = []
+        query.orderings = []
         return query
     }
 }
@@ -202,14 +202,14 @@ indirect enum _SQLSource {
 }
 
 
-// MARK: - _SQLSortDescriptorType
+// MARK: - _SQLOrdering
 
 /// This protocol is an implementation detail of the query interface.
 /// Do not use it directly.
 ///
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
-public protocol _SQLSortDescriptorType {
-    var reversedSortDescriptor: _SQLSortDescriptor { get }
+public protocol _SQLOrdering {
+    var reversedOrdering: _SQLOrderingExpression { get }
     func orderingSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String
 }
 
@@ -217,18 +217,18 @@ public protocol _SQLSortDescriptorType {
 /// Do not use it directly.
 ///
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
-public enum _SQLSortDescriptor {
+public enum _SQLOrderingExpression {
     case asc(_SQLExpression)
     case desc(_SQLExpression)
 }
 
-extension _SQLSortDescriptor : _SQLSortDescriptorType {
+extension _SQLOrderingExpression : _SQLOrdering {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var reversedSortDescriptor: _SQLSortDescriptor {
+    public var reversedOrdering: _SQLOrderingExpression {
         switch self {
         case .asc(let expression):
             return .desc(expression)
@@ -295,7 +295,7 @@ extension DatabaseValueConvertible {
 /// Do not use it directly.
 ///
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
-public protocol _PrivateSQLExpressible : _SQLExpressible, _SQLSortDescriptorType, _SQLSelectable {
+public protocol _PrivateSQLExpressible : _SQLExpressible, _SQLOrdering, _SQLSelectable {
     // _SQLExpressible can be adopted by Swift standard types, and user types,
     // through the DatabaseValueConvertible protocol, which inherits
     // from _SQLExpressible.
@@ -307,14 +307,14 @@ public protocol _PrivateSQLExpressible : _SQLExpressible, _SQLSortDescriptorType
     // types, such as SQLColumn, _SQLExpression and _SQLLiteral.
 }
 
-// Conformance to _SQLSortDescriptorType
+// Conformance to _SQLOrdering
 extension _PrivateSQLExpressible {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var reversedSortDescriptor: _SQLSortDescriptor {
+    public var reversedOrdering: _SQLOrderingExpression {
         return .desc(sqlExpression)
     }
     
@@ -360,14 +360,14 @@ extension _PrivateSQLExpressible {
     /// Returns a value that can be used as an argument to FetchRequest.order()
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var asc: _SQLSortDescriptor {
+    public var asc: _SQLOrderingExpression {
         return .asc(sqlExpression)
     }
     
     /// Returns a value that can be used as an argument to FetchRequest.order()
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var desc: _SQLSortDescriptor {
+    public var desc: _SQLOrderingExpression {
         return .desc(sqlExpression)
     }
     

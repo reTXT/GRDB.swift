@@ -18,27 +18,27 @@ extension _SQLCollatedExpression : _SQLExpressible {
     }
 }
 
-extension _SQLCollatedExpression : _SQLSortDescriptorType {
+extension _SQLCollatedExpression : _SQLOrdering {
     
     /// This property is an implementation detail of the query interface.
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var reversedSortDescriptor: _SQLSortDescriptor {
+    public var reversedOrdering: _SQLOrderingExpression {
         return .desc(sqlExpression)
     }
     
     /// Returns a value that can be used as an argument to FetchRequest.order()
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var asc: _SQLSortDescriptor {
+    public var asc: _SQLOrderingExpression {
         return .asc(sqlExpression)
     }
     
     /// Returns a value that can be used as an argument to FetchRequest.order()
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public var desc: _SQLSortDescriptor {
+    public var desc: _SQLOrderingExpression {
         return .desc(sqlExpression)
     }
     
