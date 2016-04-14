@@ -1,7 +1,7 @@
 - [ ] Swift 3
     - [X] lowercased enum cases
-    - [ ] XXXType protocol: remove Type. Compare with Sequence vs IteratorProtocol 
-    - [ ] Compare FechtedRecordsController.record(at:NSIndexPath) with NSFetchedResultsController
+    - [X] XXXType protocol: remove Type. Compare with Sequence vs IteratorProtocol 
+    - [ ] Compare FetchedRecordsController.record(at:NSIndexPath) with NSFetchedResultsController
     - [ ] FetchedRecordsController: configure(_ cell: UITableViewCell, at indexPath: NSIndexPath)
     - [ ] Not sure: row.value(at: 0) (used to be row.value(atIndex: 0))
     - [ ] lowercase(d), uppercase(d), capitalize(d), localizedLowercase(d), etc: pick one form, and pick var or func.  
