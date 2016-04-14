@@ -39,7 +39,7 @@ public struct _SQLSelectQuery {
         self.limit = limit
     }
     
-    func sql(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    func sql(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         var sql = "SELECT"
         
         if distinct {
@@ -47,7 +47,7 @@ public struct _SQLSelectQuery {
         }
         
         assert(!selection.isEmpty)
-        sql += try " " + selection.map { try $0.resultColumnSQL(db, &bindings) }.joinWithSeparator(", ")
+        sql += try " " + selection.map { try $0.resultColumnSQL(db, &bindings) }.joined(separator: ", ")
         
         if let source = source {
             sql += try " FROM " + source.sql(db, &bindings)
@@ -58,7 +58,7 @@ public struct _SQLSelectQuery {
         }
         
         if !groupByExpressions.isEmpty {
-            sql += try " GROUP BY " + groupByExpressions.map { try $0.sql(db, &bindings) }.joinWithSeparator(", ")
+            sql += try " GROUP BY " + groupByExpressions.map { try $0.sql(db, &bindings) }.joined(separator: ", ")
         }
         
         if let havingExpression = havingExpression {
@@ -71,7 +71,7 @@ public struct _SQLSelectQuery {
                 guard let source = source, case .Table(let tableName, let alias) = source else {
                     throw DatabaseError(message: "can't reverse without a source table")
                 }
-                guard case let columns = try db.primaryKey(tableName).columns where !columns.isEmpty else {
+                guard case let columns = try db.primaryKey(forTableName: tableName).columns where !columns.isEmpty else {
                     throw DatabaseError(message: "can't reverse a table without primary key")
                 }
                 sortDescriptors = columns.map { _SQLSortDescriptor.Desc(_SQLExpression.Identifier(identifier: $0, sourceName: alias)) }
@@ -80,7 +80,7 @@ public struct _SQLSelectQuery {
             }
         }
         if !sortDescriptors.isEmpty {
-            sql += try " ORDER BY " + sortDescriptors.map { try $0.orderingSQL(db, &bindings) }.joinWithSeparator(", ")
+            sql += try " ORDER BY " + sortDescriptors.map { try $0.orderingSQL(db, &bindings) }.joined(separator: ", ")
         }
         
         if let limit = limit {
@@ -183,7 +183,7 @@ indirect enum _SQLSource {
     case Table(name: String, alias: String?)
     case Query(query: _SQLSelectQuery, alias: String?)
     
-    func sql(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    func sql(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         switch self {
         case .Table(let table, let alias):
             if let alias = alias {
@@ -210,7 +210,7 @@ indirect enum _SQLSource {
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
 public protocol _SQLSortDescriptorType {
     var reversedSortDescriptor: _SQLSortDescriptor { get }
-    func orderingSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String
+    func orderingSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String
 }
 
 /// This type is an implementation detail of the query interface.
@@ -241,7 +241,7 @@ extension _SQLSortDescriptor : _SQLSortDescriptorType {
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public func orderingSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    public func orderingSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         switch self {
         case .Asc(let expression):
             return try expression.sql(db, &bindings) + " ASC"
@@ -313,7 +313,7 @@ extension _SQLDerivedExpressionType {
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public func orderingSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    public func orderingSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         return try sqlExpression.sql(db, &bindings)
     }
 }
@@ -325,7 +325,7 @@ extension _SQLDerivedExpressionType {
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public func resultColumnSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    public func resultColumnSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         return try sqlExpression.sql(db, &bindings)
     }
     
@@ -333,7 +333,7 @@ extension _SQLDerivedExpressionType {
     /// Do not use it directly.
     ///
     /// See https://github.com/groue/GRDB.swift/#the-query-interface
-    public func countedSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    public func countedSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         return try sqlExpression.sql(db, &bindings)
     }
     
@@ -431,7 +431,7 @@ public indirect enum _SQLExpression {
     case CountDistinct(_SQLExpression)
     
     ///
-    func sql(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    func sql(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         switch self {
         case .Literal(let sql):
             return sql
@@ -468,7 +468,7 @@ public indirect enum _SQLExpression {
                 if expressions.isEmpty {
                     return "1"
                 } else {
-                    return try "(" + expression.sql(db, &bindings) + " NOT IN (" + expressions.map { try $0.sql(db, &bindings) }.joinWithSeparator(", ") + "))"
+                    return try "(" + expression.sql(db, &bindings) + " NOT IN (" + expressions.map { try $0.sql(db, &bindings) }.joined(separator: ", ") + "))"
                 }
                 
             case .InSubQuery(let subQuery, let expression):
@@ -549,7 +549,7 @@ public indirect enum _SQLExpression {
             guard !expressions.isEmpty else {
                 return "0"
             }
-            return try "(" + expression.sql(db, &bindings) + " IN (" + expressions.map { try $0.sql(db, &bindings) }.joinWithSeparator(", ")  + "))"
+            return try "(" + expression.sql(db, &bindings) + " IN (" + expressions.map { try $0.sql(db, &bindings) }.joined(separator: ", ")  + "))"
         
         case .InSubQuery(let subQuery, let expression):
             return try "(" + expression.sql(db, &bindings) + " IN (" + subQuery.sql(db, &bindings)  + "))"
@@ -561,7 +561,7 @@ public indirect enum _SQLExpression {
             return try "(" + value.sql(db, &bindings) + " BETWEEN " + min.sql(db, &bindings) + " AND " + max.sql(db, &bindings) + ")"
             
         case .Function(let functionName, let functionArguments):
-            return try functionName + "(" + functionArguments.map { try $0.sql(db, &bindings) }.joinWithSeparator(", ")  + ")"
+            return try functionName + "(" + functionArguments.map { try $0.sql(db, &bindings) }.joined(separator: ", ")  + ")"
             
         case .Count(let counted):
             return try "COUNT(" + counted.countedSQL(db, &bindings) + ")"
@@ -591,8 +591,8 @@ extension _SQLExpression : _SQLDerivedExpressionType {
 ///
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
 public protocol _SQLSelectable {
-    func resultColumnSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String
-    func countedSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String
+    func resultColumnSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String
+    func countedSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String
     var sqlSelectableKind: _SQLSelectableKind { get }
 }
 
@@ -612,7 +612,7 @@ enum _SQLResultColumn {
 
 extension _SQLResultColumn : _SQLSelectable {
     
-    func resultColumnSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    func resultColumnSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         switch self {
         case .Star(let sourceName):
             if let sourceName = sourceName {
@@ -625,7 +625,7 @@ extension _SQLResultColumn : _SQLSelectable {
         }
     }
     
-    func countedSQL(db: Database, inout _ bindings: [DatabaseValueConvertible?]) throws -> String {
+    func countedSQL(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         switch self {
         case .Star:
             return "*"

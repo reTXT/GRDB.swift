@@ -68,7 +68,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence of values.
     @warn_unused_result
-    public static func fetch(statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
+    public static func fetch(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
         let sqliteStatement = statement.sqliteStatement
         return statement.fetchSequence(arguments: arguments) {
             guard sqlite3_column_type(sqliteStatement, 0) != SQLITE_NULL else {
@@ -88,7 +88,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     ///     - arguments: Optional statement arguments.
     /// - returns: An array of values.
     @warn_unused_result
-    public static func fetchAll(statement: SelectStatement, arguments: StatementArguments? = nil) -> [Self] {
+    public static func fetchAll(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> [Self] {
         return Array(fetch(statement, arguments: arguments))
     }
     
@@ -102,14 +102,14 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     ///     - arguments: Optional statement arguments.
     /// - returns: An optional value.
     @warn_unused_result
-    public static func fetchOne(statement: SelectStatement, arguments: StatementArguments? = nil) -> Self? {
+    public static func fetchOne(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> Self? {
         let sqliteStatement = statement.sqliteStatement
         let sequence = statement.fetchSequence(arguments: arguments) {
             (sqlite3_column_type(sqliteStatement, 0) == SQLITE_NULL) ?
                 (nil as Self?) :
                 Self.init(sqliteStatement: sqliteStatement, index: 0)
         }
-        if let value = sequence.generate().next() {
+        if let value = sequence.makeIterator().next() {
             return value
         }
         return nil
@@ -140,7 +140,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence of values.
     @warn_unused_result
-    public static func fetch(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
+    public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
         return fetch(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -154,7 +154,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     ///     - arguments: Optional statement arguments.
     /// - returns: An array of values.
     @warn_unused_result
-    public static func fetchAll(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Self] {
+    public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Self] {
         return fetchAll(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -168,7 +168,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     ///     - arguments: Optional statement arguments.
     /// - returns: An optional value.
     @warn_unused_result
-    public static func fetchOne(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Self? {
+    public static func fetchOne(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Self? {
         return fetchOne(try! db.selectStatement(sql), arguments: arguments)
     }
 }

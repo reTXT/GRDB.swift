@@ -151,7 +151,7 @@ public final class DatabasePool {
     /// - param application: The UIApplication that will start a background
     ///   task to let the database pool release its memory when the application
     ///   enters background.
-    public func setupMemoryManagement(application application: UIApplication) {
+    public func setupMemoryManagement(application: UIApplication) {
         self.application = application
         let center = NSNotificationCenter.defaultCenter()
         center.addObserver(self, selector: #selector(DatabasePool.applicationDidReceiveMemoryWarning(_:)), name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
@@ -319,7 +319,7 @@ extension DatabasePool : DatabaseReader {
     ///     dbPool.read { db in
     ///         Int.fetchOne(db, "SELECT succ(1)") // 2
     ///     }
-    public func addFunction(function: DatabaseFunction) {
+    public func addFunction(_ function: DatabaseFunction) {
         functions.remove(function)
         functions.insert(function)
         writer.performSync { db in db.addFunction(function) }
@@ -327,7 +327,7 @@ extension DatabasePool : DatabaseReader {
     }
     
     /// Remove an SQL function.
-    public func removeFunction(function: DatabaseFunction) {
+    public func removeFunction(_ function: DatabaseFunction) {
         functions.remove(function)
         writer.performSync { db in db.removeFunction(function) }
         readerPool.forEach { $0.performSync { db in db.removeFunction(function) } }

@@ -30,7 +30,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// Record subclasses have an opportunity to complete their initialization.
     ///
     /// *Important*: subclasses must invoke super's implementation.
-    public func awakeFromFetch(row row: Row) {
+    public func awakeFromFetch(row: Row) {
         // Take care of the hasPersistentChangedValues flag. If the row does not
         /// contain all needed columns, the record turns edited.
         //
@@ -93,7 +93,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     ///         var id: Int64?
     ///         var name: String?
     ///
-    ///         func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    ///         func didInsert(withRowID rowID: Int64, forColumn column: String?) {
     ///             id = rowID
     ///         }
     ///     }
@@ -101,7 +101,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// - parameters:
     ///     - rowID: The inserted rowID.
     ///     - column: The name of the eventual INTEGER PRIMARY KEY column.
-    public func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    public func didInsert(withRowID rowID: Int64, forColumn column: String?) {
     }
     
     
@@ -140,7 +140,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// false does not prevent it from turning true on subsequent modifications
     /// of the record.
     public var hasPersistentChangedValues: Bool {
-        get { return generatePersistentChangedValues().next() != nil }
+        get { return makePersistentChangedValuesIterator().next() != nil }
         set { referenceRow = newValue ? nil : Row(persistentDictionary) }
     }
     
@@ -156,20 +156,20 @@ public class Record : RowConvertible, TableMapping, Persistable {
     public var persistentChangedValues: [String: DatabaseValue?] {
         var persistentChangedValues: [String: DatabaseValue?] = [:]
         
-        for (key, value) in generatePersistentChangedValues() {
+        for (key, value) in makePersistentChangedValuesIterator() {
             persistentChangedValues[key] = value
         }
         return persistentChangedValues    
     }
     
-    // A change generator that is used by both hasPersistentChangedValues and
+    // A change iterator that is used by both hasPersistentChangedValues and
     // persistentChangedValues properties.
-    private func generatePersistentChangedValues() -> AnyGenerator<(column: String, old: DatabaseValue?)> {
+    private func makePersistentChangedValuesIterator() -> AnyIterator<(column: String, old: DatabaseValue?)> {
         let oldRow = referenceRow
-        var newValueGenerator = persistentDictionary.generate()
-        return AnyGenerator {
+        var newValueIterator = persistentDictionary.makeIterator()
+        return AnyIterator {
             // Loop until we find a change, or exhaust columns:
-            while let (column, newValue) = newValueGenerator.next() {
+            while let (column, newValue) = newValueIterator.next() {
                 let new = newValue?.databaseValue ?? .Null
                 guard let old = oldRow?[column] else {
                     return (column: column, old: nil)
@@ -203,7 +203,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     ///
     /// - parameter db: A database connection.
     /// - throws: A DatabaseError whenever an SQLite error occurs.
-    public func insert(db: Database) throws {
+    public func insert(_ db: Database) throws {
         // The simplest code would be:
         //
         //     try performInsert(db)
@@ -221,7 +221,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
         let changes = try dataMapper.insertStatement().execute()
         if let rowID = changes.insertedRowID {
             let rowIDColumn = dataMapper.primaryKey.rowIDColumn
-            didInsertWithRowID(rowID, forColumn: rowIDColumn)
+            didInsert(withRowID: rowID, forColumn: rowIDColumn)
             
             // Update persistentDictionary with inserted id, so that we can
             // set hasPersistentChangedValues to false:
@@ -229,8 +229,8 @@ public class Record : RowConvertible, TableMapping, Persistable {
                 if persistentDictionary[rowIDColumn] != nil {
                     persistentDictionary[rowIDColumn] = rowID
                 } else {
-                    let rowIDColumn = rowIDColumn.lowercaseString
-                    for column in persistentDictionary.keys where column.lowercaseString == rowIDColumn {
+                    let rowIDColumn = rowIDColumn.lowercased()
+                    for column in persistentDictionary.keys where column.lowercased() == rowIDColumn {
                         persistentDictionary[column] = rowID
                         break
                     }
@@ -254,7 +254,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// - throws: A DatabaseError is thrown whenever an SQLite error occurs.
     ///   PersistenceError.NotFound is thrown if the primary key does not match
     ///   any row in the database and record could not be updated.
-    public func update(db: Database) throws {
+    public func update(_ db: Database) throws {
         // The simplest code would be:
         //
         //     try performUpdate(db)
@@ -293,7 +293,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// - parameter db: A database connection.
     /// - throws: A DatabaseError whenever an SQLite error occurs, or errors
     ///   thrown by update().
-    final public func save(db: Database) throws {
+    final public func save(_ db: Database) throws {
         try performSave(db)
     }
     
@@ -305,7 +305,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// - parameter db: A database connection.
     /// - returns: Whether a database row was deleted.
     /// - throws: A DatabaseError is thrown whenever an SQLite error occurs.
-    public func delete(db: Database) throws -> Bool {
+    public func delete(_ db: Database) throws -> Bool {
         defer {
             // Future calls to update() will throw NotFound. Make the user
             // a favor and make sure this error is thrown even if she checks the
@@ -330,7 +330,7 @@ extension Record : CustomStringConvertible {
                 } else {
                     return " \(key):nil"
                 }
-                }.joinWithSeparator("")
+                }.joined(separator: "")
             + ">"
     }
 }

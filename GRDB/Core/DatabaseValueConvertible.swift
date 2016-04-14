@@ -19,7 +19,7 @@ public protocol DatabaseValueConvertible : _SQLExpressionType {
     var databaseValue: DatabaseValue { get }
     
     /// Returns a value initialized from *databaseValue*, if possible.
-    static func fromDatabaseValue(databaseValue: DatabaseValue) -> Self?
+    static func from(databaseValue: DatabaseValue) -> Self?
 }
 
 
@@ -63,7 +63,7 @@ public extension DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence.
     @warn_unused_result
-    public static func fetch(statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
+    public static func fetch(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
         let sqliteStatement = statement.sqliteStatement
         return statement.fetchSequence(arguments: arguments) {
             DatabaseValue(sqliteStatement: sqliteStatement, index: 0).value()
@@ -80,7 +80,7 @@ public extension DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: An array.
     @warn_unused_result
-    public static func fetchAll(statement: SelectStatement, arguments: StatementArguments? = nil) -> [Self] {
+    public static func fetchAll(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> [Self] {
         return Array(fetch(statement, arguments: arguments))
     }
     
@@ -97,11 +97,11 @@ public extension DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: An optional value.
     @warn_unused_result
-    public static func fetchOne(statement: SelectStatement, arguments: StatementArguments? = nil) -> Self? {
+    public static func fetchOne(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> Self? {
         let sequence = statement.fetchSequence(arguments: arguments) {
-            fromDatabaseValue(DatabaseValue(sqliteStatement: statement.sqliteStatement, index: 0))
+            from(databaseValue: DatabaseValue(sqliteStatement: statement.sqliteStatement, index: 0))
         }
-        if let value = sequence.generate().next() {
+        if let value = sequence.makeIterator().next() {
             return value
         }
         return nil
@@ -132,7 +132,7 @@ public extension DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence.
     @warn_unused_result
-    public static func fetch(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
+    public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
         return fetch(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -146,7 +146,7 @@ public extension DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: An array.
     @warn_unused_result
-    public static func fetchAll(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Self] {
+    public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Self] {
         return fetchAll(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -163,7 +163,7 @@ public extension DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: An optional value.
     @warn_unused_result
-    public static func fetchOne(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Self? {
+    public static func fetchOne(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Self? {
         return fetchOne(try! db.selectStatement(sql), arguments: arguments)
     }
 }
@@ -207,10 +207,10 @@ public extension Optional where Wrapped: DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence of optional values.
     @warn_unused_result
-    public static func fetch(statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Wrapped?> {
+    public static func fetch(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Wrapped?> {
         let sqliteStatement = statement.sqliteStatement
         return statement.fetchSequence(arguments: arguments) {
-            Wrapped.fromDatabaseValue(DatabaseValue(sqliteStatement: sqliteStatement, index: 0))
+            Wrapped.from(databaseValue: DatabaseValue(sqliteStatement: sqliteStatement, index: 0))
         }
     }
     
@@ -224,7 +224,7 @@ public extension Optional where Wrapped: DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: An array of optional values.
     @warn_unused_result
-    public static func fetchAll(statement: SelectStatement, arguments: StatementArguments? = nil) -> [Wrapped?] {
+    public static func fetchAll(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> [Wrapped?] {
         return Array(fetch(statement, arguments: arguments))
     }
     
@@ -253,7 +253,7 @@ public extension Optional where Wrapped: DatabaseValueConvertible {
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence of optional values.
     @warn_unused_result
-    public static func fetch(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Wrapped?> {
+    public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Wrapped?> {
         return fetch(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -267,7 +267,7 @@ public extension Optional where Wrapped: DatabaseValueConvertible {
     ///     - parameter arguments: Optional statement arguments.
     /// - returns: An array of optional values.
     @warn_unused_result
-    public static func fetchAll(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Wrapped?] {
+    public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Wrapped?] {
         return fetchAll(try! db.selectStatement(sql), arguments: arguments)
     }
 }

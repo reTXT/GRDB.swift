@@ -38,7 +38,7 @@ final class SerializedDatabase {
         queue = dispatch_queue_create("GRDB.SerializedDatabase", nil)
         
         // Activate database.preconditionValidQueue()
-        let dispatchQueueID = unsafeBitCast(db, UnsafeMutablePointer<Void>.self)
+        let dispatchQueueID = unsafeBitCast(db, to: UnsafeMutablePointer<Void>.self)
         dispatch_queue_set_specific(queue, Database.dispatchQueueIDKey, dispatchQueueID, nil)
         db.dispatchQueueID = dispatchQueueID
     }
@@ -94,7 +94,7 @@ final class SerializedDatabase {
     }
     
     /// Fatal error if current dispatch queue is not valid.
-    func preconditionValidQueue(@autoclosure message: () -> String = "Database was not used on the correct thread.", file: StaticString = #file, line: UInt = #line) {
+    func preconditionValidQueue(@autoclosure _ message: () -> String = "Database was not used on the correct thread.", file: StaticString = #file, line: UInt = #line) {
         db.preconditionValidQueue(message, file: file, line: line)
     }
 }

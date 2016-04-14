@@ -15,27 +15,27 @@ class DatabaseSchemaCache: DatabaseSchemaCacheType {
         selectStatements = [:]
     }
     
-    func primaryKey(tableName tableName: String) -> PrimaryKey? {
+    func primaryKey(forTableName tableName: String) -> PrimaryKey? {
         return primaryKeys[tableName]
     }
     
-    func setPrimaryKey(primaryKey: PrimaryKey, forTableName tableName: String) {
+    func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String) {
         primaryKeys[tableName] = primaryKey
     }
     
-    func updateStatement(sql sql: String) -> UpdateStatement? {
+    func updateStatement(sql: String) -> UpdateStatement? {
         return updateStatements[sql]
     }
     
-    func setUpdateStatement(statement: UpdateStatement, forSQL sql: String) {
+    func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String) {
         updateStatements[sql] = statement
     }
     
-    func selectStatement(sql sql: String) -> SelectStatement? {
+    func selectStatement(sql: String) -> SelectStatement? {
         return selectStatements[sql]
     }
     
-    func setSelectStatement(statement: SelectStatement, forSQL sql: String) {
+    func setSelectStatement(_ statement: SelectStatement, forSQL sql: String) {
         selectStatements[sql] = statement
     }
 }
@@ -48,27 +48,27 @@ struct SharedDatabaseSchemaCache: DatabaseSchemaCacheType {
         cache.write { $0.clear() }
     }
     
-    func primaryKey(tableName tableName: String) -> PrimaryKey? {
-        return cache.read { $0.primaryKey(tableName: tableName) }
+    func primaryKey(forTableName tableName: String) -> PrimaryKey? {
+        return cache.read { $0.primaryKey(forTableName: tableName) }
     }
     
-    mutating func setPrimaryKey(primaryKey: PrimaryKey, forTableName tableName: String) {
+    mutating func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String) {
         cache.write { $0.setPrimaryKey(primaryKey, forTableName: tableName) }
     }
     
-    func updateStatement(sql sql: String) -> UpdateStatement? {
+    func updateStatement(sql: String) -> UpdateStatement? {
         return cache.read { $0.updateStatement(sql: sql) }
     }
     
-    mutating func setUpdateStatement(statement: UpdateStatement, forSQL sql: String) {
+    mutating func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String) {
         cache.write { $0.setUpdateStatement(statement, forSQL: sql) }
     }
     
-    func selectStatement(sql sql: String) -> SelectStatement? {
+    func selectStatement(sql: String) -> SelectStatement? {
         return cache.read { $0.selectStatement(sql: sql) }
     }
     
-    mutating func setSelectStatement(statement: SelectStatement, forSQL sql: String) {
+    mutating func setSelectStatement(_ statement: SelectStatement, forSQL sql: String) {
         cache.write { $0.setSelectStatement(statement, forSQL: sql) }
     }
 }

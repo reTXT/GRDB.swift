@@ -18,7 +18,7 @@ class DatabaseStore {
         }
         
         let databaseFileName = (path as NSString).lastPathComponent
-        let directoryPath = (path as NSString).stringByDeletingLastPathComponent
+        let directoryPath = (path as NSString).deletingLastPathComponent
         
         // Apply file attributes on existing files
         DatabaseStore.setFileAttributes(
@@ -33,7 +33,7 @@ class DatabaseStore {
         let directoryDescriptor = open(directoryPath, O_EVTONLY)
         guard directoryDescriptor != -1 else {
             // Let NSFileManager throw a nice NSError
-            try NSFileManager.defaultManager().contentsOfDirectoryAtPath(directoryPath)
+            try NSFileManager.defaultManager().contentsOfDirectory(atPath: directoryPath)
             // Come on, NSFileManager... OK just throw something that is somewhat relevant
             throw NSError(domain: NSCocoaErrorDomain, code: NSFileReadUnknownError, userInfo: nil)
         }
@@ -63,12 +63,12 @@ class DatabaseStore {
         }
     }
     
-    private static func setFileAttributes(directoryPath directoryPath: String, databaseFileName: String, attributes: [String: AnyObject]) {
+    private static func setFileAttributes(directoryPath: String, databaseFileName: String, attributes: [String: AnyObject]) {
         let fm = NSFileManager.defaultManager()
-        let fileNames = try! fm.contentsOfDirectoryAtPath(directoryPath).filter({ $0.hasPrefix(databaseFileName) })
+        let fileNames = try! fm.contentsOfDirectory(atPath: directoryPath).filter({ $0.hasPrefix(databaseFileName) })
         for fileName in fileNames {
             do {
-                try fm.setAttributes(attributes, ofItemAtPath: (directoryPath as NSString).stringByAppendingPathComponent(fileName))
+                try fm.setAttributes(attributes, ofItemAtPath: (directoryPath as NSString).appendingPathComponent(fileName))
             } catch let error as NSError {
                 guard error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError else {
                     try! { throw error }()

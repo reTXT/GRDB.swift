@@ -403,7 +403,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
         didSet {
             guard let observer = observer else { return }
             databaseWriter.write { db in
-                observer.checkForChangesInDatabase(db)
+                observer.checkForChanges(inDatabase: db)
             }
         }
     }
@@ -518,7 +518,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
     }
     
     /// Part of the TransactionObserverType protocol
-    func databaseDidChangeWithEvent(event: DatabaseEvent) {
+    func databaseDidChange(withEvent event: DatabaseEvent) {
         if observedTables.contains(event.tableName) {
             needsComputeChanges = true
         }
@@ -528,12 +528,12 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
     func databaseWillCommit() throws { }
     
     /// Part of the TransactionObserverType protocol
-    func databaseDidRollback(db: Database) {
+    func databaseDidRollback(_ db: Database) {
         needsComputeChanges = false
     }
     
     /// Part of the TransactionObserverType protocol
-    func databaseDidCommit(db: Database) {
+    func databaseDidCommit(_ db: Database) {
         // The databaseDidCommit callback is called in the database writer
         // dispatch queue, which is serialized: it is guaranteed to process the
         // last database transaction.
@@ -542,12 +542,12 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
         guard needsComputeChanges else { return }
         needsComputeChanges = false
         
-        checkForChangesInDatabase(db)
+        checkForChanges(inDatabase: db)
     }
     
     // Precondition: this method must be called from the database writer's
     // serialized dispatch queue.
-    func checkForChangesInDatabase(db: Database) {
+    func checkForChanges(inDatabase db: Database) {
         // Invalidated?
         guard let controller = self.controller else { return }
         
@@ -940,7 +940,7 @@ private enum DatabaseSource<T> {
     case sql(String, StatementArguments?)
     case fetchRequest(FetchRequest<T>)
     
-    func selectStatement(db: Database) throws -> SelectStatement {
+    func selectStatement(_ db: Database) throws -> SelectStatement {
         switch self {
         case .sql(let sql, let arguments):
             let statement = try db.selectStatement(sql)

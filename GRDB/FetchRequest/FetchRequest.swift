@@ -13,7 +13,7 @@ public struct FetchRequest<T> {
     ///
     /// - throws: A DatabaseError whenever SQLite could not parse the sql query.
     @warn_unused_result
-    public func selectStatement(database: Database) throws -> SelectStatement {
+    public func selectStatement(_ database: Database) throws -> SelectStatement {
         // TODO: split statement generation from arguments building
         var bindings: [DatabaseValueConvertible?] = []
         let sql = try query.sql(database, &bindings)
@@ -34,13 +34,13 @@ extension FetchRequest {
     
     /// Returns a new FetchRequest with a new net of selected columns.
     @warn_unused_result
-    public func select(selection: _SQLSelectable...) -> FetchRequest<T> {
+    public func select(_ selection: _SQLSelectable...) -> FetchRequest<T> {
         return select(selection)
     }
     
     /// Returns a new FetchRequest with a new net of selected columns.
     @warn_unused_result
-    public func select(selection: [_SQLSelectable]) -> FetchRequest<T> {
+    public func select(_ selection: [_SQLSelectable]) -> FetchRequest<T> {
         var query = self.query
         query.selection = selection
         return FetchRequest(query: query)
@@ -48,12 +48,13 @@ extension FetchRequest {
     
     /// Returns a new FetchRequest with a new net of selected columns.
     @warn_unused_result
-    public func select(sql sql: String) -> FetchRequest<T> {
+    public func select(sql: String) -> FetchRequest<T> {
         return select(_SQLLiteral(sql))
     }
     
     /// Returns a new FetchRequest which returns distinct rows.
     public var distinct: FetchRequest<T> {
+        /// TODO: turn into a function
         var query = self.query
         query.distinct = true
         return FetchRequest(query: query)
@@ -62,7 +63,7 @@ extension FetchRequest {
     /// Returns a new FetchRequest with the provided *predicate* added to the
     /// eventual set of already applied predicates.
     @warn_unused_result
-    public func filter(predicate: _SQLExpressionType) -> FetchRequest<T> {
+    public func filter(_ predicate: _SQLExpressionType) -> FetchRequest<T> {
         var query = self.query
         if let whereExpression = query.whereExpression {
             query.whereExpression = .InfixOperator("AND", whereExpression, predicate.sqlExpression)
@@ -75,19 +76,19 @@ extension FetchRequest {
     /// Returns a new FetchRequest with the provided *predicate* added to the
     /// eventual set of already applied predicates.
     @warn_unused_result
-    public func filter(sql sql: String) -> FetchRequest<T> {
+    public func filter(sql: String) -> FetchRequest<T> {
         return filter(_SQLLiteral(sql))
     }
     
     /// Returns a new FetchRequest grouped according to *expressions*.
     @warn_unused_result
-    public func group(expressions: _SQLExpressionType...) -> FetchRequest<T> {
+    public func group(_ expressions: _SQLExpressionType...) -> FetchRequest<T> {
         return group(expressions)
     }
     
     /// Returns a new FetchRequest grouped according to *expressions*.
     @warn_unused_result
-    public func group(expressions: [_SQLExpressionType]) -> FetchRequest<T> {
+    public func group(_ expressions: [_SQLExpressionType]) -> FetchRequest<T> {
         var query = self.query
         query.groupByExpressions = expressions.map { $0.sqlExpression }
         return FetchRequest(query: query)
@@ -95,14 +96,14 @@ extension FetchRequest {
     
     /// Returns a new FetchRequest with a new grouping.
     @warn_unused_result
-    public func group(sql sql: String) -> FetchRequest<T> {
+    public func group(sql: String) -> FetchRequest<T> {
         return group(_SQLLiteral(sql))
     }
     
     /// Returns a new FetchRequest with the provided *predicate* added to the
     /// eventual set of already applied predicates.
     @warn_unused_result
-    public func having(predicate: _SQLExpressionType) -> FetchRequest<T> {
+    public func having(_ predicate: _SQLExpressionType) -> FetchRequest<T> {
         var query = self.query
         if let havingExpression = query.havingExpression {
             query.havingExpression = (havingExpression && predicate).sqlExpression
@@ -115,30 +116,30 @@ extension FetchRequest {
     /// Returns a new FetchRequest with the provided *sql* added to
     /// the eventual set of already applied predicates.
     @warn_unused_result
-    public func having(sql sql: String) -> FetchRequest<T> {
+    public func having(sql: String) -> FetchRequest<T> {
         return having(_SQLLiteral(sql))
     }
     
     /// Returns a new FetchRequest with the provided *sortDescriptors* added to
     /// the eventual set of already applied sort descriptors.
     @warn_unused_result
-    public func order(sortDescriptors: _SQLSortDescriptorType...) -> FetchRequest<T> {
+    public func order(_ sortDescriptors: _SQLSortDescriptorType...) -> FetchRequest<T> {
         return order(sortDescriptors)
     }
     
     /// Returns a new FetchRequest with the provided *sortDescriptors* added to
     /// the eventual set of already applied sort descriptors.
     @warn_unused_result
-    public func order(sortDescriptors: [_SQLSortDescriptorType]) -> FetchRequest<T> {
+    public func order(_ sortDescriptors: [_SQLSortDescriptorType]) -> FetchRequest<T> {
         var query = self.query
-        query.sortDescriptors.appendContentsOf(sortDescriptors)
+        query.sortDescriptors.append(contentsOf: sortDescriptors)
         return FetchRequest(query: query)
     }
     
     /// Returns a new FetchRequest with the provided *sql* added to the
     /// eventual set of already applied sort descriptors.
     @warn_unused_result
-    public func order(sql sql: String) -> FetchRequest<T> {
+    public func order(sql: String) -> FetchRequest<T> {
         return order([_SQLLiteral(sql)])
     }
     
@@ -153,7 +154,7 @@ extension FetchRequest {
     /// Returns a FetchRequest which fetches *limit* rows, starting at
     /// *offset*.
     @warn_unused_result
-    public func limit(limit: Int, offset: Int? = nil) -> FetchRequest<T> {
+    public func limit(_ limit: Int, offset: Int? = nil) -> FetchRequest<T> {
         var query = self.query
         query.limit = _SQLLimit(limit: limit, offset: offset)
         return FetchRequest(query: query)
@@ -169,7 +170,7 @@ extension FetchRequest {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public func fetchCount(db: Database) -> Int {
+    public func fetchCount(_ db: Database) -> Int {
         return Int.fetchOne(db, FetchRequest(query: query.countQuery))!
     }
 }
@@ -181,7 +182,7 @@ extension FetchRequest {
     
     /// Returns an SQL expression that checks the inclusion of a value in
     /// the results of another request.
-    public func contains(element: _SQLExpressionType) -> _SQLExpression {
+    public func contains(_ element: _SQLExpressionType) -> _SQLExpression {
         return .InSubQuery(query, element.sqlExpression)
     }
     
@@ -215,7 +216,7 @@ extension FetchRequest where T: RowConvertible {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements are undefined.
     @warn_unused_result
-    public func fetch(db: Database) -> DatabaseSequence<T> {
+    public func fetch(_ db: Database) -> DatabaseSequence<T> {
         return try! T.fetch(selectStatement(db))
     }
     
@@ -227,7 +228,7 @@ extension FetchRequest where T: RowConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public func fetchAll(db: Database) -> [T] {
+    public func fetchAll(_ db: Database) -> [T] {
         return Array(fetch(db))
     }
     
@@ -239,8 +240,8 @@ extension FetchRequest where T: RowConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public func fetchOne(db: Database) -> T? {
-        return fetch(db).generate().next()
+    public func fetchOne(_ db: Database) -> T? {
+        return fetch(db).makeIterator().next()
     }
 }
 
@@ -257,19 +258,19 @@ extension TableMapping {
     
     /// Returns a FetchRequest which selects *selection*.
     @warn_unused_result
-    public static func select(selection: _SQLSelectable...) -> FetchRequest<Self> {
+    public static func select(_ selection: _SQLSelectable...) -> FetchRequest<Self> {
         return all().select(selection)
     }
     
     /// Returns a FetchRequest which selects *selection*.
     @warn_unused_result
-    public static func select(selection: [_SQLSelectable]) -> FetchRequest<Self> {
+    public static func select(_ selection: [_SQLSelectable]) -> FetchRequest<Self> {
         return all().select(selection)
     }
     
     /// Returns a FetchRequest which selects *sql*.
     @warn_unused_result
-    public static func select(sql sql: String) -> FetchRequest<Self> {
+    public static func select(sql: String) -> FetchRequest<Self> {
         return all().select(sql: sql)
     }
     
@@ -281,7 +282,7 @@ extension TableMapping {
     
     /// Returns a FetchRequest with the provided *predicate*.
     @warn_unused_result
-    public static func filter(sql sql: String) -> FetchRequest<Self> {
+    public static func filter(sql: String) -> FetchRequest<Self> {
         return all().filter(sql: sql)
     }
     
@@ -301,7 +302,7 @@ extension TableMapping {
     
     /// Returns a FetchRequest sorted according to *sql*.
     @warn_unused_result
-    public static func order(sql sql: String) -> FetchRequest<Self> {
+    public static func order(sql: String) -> FetchRequest<Self> {
         return all().order(sql: sql)
     }
     
@@ -322,7 +323,7 @@ extension TableMapping {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchCount(db: Database) -> Int {
+    public static func fetchCount(_ db: Database) -> Int {
         return all().fetchCount(db)
     }
 }
@@ -350,7 +351,7 @@ extension DatabaseValueConvertible {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements are undefined.
     @warn_unused_result
-    public static func fetch<T>(db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Self> {
+    public static func fetch<T>(_ db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Self> {
         return try! fetch(request.selectStatement(db))
     }
     
@@ -362,7 +363,7 @@ extension DatabaseValueConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchAll<T>(db: Database, _ request: FetchRequest<T>) -> [Self] {
+    public static func fetchAll<T>(_ db: Database, _ request: FetchRequest<T>) -> [Self] {
         return try! fetchAll(request.selectStatement(db))
     }
     
@@ -377,7 +378,7 @@ extension DatabaseValueConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchOne<T>(db: Database, _ request: FetchRequest<T>) -> Self? {
+    public static func fetchOne<T>(_ db: Database, _ request: FetchRequest<T>) -> Self? {
         return try! fetchOne(request.selectStatement(db))
     }
 }
@@ -405,7 +406,7 @@ extension Optional where Wrapped: DatabaseValueConvertible {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements are undefined.
     @warn_unused_result
-    public static func fetch<T>(db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Wrapped?> {
+    public static func fetch<T>(_ db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Wrapped?> {
         return try! fetch(request.selectStatement(db))
     }
     
@@ -417,7 +418,7 @@ extension Optional where Wrapped: DatabaseValueConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchAll<T>(db: Database, _ request: FetchRequest<T>) -> [Wrapped?] {
+    public static func fetchAll<T>(_ db: Database, _ request: FetchRequest<T>) -> [Wrapped?] {
         return try! fetchAll(request.selectStatement(db))
     }
 }
@@ -445,7 +446,7 @@ extension DatabaseValueConvertible where Self: StatementColumnConvertible {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements are undefined.
     @warn_unused_result
-    public static func fetch<T>(db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Self> {
+    public static func fetch<T>(_ db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Self> {
         return try! fetch(request.selectStatement(db))
     }
     
@@ -457,7 +458,7 @@ extension DatabaseValueConvertible where Self: StatementColumnConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchAll<T>(db: Database, _ request: FetchRequest<T>) -> [Self] {
+    public static func fetchAll<T>(_ db: Database, _ request: FetchRequest<T>) -> [Self] {
         return try! fetchAll(request.selectStatement(db))
     }
     
@@ -472,7 +473,7 @@ extension DatabaseValueConvertible where Self: StatementColumnConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchOne<T>(db: Database, _ request: FetchRequest<T>) -> Self? {
+    public static func fetchOne<T>(_ db: Database, _ request: FetchRequest<T>) -> Self? {
         return try! fetchOne(request.selectStatement(db))
     }
 }
@@ -500,7 +501,7 @@ extension RowConvertible {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements are undefined.
     @warn_unused_result
-    public static func fetch<T>(db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Self> {
+    public static func fetch<T>(_ db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Self> {
         return try! fetch(request.selectStatement(db))
     }
     
@@ -512,7 +513,7 @@ extension RowConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchAll<T>(db: Database, _ request: FetchRequest<T>) -> [Self] {
+    public static func fetchAll<T>(_ db: Database, _ request: FetchRequest<T>) -> [Self] {
         return try! fetchAll(request.selectStatement(db))
     }
     
@@ -524,7 +525,7 @@ extension RowConvertible {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchOne<T>(db: Database, _ request: FetchRequest<T>) -> Self? {
+    public static func fetchOne<T>(_ db: Database, _ request: FetchRequest<T>) -> Self? {
         return try! fetchOne(request.selectStatement(db))
     }
 }
@@ -549,7 +550,7 @@ extension RowConvertible where Self: TableMapping {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements are undefined.
     @warn_unused_result
-    public static func fetch(db: Database) -> DatabaseSequence<Self> {
+    public static func fetch(_ db: Database) -> DatabaseSequence<Self> {
         return all().fetch(db)
     }
     
@@ -559,7 +560,7 @@ extension RowConvertible where Self: TableMapping {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchAll(db: Database) -> [Self] {
+    public static func fetchAll(_ db: Database) -> [Self] {
         return all().fetchAll(db)
     }
     
@@ -569,7 +570,7 @@ extension RowConvertible where Self: TableMapping {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchOne(db: Database) -> Self? {
+    public static func fetchOne(_ db: Database) -> Self? {
         return all().fetchOne(db)
     }
 }
@@ -609,7 +610,7 @@ extension Row {
     /// If the database is modified while the sequence is iterating, the
     /// remaining elements of the sequence are undefined.
     @warn_unused_result
-    public static func fetch<T>(db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Row> {
+    public static func fetch<T>(_ db: Database, _ request: FetchRequest<T>) -> DatabaseSequence<Row> {
         return try! fetch(request.selectStatement(db))
     }
     
@@ -622,7 +623,7 @@ extension Row {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchAll<T>(db: Database, _ request: FetchRequest<T>) -> [Row] {
+    public static func fetchAll<T>(_ db: Database, _ request: FetchRequest<T>) -> [Row] {
         return try! fetchAll(request.selectStatement(db))
     }
     
@@ -635,7 +636,7 @@ extension Row {
     ///
     /// - parameter db: A database connection.
     @warn_unused_result
-    public static func fetchOne<T>(db: Database, _ request: FetchRequest<T>) -> Row? {
+    public static func fetchOne<T>(_ db: Database, _ request: FetchRequest<T>) -> Row? {
         return try! fetchOne(request.selectStatement(db))
     }
 }

@@ -29,21 +29,21 @@ extension String {
 /// Return as many question marks separated with commas as the *count* argument.
 ///
 ///     databaseQuestionMarks(count: 3) // "?,?,?"
-public func databaseQuestionMarks(count count: Int) -> String {
-    return Array(count: count, repeatedValue: "?").joinWithSeparator(",")
+public func databaseQuestionMarks(count: Int) -> String {
+    return Array(repeating: "?", count: count).joined(separator: ",")
 }
 
 
 // MARK: - Internal
 
-let SQLITE_TRANSIENT = unsafeBitCast(COpaquePointer(bitPattern: -1), sqlite3_destructor_type.self)
+let SQLITE_TRANSIENT = unsafeBitCast(OpaquePointer(bitPattern: -1), to: sqlite3_destructor_type.self)
 
 /// Custom precondition function which aims at solving
 /// https://bugs.swift.org/browse/SR-905 and
 /// https://github.com/groue/GRDB.swift/issues/37
 ///
 /// TODO: remove this function when https://bugs.swift.org/browse/SR-905 is solved.
-func GRDBPrecondition(@autoclosure condition: () -> Bool, @autoclosure _ message: () -> String = "", file: StaticString = #file, line: UInt = #line) {
+func GRDBPrecondition(@autoclosure _ condition: () -> Bool, @autoclosure _ message: () -> String = "", file: StaticString = #file, line: UInt = #line) {
     if !condition() {
         fatalError(message, file: file, line: line)
     }
@@ -51,10 +51,11 @@ func GRDBPrecondition(@autoclosure condition: () -> Bool, @autoclosure _ message
 
 /// A function declared as rethrows that synchronously executes a throwing
 /// block in a dispatch_queue.
-func dispatchSync<T>(queue: dispatch_queue_t, _ block: () throws -> T) rethrows -> T {
-    func impl(queue: dispatch_queue_t, block: () throws -> T, onError: (ErrorType) throws -> ()) rethrows -> T {
+func dispatchSync<T>(_ queue: dispatch_queue_t, _ block: () throws -> T) rethrows -> T {
+    // TODO: Is this hack still needed with Swift 3?
+    func impl(_ queue: dispatch_queue_t, block: () throws -> T, onError: (ErrorProtocol) throws -> ()) rethrows -> T {
         var result: T? = nil
-        var blockError: ErrorType? = nil
+        var blockError: ErrorProtocol? = nil
         dispatch_sync(queue) {
             do {
                 result = try block()
@@ -73,8 +74,8 @@ func dispatchSync<T>(queue: dispatch_queue_t, _ block: () throws -> T) rethrows 
 extension Array {
     /// Removes the first object that matches *predicate*.
     mutating func removeFirst(@noescape predicate: (Element) throws -> Bool) rethrows {
-        if let index = try indexOf(predicate) {
-            removeAtIndex(index)
+        if let index = try index(where: predicate) {
+            remove(at: index)
         }
     }
 }
@@ -82,26 +83,30 @@ extension Array {
 extension Dictionary {
     
     /// Create a dictionary with the keys and values in the given sequence.
-    init<Sequence: SequenceType where Sequence.Generator.Element == Generator.Element>(keyValueSequence: Sequence) {
-        self.init(minimumCapacity: keyValueSequence.underestimateCount())
+    init<S: Sequence where S.Iterator.Element == Iterator.Element>(keyValueSequence: S) {
+        // TODO: restore use of underestimateCount when Swift is fixed
+//        self.init(minimumCapacity: keyValueSequence.underestimateCount)
+        self.init()
         for (key, value) in keyValueSequence {
             self[key] = value
         }
     }
     
     /// Create a dictionary from keys and a value builder.
-    init<Sequence: SequenceType where Sequence.Generator.Element == Key>(keys: Sequence, value: Key -> Value) {
-        self.init(minimumCapacity: keys.underestimateCount())
+    init<S: Sequence where S.Iterator.Element == Key>(keys: S, value: Key -> Value) {
+        // TODO: restore use of underestimateCount when Swift is fixed
+//        self.init(minimumCapacity: keys.underestimateCount)
+        self.init()
         for key in keys {
             self[key] = value(key)
         }
     }
 }
 
-extension SequenceType where Generator.Element: Equatable {
+extension Sequence where Iterator.Element: Equatable {
     
     /// Filter out elements contained in *removedElements*.
-    func removingElementsOf<S : SequenceType where S.Generator.Element == Self.Generator.Element>(removedElements: S) -> [Self.Generator.Element] {
+    func removingElementsOf<S : Sequence where S.Iterator.Element == Self.Iterator.Element>(removedElements: S) -> [Self.Iterator.Element] {
         return filter { element in !removedElements.contains(element) }
     }
 }
@@ -238,7 +243,7 @@ final class Pool<T> {
         var item: PoolItem<T>! = nil
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
         dispatch_sync(queue) {
-            if let index = self.items.indexOf({ $0.available }) {
+            if let index = self.items.index(where: { $0.available }) {
                 item = self.items[index]
                 item.available = false
             } else {
@@ -249,7 +254,7 @@ final class Pool<T> {
         return item
     }
     
-    private func unlockItem(item: PoolItem<T>) {
+    private func unlockItem(_ item: PoolItem<T>) {
         dispatch_sync(queue) {
             item.available = true
         }

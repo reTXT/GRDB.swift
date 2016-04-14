@@ -445,7 +445,7 @@ extension Row {
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence of rows.
     @warn_unused_result
-    public static func fetch(statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Row> {
+    public static func fetch(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Row> {
         // Metal rows can be reused. And reusing them yields better performance.
         let row = Row(statement: statement)
         return statement.fetchSequence(arguments: arguments) {
@@ -463,7 +463,7 @@ extension Row {
     ///     - arguments: Optional statement arguments.
     /// - returns: An array of rows.
     @warn_unused_result
-    public static func fetchAll(statement: SelectStatement, arguments: StatementArguments? = nil) -> [Row] {
+    public static func fetchAll(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> [Row] {
         let sqliteStatement = statement.sqliteStatement
         let columnNames = statement.columnNames
         let sequence = statement.fetchSequence(arguments: arguments) {
@@ -482,13 +482,13 @@ extension Row {
     ///     - arguments: Optional statement arguments.
     /// - returns: An optional row.
     @warn_unused_result
-    public static func fetchOne(statement: SelectStatement, arguments: StatementArguments? = nil) -> Row? {
+    public static func fetchOne(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> Row? {
         let sqliteStatement = statement.sqliteStatement
         let columnNames = statement.columnNames
         let sequence = statement.fetchSequence(arguments: arguments) {
             Row(copiedFromSQLiteStatement: sqliteStatement, columnNames: columnNames)
         }
-        return sequence.generate().next()
+        return sequence.makeIterator().next()
     }
     
     
@@ -527,7 +527,7 @@ extension Row {
     ///     - arguments: Optional statement arguments.
     /// - returns: A sequence of rows.
     @warn_unused_result
-    public static func fetch(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Row> {
+    public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Row> {
         return fetch(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -541,7 +541,7 @@ extension Row {
     ///     - arguments: Optional statement arguments.
     /// - returns: An array of rows.
     @warn_unused_result
-    public static func fetchAll(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Row] {
+    public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Row] {
         return fetchAll(try! db.selectStatement(sql), arguments: arguments)
     }
     
@@ -555,12 +555,12 @@ extension Row {
     ///     - arguments: Optional statement arguments.
     /// - returns: An optional row.
     @warn_unused_result
-    public static func fetchOne(db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Row? {
+    public static func fetchOne(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Row? {
         return fetchOne(try! db.selectStatement(sql), arguments: arguments)
     }
 }
 
-extension Row : CollectionType {
+extension Row : Collection {
     
     // MARK: - Row as a Collection of (ColumnName, DatabaseValue) Pairs
     
@@ -573,10 +573,10 @@ extension Row : CollectionType {
         return Int(sqlite3_column_count(sqliteStatement))
     }
     
-    /// Returns a *generator* over (ColumnName, DatabaseValue) pairs, from left
+    /// Returns an *iterator* over (ColumnName, DatabaseValue) pairs, from left
     /// to right.
-    public func generate() -> IndexingGenerator<Row> {
-        return IndexingGenerator(self)
+    public func makeIterator() -> IndexingIterator<Row> {
+        return IndexingIterator(self)
     }
     
     /// The index of the first (ColumnName, DatabaseValue) pair.
@@ -611,10 +611,10 @@ public func ==(lhs: Row, rhs: Row) -> Bool {
         return false
     }
     
-    var lgen = lhs.generate()
-    var rgen = rhs.generate()
+    var liter = lhs.makeIterator()
+    var riter = rhs.makeIterator()
     
-    while let (lcol, lval) = lgen.next(), let (rcol, rval) = rgen.next() {
+    while let (lcol, lval) = liter.next(), let (rcol, rval) = riter.next() {
         guard lcol == rcol else {
             return false
         }
@@ -633,7 +633,7 @@ extension Row: CustomStringConvertible {
         return "<Row"
             + map { (column, dbv) in
                 " \(column):\(dbv)"
-                }.joinWithSeparator("")
+                }.joined(separator: "")
             + ">"
     }
 }
@@ -642,7 +642,7 @@ extension Row: CustomStringConvertible {
 // MARK: - RowIndex
 
 /// Indexes to (columnName, databaseValue) pairs in a database row.
-public struct RowIndex: ForwardIndexType, BidirectionalIndexType, RandomAccessIndexType {
+public struct RowIndex: ForwardIndex, BidirectionalIndex, RandomAccessIndex {
     let index: Int
     init(_ index: Int) { self.index = index }
     
@@ -657,7 +657,7 @@ public struct RowIndex: ForwardIndexType, BidirectionalIndexType, RandomAccessIn
     public func distanceTo(other: RowIndex) -> Int { return other.index - index }
     
     /// Return `self` offset by `n` steps.
-    public func advancedBy(n: Int) -> RowIndex { return RowIndex(index + n) }
+    public func advanced(by n: Int) -> RowIndex { return RowIndex(index + n) }
 }
 
 /// Equatable implementation for RowIndex
@@ -711,8 +711,8 @@ private struct DictionaryRowImpl : RowImpl {
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
     func indexOfColumn(named name: String) -> Int? {
-        let lowercaseName = name.lowercaseString
-        guard let index = dictionary.indexOf({ (column, value) in column.lowercaseString == lowercaseName }) else {
+        let lowercaseName = name.lowercased
+        guard let index = dictionary.indexOf({ (column, value) in column.lowercased == lowercaseName }) else {
             return nil
         }
         return dictionary.startIndex.distanceTo(index)
@@ -755,8 +755,8 @@ private struct StatementCopyRowImpl : RowImpl {
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
     func indexOfColumn(named name: String) -> Int? {
-        let lowercaseName = name.lowercaseString
-        return columnNames.indexOf { $0.lowercaseString == lowercaseName }
+        let lowercaseName = name.lowercased
+        return columnNames.indexOf { $0.lowercased == lowercaseName }
     }
     
     func copy(row: Row) -> Row {
@@ -776,7 +776,7 @@ private struct StatementRowImpl : RowImpl {
         self.statementRef = statementRef
         self.sqliteStatement = sqliteStatement
         // Optimize row.value(named: "...")
-        let lowercaseColumnNames = (0..<sqlite3_column_count(sqliteStatement)).map { String.fromCString(sqlite3_column_name(sqliteStatement, Int32($0)))!.lowercaseString }
+        let lowercaseColumnNames = (0..<sqlite3_column_count(sqliteStatement)).map { String(validatingUTF8: sqlite3_column_name(sqliteStatement, Int32($0)))!.lowercased }
         self.lowercaseColumnIndexes = Dictionary(keyValueSequence: lowercaseColumnNames.enumerate().map { ($1, $0) }.reverse())
     }
     
@@ -807,7 +807,7 @@ private struct StatementRowImpl : RowImpl {
         if let index = lowercaseColumnIndexes[name] {
             return index
         }
-        return lowercaseColumnIndexes[name.lowercaseString]
+        return lowercaseColumnIndexes[name.lowercased]
     }
     
     func copy(row: Row) -> Row {

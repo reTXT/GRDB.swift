@@ -13,10 +13,10 @@ import Foundation
 #endif
 
 /// A raw SQLite connection, suitable for the SQLite C API.
-public typealias SQLiteConnection = COpaquePointer
+public typealias SQLiteConnection = OpaquePointer
 
 /// A raw SQLite function argument.
-typealias SQLiteValue = COpaquePointer
+typealias SQLiteValue = OpaquePointer
 
 
 /// A Database connection.
@@ -38,7 +38,7 @@ public final class Database {
     /// The raw SQLite connection, suitable for the SQLite C API.
     public let sqliteConnection: SQLiteConnection
     
-    var lastErrorMessage: String? { return String.fromCString(sqlite3_errmsg(sqliteConnection)) }
+    var lastErrorMessage: String? { return String(validatingUTF8: sqlite3_errmsg(sqliteConnection)) }
     
     private var functions = Set<DatabaseFunction>()
     private var collations = Set<DatabaseCollation>()
@@ -56,14 +56,14 @@ public final class Database {
     
     /// The value for the dispatch queue specific that holds the Database identity.
     /// See preconditionValidQueue.
-    var dispatchQueueID: UnsafeMutablePointer<Void> = nil
+    var dispatchQueueID: UnsafeMutablePointer<Void>? = nil
     
     init(path: String, configuration: Configuration, schemaCache: DatabaseSchemaCacheType) throws {
         // See https://www.sqlite.org/c3ref/open.html
-        var sqliteConnection: SQLiteConnection = nil
+        var sqliteConnection: SQLiteConnection? = nil
         let code = sqlite3_open_v2(path, &sqliteConnection, configuration.sqliteOpenFlags, nil)
         guard code == SQLITE_OK else {
-            throw DatabaseError(code: code, message: String.fromCString(sqlite3_errmsg(sqliteConnection)))
+            throw DatabaseError(code: code, message: String(validatingUTF8: sqlite3_errmsg(sqliteConnection)))
         }
         
         #if SQLITE_HAS_CODEC
@@ -75,7 +75,7 @@ public final class Database {
                 // Fail early if key is wrong or missing
                 let readCode = sqlite3_exec(sqliteConnection, "SELECT * FROM sqlite_master LIMIT 1", nil, nil, nil)
                 guard readCode == SQLITE_OK else {
-                    throw DatabaseError(code: readCode, message: String.fromCString(sqlite3_errmsg(sqliteConnection)))
+                    throw DatabaseError(code: readCode, message: String(validatingUTF8: sqlite3_errmsg(sqliteConnection)))
                 }
             } catch {
                 // deinit is not called: close connection
@@ -86,7 +86,7 @@ public final class Database {
         
         self.configuration = configuration
         self.schemaCache = schemaCache
-        self.sqliteConnection = sqliteConnection
+        self.sqliteConnection = sqliteConnection!
         
         configuration.SQLiteConnectionDidOpen?()
         
@@ -119,10 +119,10 @@ public final class Database {
         guard configuration.trace != nil else {
             return
         }
-        let dbPointer = unsafeBitCast(self, UnsafeMutablePointer<Void>.self)
+        let dbPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
         sqlite3_trace(sqliteConnection, { (dbPointer, sql) in
-            let database = unsafeBitCast(dbPointer, Database.self)
-            database.configuration.trace!(String.fromCString(sql)!)
+            let database = unsafeBitCast(dbPointer, to: Database.self)
+            database.configuration.trace!(String(validatingUTF8: sql)!)
             }, dbPointer)
     }
     
@@ -136,13 +136,13 @@ public final class Database {
             sqlite3_busy_timeout(sqliteConnection, milliseconds)
             
         case .Callback(let callback):
-            let dbPointer = unsafeBitCast(self, UnsafeMutablePointer<Void>.self)
+            let dbPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
             busyCallback = callback
             
             sqlite3_busy_handler(
                 sqliteConnection,
-                { (dbPointer: UnsafeMutablePointer<Void>, numberOfTries: Int32) in
-                    let database = unsafeBitCast(dbPointer, Database.self)
+                { (dbPointer: UnsafeMutablePointer<Void>?, numberOfTries: Int32) in
+                    let database = unsafeBitCast(dbPointer, to: Database.self)
                     let callback = database.busyCallback!
                     return callback(numberOfTries: Int(numberOfTries)) ? 1 : 0
                 },
@@ -156,17 +156,17 @@ public final class Database {
         // Those functions are used by query's interface:
         //
         ///     let nameColumn = SQLColumn("name")
-        ///     let request = Person.select(nameColumn.capitalizedString)
+        ///     let request = Person.select(nameColumn.capitalized())
         ///     let names = String.fetchAll(dbQueue, request)   // [String]
         
-        addFunction(.capitalizedString)
-        addFunction(.lowercaseString)
-        addFunction(.uppercaseString)
+        addFunction(.capitalized)
+        addFunction(.lowercased)
+        addFunction(.uppercased)
         
         if #available(iOS 9.0, OSX 10.11, *) {
-            addFunction(.localizedCapitalizedString)
-            addFunction(.localizedLowercaseString)
-            addFunction(.localizedUppercaseString)
+            addFunction(.localizedCapitalized)
+            addFunction(.localizedLowercase)
+            addFunction(.localizedUppercase)
         }
     }
     
@@ -259,9 +259,9 @@ extension Database {
     
     /// The key for the dispatch queue specific that holds the Database identity.
     /// See preconditionValidQueue.
-    static let dispatchQueueIDKey = unsafeBitCast(Database.self, UnsafePointer<Void>.self)     // some unique pointer
+    static let dispatchQueueIDKey = unsafeBitCast(Database.self, to: UnsafePointer<Void>.self)     // some unique pointer
     
-    func preconditionValidQueue(@autoclosure message: () -> String = "Database was not used on the correct thread.", file: StaticString = #file, line: UInt = #line) {
+    func preconditionValidQueue(@autoclosure _ message: () -> String = "Database was not used on the correct thread.", file: StaticString = #file, line: UInt = #line) {
         GRDBPrecondition(dispatchQueueID == nil || dispatchQueueID == dispatch_get_specific(Database.dispatchQueueIDKey), message, file: file, line: line)
     }
 }
@@ -282,12 +282,12 @@ extension Database {
     /// - returns: A SelectStatement.
     /// - throws: A DatabaseError whenever SQLite could not parse the sql query.
     @warn_unused_result
-    public func selectStatement(sql: String) throws -> SelectStatement {
+    public func selectStatement(_ sql: String) throws -> SelectStatement {
         return try SelectStatement(database: self, sql: sql)
     }
     
     @warn_unused_result
-    func cachedSelectStatement(sql: String) throws -> SelectStatement {
+    func cachedSelectStatement(_ sql: String) throws -> SelectStatement {
         if let statement = schemaCache.selectStatement(sql: sql) {
             return statement
         }
@@ -309,12 +309,12 @@ extension Database {
     /// - returns: An UpdateStatement.
     /// - throws: A DatabaseError whenever SQLite could not parse the sql query.
     @warn_unused_result
-    public func updateStatement(sql: String) throws -> UpdateStatement {
+    public func updateStatement(_ sql: String) throws -> UpdateStatement {
         return try UpdateStatement(database: self, sql: sql)
     }
     
     @warn_unused_result
-    func cachedUpdateStatement(sql: String) throws -> UpdateStatement {
+    func cachedUpdateStatement(_ sql: String) throws -> UpdateStatement {
         if let statement = schemaCache.updateStatement(sql: sql) {
             return statement
         }
@@ -343,7 +343,7 @@ extension Database {
     ///     - arguments: Optional statement arguments.
     /// - returns: A DatabaseChanges.
     /// - throws: A DatabaseError whenever an SQLite error occurs.
-    public func execute(sql: String, arguments: StatementArguments? = nil) throws -> DatabaseChanges {
+    public func execute(_ sql: String, arguments: StatementArguments? = nil) throws -> DatabaseChanges {
         preconditionValidQueue()
         
         // The tricky part is to consume arguments as statements are executed.
@@ -365,7 +365,7 @@ extension Database {
                     let argumentCount = statement.sqliteArgumentCount
                     defer {
                         if remainingValues.count >= argumentCount {
-                            remainingValues = Array(remainingValues.suffixFrom(argumentCount))
+                            remainingValues = Array(remainingValues.suffix(from: argumentCount))
                         } else {
                             remainingValues = []
                         }
@@ -394,7 +394,7 @@ extension Database {
         
         let changedRowsBefore = sqlite3_total_changes(sqliteConnection)
         let sqlCodeUnits = sql.nulTerminatedUTF8
-        var error: ErrorType?
+        var error: ErrorProtocol?
         
         // During the execution of sqlite3_prepare_v2, the observer listens to
         // authorization callbacks in order to observe schema changes.
@@ -402,34 +402,34 @@ extension Database {
         observer.start()
         
         sqlCodeUnits.withUnsafeBufferPointer { codeUnits in
-            let sqlStart = UnsafePointer<Int8>(codeUnits.baseAddress)
+            let sqlStart = UnsafePointer<Int8>(codeUnits.baseAddress)!
             let sqlEnd = sqlStart + sqlCodeUnits.count
             var statementStart = sqlStart
             while statementStart < sqlEnd - 1 {
                 observer.reset()
-                var statementEnd: UnsafePointer<Int8> = nil
-                var sqliteStatement: SQLiteStatement = nil
+                var statementEnd: UnsafePointer<Int8>? = nil
+                var sqliteStatement: SQLiteStatement? = nil
                 let code = sqlite3_prepare_v2(sqliteConnection, statementStart, -1, &sqliteStatement, &statementEnd)
                 guard code == SQLITE_OK else {
                     error = DatabaseError(code: code, message: lastErrorMessage, sql: sql)
                     break
                 }
                 
-                let sqlData = NSData(bytesNoCopy: UnsafeMutablePointer<Void>(statementStart), length: statementEnd - statementStart, freeWhenDone: false)
-                let sql = String(data: sqlData, encoding: NSUTF8StringEncoding)!.stringByTrimmingCharactersInSet(.whitespaceAndNewlineCharacterSet())
+                let sqlData = NSData(bytesNoCopy: UnsafeMutablePointer<Void>(statementStart), length: statementEnd! - statementStart, freeWhenDone: false)
+                let sql = String(data: sqlData, encoding: NSUTF8StringEncoding)!.trimmingCharacters(in: .whitespacesAndNewlines())
                 guard !sql.isEmpty else {
                     break
                 }
                 
                 do {
-                    let statement = UpdateStatement(database: self, sql: sql, sqliteStatement: sqliteStatement, invalidatesDatabaseSchemaCache: observer.invalidatesDatabaseSchemaCache)
+                    let statement = UpdateStatement(database: self, sql: sql, sqliteStatement: sqliteStatement!, invalidatesDatabaseSchemaCache: observer.invalidatesDatabaseSchemaCache)
                     try statement.execute(arguments: consumeArguments(statement))
                 } catch let statementError {
                     error = statementError
                     break
                 }
                 
-                statementStart = statementEnd
+                statementStart = statementEnd!
             }
         }
         
@@ -466,10 +466,10 @@ extension Database {
     ///     }
     ///     db.addFunction(fn)
     ///     Int.fetchOne(db, "SELECT succ(1)")! // 2
-    public func addFunction(function: DatabaseFunction) {
+    public func addFunction(_ function: DatabaseFunction) {
         functions.remove(function)
         functions.insert(function)
-        let functionPointer = unsafeBitCast(function, UnsafeMutablePointer<Void>.self)
+        let functionPointer = unsafeBitCast(function, to: UnsafeMutablePointer<Void>.self)
         let code = sqlite3_create_function_v2(
             sqliteConnection,
             function.name,
@@ -477,7 +477,7 @@ extension Database {
             SQLITE_UTF8 | function.eTextRep,
             functionPointer,
             { (context, argc, argv) in
-                let function = unsafeBitCast(sqlite3_user_data(context), DatabaseFunction.self)
+                let function = unsafeBitCast(sqlite3_user_data(context), to: DatabaseFunction.self)
                 do {
                     let result = try function.function(argc, argv)
                     switch result.storage {
@@ -508,7 +508,7 @@ extension Database {
     }
     
     /// Remove an SQL function.
-    public func removeFunction(function: DatabaseFunction) {
+    public func removeFunction(_ function: DatabaseFunction) {
         functions.remove(function)
         let code = sqlite3_create_function_v2(
             sqliteConnection,
@@ -528,7 +528,7 @@ public final class DatabaseFunction {
     public let name: String
     let argumentCount: Int32
     let pure: Bool
-    let function: (Int32, UnsafeMutablePointer<COpaquePointer>) throws -> DatabaseValue
+    let function: (Int32, UnsafeMutablePointer<OpaquePointer?>) throws -> DatabaseValue
     var eTextRep: Int32 { return pure ? SQLITE_DETERMINISTIC : 0 }
     
     /// Returns an SQL function.
@@ -561,7 +561,7 @@ public final class DatabaseFunction {
         self.argumentCount = argumentCount ?? -1
         self.pure = pure
         self.function = { (argc, argv) in
-            let arguments = (0..<Int(argc)).map { index in DatabaseValue(sqliteValue: argv[index]) }
+            let arguments = (0..<Int(argc)).map { index in DatabaseValue(sqliteValue: argv[index]!) }
             return try function(arguments)?.databaseValue ?? .Null
         }
     }
@@ -592,17 +592,17 @@ extension Database {
     ///     }
     ///     db.addCollation(collation)
     ///     try db.execute("CREATE TABLE files (name TEXT COLLATE localized_standard")
-    public func addCollation(collation: DatabaseCollation) {
+    public func addCollation(_ collation: DatabaseCollation) {
         collations.remove(collation)
         collations.insert(collation)
-        let collationPointer = unsafeBitCast(collation, UnsafeMutablePointer<Void>.self)
+        let collationPointer = unsafeBitCast(collation, to: UnsafeMutablePointer<Void>.self)
         let code = sqlite3_create_collation_v2(
             sqliteConnection,
             collation.name,
             SQLITE_UTF8,
             collationPointer,
             { (collationPointer, length1, buffer1, length2, buffer2) -> Int32 in
-                let collation = unsafeBitCast(collationPointer, DatabaseCollation.self)
+                let collation = unsafeBitCast(collationPointer, to: DatabaseCollation.self)
                 return Int32(collation.function(length1, buffer1, length2, buffer2).rawValue)
             }, nil)
         guard code == SQLITE_OK else {
@@ -611,7 +611,7 @@ extension Database {
     }
     
     /// Remove a collation.
-    public func removeCollation(collation: DatabaseCollation) {
+    public func removeCollation(_ collation: DatabaseCollation) {
         collations.remove(collation)
         sqlite3_create_collation_v2(
             sqliteConnection,
@@ -673,7 +673,7 @@ extension Database {
         let data = passphrase.dataUsingEncoding(NSUTF8StringEncoding)!
         let code = sqlite3_key(sqliteConnection, data.bytes, Int32(data.length))
         guard code == SQLITE_OK else {
-            throw DatabaseError(code: code, message: String.fromCString(sqlite3_errmsg(sqliteConnection)))
+            throw DatabaseError(code: code, message: String(validatingUTF8: sqlite3_errmsg(sqliteConnection)))
         }
     }
 
@@ -681,7 +681,7 @@ extension Database {
         let data = passphrase.dataUsingEncoding(NSUTF8StringEncoding)!
         let code = sqlite3_rekey(sqliteConnection, data.bytes, Int32(data.length))
         guard code == SQLITE_OK else {
-            throw DatabaseError(code: code, message: String.fromCString(sqlite3_errmsg(sqliteConnection)))
+            throw DatabaseError(code: code, message: String(validatingUTF8: sqlite3_errmsg(sqliteConnection)))
         }
     }
 }
@@ -694,14 +694,14 @@ extension Database {
 protocol DatabaseSchemaCacheType {
     mutating func clear()
     
-    func primaryKey(tableName tableName: String) -> PrimaryKey?
-    mutating func setPrimaryKey(primaryKey: PrimaryKey, forTableName tableName: String)
+    func primaryKey(forTableName tableName: String) -> PrimaryKey?
+    mutating func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String)
 
-    func updateStatement(sql sql: String) -> UpdateStatement?
-    mutating func setUpdateStatement(statement: UpdateStatement, forSQL sql: String)
+    func updateStatement(sql: String) -> UpdateStatement?
+    mutating func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String)
     
-    func selectStatement(sql sql: String) -> SelectStatement?
-    mutating func setSelectStatement(statement: SelectStatement, forSQL sql: String)
+    func selectStatement(sql: String) -> SelectStatement?
+    mutating func setSelectStatement(_ statement: SelectStatement, forSQL sql: String)
 }
 
 extension Database {
@@ -722,7 +722,7 @@ extension Database {
         // SQlite identifiers are case-insensitive, case-preserving (http://www.alberton.info/dbms_identifiers_and_case_sensitivity.html)
         return Row.fetchOne(self,
             "SELECT sql FROM sqlite_master WHERE type = 'table' AND LOWER(name) = ?",
-            arguments: [tableName.lowercaseString]) != nil
+            arguments: [tableName.lowercased()]) != nil
     }
     
     /// Return the primary key for table named `tableName`.
@@ -731,8 +731,8 @@ extension Database {
     /// This method is not thread-safe.
     ///
     /// - throws: A DatabaseError if table does not exist.
-    func primaryKey(tableName: String) throws -> PrimaryKey {
-        if let primaryKey = schemaCache.primaryKey(tableName: tableName) {
+    func primaryKey(forTableName tableName: String) throws -> PrimaryKey {
+        if let primaryKey = schemaCache.primaryKey(forTableName: tableName) {
             return primaryKey
         }
         
@@ -798,7 +798,7 @@ extension Database {
             //
             // FIXME: We ignore the exception, and consider all INTEGER primary
             // keys as aliases for the rowid:
-            if pkColumnInfo.type.uppercaseString == "INTEGER" {
+            if pkColumnInfo.type.uppercased() == "INTEGER" {
                 primaryKey = .RowID(pkColumnInfo.name)
             } else {
                 primaryKey = .Regular([pkColumnInfo.name])
@@ -894,15 +894,15 @@ final class StatementCompilationObserver {
     }
     
     func start() {
-        let observerPointer = unsafeBitCast(self, UnsafeMutablePointer<Void>.self)
+        let observerPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
         sqlite3_set_authorizer(database.sqliteConnection, { (observerPointer, actionCode, CString1, CString2, CString3, CString4) -> Int32 in
             switch actionCode {
             case SQLITE_DROP_TABLE, SQLITE_DROP_TEMP_TABLE, SQLITE_DROP_TEMP_VIEW, SQLITE_DROP_VIEW, SQLITE_DETACH, SQLITE_ALTER_TABLE, SQLITE_DROP_VTABLE:
-                let observer = unsafeBitCast(observerPointer, StatementCompilationObserver.self)
+                let observer = unsafeBitCast(observerPointer, to: StatementCompilationObserver.self)
                 observer.invalidatesDatabaseSchemaCache = true
             case SQLITE_READ:
-                let observer = unsafeBitCast(observerPointer, StatementCompilationObserver.self)
-                observer.sourceTables.insert(String.fromCString(CString1)!)
+                let observer = unsafeBitCast(observerPointer, to: StatementCompilationObserver.self)
+                observer.sourceTables.insert(String(validatingUTF8: CString1)!)
             default:
                 break
             }
@@ -947,11 +947,11 @@ extension Database {
     ///     - block: A block that executes SQL statements and return either
     ///       .Commit or .Rollback.
     /// - throws: The error thrown by the block.
-    public func inTransaction(kind: TransactionKind? = nil, @noescape _ block: () throws -> TransactionCompletion) throws {
+    public func inTransaction(_ kind: TransactionKind? = nil, @noescape _ block: () throws -> TransactionCompletion) throws {
         try beginTransaction(kind ?? configuration.defaultTransactionKind)
         
         var completion: TransactionCompletion = .Rollback
-        var blockError: ErrorType? = nil
+        var blockError: ErrorProtocol? = nil
         do {
             completion = try block()
         } catch {
@@ -998,7 +998,7 @@ extension Database {
         }
     }
     
-    private func beginTransaction(kind: TransactionKind) throws {
+    private func beginTransaction(_ kind: TransactionKind) throws {
         switch kind {
         case .Deferred:
             try execute("BEGIN DEFERRED TRANSACTION")
@@ -1022,7 +1022,7 @@ extension Database {
     ///
     /// The transaction observer is weakly referenced: it is not retained, and
     /// stops getting notifications after it is deallocated.
-    public func addTransactionObserver(transactionObserver: TransactionObserverType) {
+    public func addTransactionObserver(_ transactionObserver: TransactionObserverType) {
         preconditionValidQueue()
         transactionObservers.append(WeakTransactionObserver(transactionObserver))
         if transactionObservers.count == 1 {
@@ -1031,7 +1031,7 @@ extension Database {
     }
     
     /// Remove a transaction observer.
-    public func removeTransactionObserver(transactionObserver: TransactionObserverType) {
+    public func removeTransactionObserver(_ transactionObserver: TransactionObserverType) {
         preconditionValidQueue()
         transactionObservers.removeFirst { $0.observer === transactionObserver }
         if transactionObservers.isEmpty {
@@ -1083,9 +1083,9 @@ extension Database {
         }
     }
     
-    private func didChangeWithEvent(event: DatabaseEvent) {
+    private func didChange(withEvent event: DatabaseEvent) {
         for observer in transactionObservers.flatMap({ $0.observer }) {
-            observer.databaseDidChangeWithEvent(event)
+            observer.databaseDidChange(withEvent: event)
         }
     }
     
@@ -1104,11 +1104,11 @@ extension Database {
     }
     
     private func installTransactionObserverHooks() {
-        let dbPointer = unsafeBitCast(self, UnsafeMutablePointer<Void>.self)
+        let dbPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
         
         sqlite3_update_hook(sqliteConnection, { (dbPointer, updateKind, databaseNameCString, tableNameCString, rowID) in
-            let db = unsafeBitCast(dbPointer, Database.self)
-            db.didChangeWithEvent(DatabaseEvent(
+            let db = unsafeBitCast(dbPointer, to: Database.self)
+            db.didChange(withEvent: DatabaseEvent(
                 databaseNameCString: databaseNameCString,
                 tableNameCString: tableNameCString,
                 kind: DatabaseEvent.Kind(rawValue: updateKind)!,
@@ -1117,7 +1117,7 @@ extension Database {
         
         
         sqlite3_commit_hook(sqliteConnection, { dbPointer in
-            let db = unsafeBitCast(dbPointer, Database.self)
+            let db = unsafeBitCast(dbPointer, to: Database.self)
             do {
                 try db.willCommit()
                 db.transactionState = .Commit
@@ -1132,7 +1132,7 @@ extension Database {
         
         
         sqlite3_rollback_hook(sqliteConnection, { dbPointer in
-            let db = unsafeBitCast(dbPointer, Database.self)
+            let db = unsafeBitCast(dbPointer, to: Database.self)
             switch db.transactionState {
             case .RollbackFromTransactionObserver:
                 // Next step: updateStatementDidFail()
@@ -1172,7 +1172,7 @@ private enum TransactionState {
     case WaitForTransactionCompletion
     case Commit
     case Rollback
-    case RollbackFromTransactionObserver(ErrorType)
+    case RollbackFromTransactionObserver(ErrorProtocol)
 }
 
 /// A transaction observer is notified of all changes and transactions committed
@@ -1192,7 +1192,7 @@ public protocol TransactionObserverType : class {
     /// need to keep it longer, store a copy of its properties.
     ///
     /// - warning: this method must not change the database.
-    func databaseDidChangeWithEvent(event: DatabaseEvent)
+    func databaseDidChange(withEvent event: DatabaseEvent)
     
     /// When a transaction is about to be committed, the transaction observer
     /// has an opportunity to rollback pending changes by throwing an error.
@@ -1207,12 +1207,12 @@ public protocol TransactionObserverType : class {
     /// Database changes have been committed.
     ///
     /// This method is called on the database queue. It can change the database.
-    func databaseDidCommit(db: Database)
+    func databaseDidCommit(_ db: Database)
     
     /// Database changes have been rollbacked.
     ///
     /// This method is called on the database queue. It can change the database.
-    func databaseDidRollback(db: Database)
+    func databaseDidRollback(_ db: Database)
 }
 
 class WeakTransactionObserver {
@@ -1241,10 +1241,10 @@ public struct DatabaseEvent {
     public let kind: Kind
     
     /// The database name
-    public var databaseName: String { return String.fromCString(databaseNameCString)! }
+    public var databaseName: String { return String(validatingUTF8: databaseNameCString)! }
 
     /// The table name
-    public var tableName: String { return String.fromCString(tableNameCString)! }
+    public var tableName: String { return String(validatingUTF8: tableNameCString)! }
     
     /// The rowID of the changed row.
     public let rowID: Int64

@@ -10,7 +10,7 @@ public func == (lhs: _SQLDerivedExpressionType, rhs: _SQLExpressionType?) -> _SQ
 /// Returns an SQL expression that compares two values.
 ///
 /// See https://github.com/groue/GRDB.swift/#sql-operators
-public func == (lhs: _SQLDerivedExpressionType, rhs: protocol<_SQLExpressionType, BooleanType>?) -> _SQLExpression {
+public func == (lhs: _SQLDerivedExpressionType, rhs: protocol<_SQLExpressionType, Boolean>?) -> _SQLExpression {
     if let rhs = rhs {
         if rhs.boolValue {
             return lhs.sqlExpression
@@ -32,7 +32,7 @@ public func == (lhs: _SQLExpressionType?, rhs: _SQLDerivedExpressionType) -> _SQ
 /// Returns an SQL expression that compares two values.
 ///
 /// See https://github.com/groue/GRDB.swift/#sql-operators
-public func == (lhs: protocol<_SQLExpressionType, BooleanType>?, rhs: _SQLDerivedExpressionType) -> _SQLExpression {
+public func == (lhs: protocol<_SQLExpressionType, Boolean>?, rhs: _SQLDerivedExpressionType) -> _SQLExpression {
     if let lhs = lhs {
         if lhs.boolValue {
             return rhs.sqlExpression
@@ -64,7 +64,7 @@ public func != (lhs: _SQLDerivedExpressionType, rhs: _SQLExpressionType?) -> _SQ
 /// Returns an SQL expression that compares two values.
 ///
 /// See https://github.com/groue/GRDB.swift/#sql-operators
-public func != (lhs: _SQLDerivedExpressionType, rhs: protocol<_SQLExpressionType, BooleanType>?) -> _SQLExpression {
+public func != (lhs: _SQLDerivedExpressionType, rhs: protocol<_SQLExpressionType, Boolean>?) -> _SQLExpression {
     if let rhs = rhs {
         if rhs.boolValue {
             return .Not(lhs.sqlExpression)
@@ -86,7 +86,7 @@ public func != (lhs: _SQLExpressionType?, rhs: _SQLDerivedExpressionType) -> _SQ
 /// Returns an SQL expression that compares two values.
 ///
 /// See https://github.com/groue/GRDB.swift/#sql-operators
-public func != (lhs: protocol<_SQLExpressionType, BooleanType>?, rhs: _SQLDerivedExpressionType) -> _SQLExpression {
+public func != (lhs: protocol<_SQLExpressionType, Boolean>?, rhs: _SQLDerivedExpressionType) -> _SQLExpression {
     if let lhs = lhs {
         if lhs.boolValue {
             return .Not(rhs.sqlExpression)
@@ -334,12 +334,12 @@ public func && (lhs: _SQLDerivedExpressionType, rhs: _SQLDerivedExpressionType) 
 
 // MARK: - Operator BETWEEN
 
-extension Range where Element: protocol<_SQLExpressionType, BidirectionalIndexType> {
+extension Range where Element: protocol<_SQLExpressionType, BidirectionalIndex> {
     /// Returns an SQL expression that checks the inclusion of a value in
     /// a range.
     ///
     /// See https://github.com/groue/GRDB.swift/#sql-operators
-    public func contains(element: _SQLDerivedExpressionType) -> _SQLExpression {
+    public func contains(_ element: _SQLDerivedExpressionType) -> _SQLExpression {
         return .Between(value: element.sqlExpression, min: startIndex.sqlExpression, max: endIndex.predecessor().sqlExpression)
     }
 }
@@ -349,7 +349,7 @@ extension ClosedInterval where Bound: _SQLExpressionType {
     /// an interval.
     ///
     /// See https://github.com/groue/GRDB.swift/#sql-operators
-    public func contains(element: _SQLDerivedExpressionType) -> _SQLExpression {
+    public func contains(_ element: _SQLDerivedExpressionType) -> _SQLExpression {
         return .Between(value: element.sqlExpression, min: start.sqlExpression, max: end.sqlExpression)
     }
 }
@@ -359,7 +359,7 @@ extension HalfOpenInterval where Bound: _SQLExpressionType {
     /// an interval.
     ///
     /// See https://github.com/groue/GRDB.swift/#sql-operators
-    public func contains(element: _SQLDerivedExpressionType) -> _SQLExpression {
+    public func contains(_ element: _SQLDerivedExpressionType) -> _SQLExpression {
         return (element >= start) && (element < end)
     }
 }
@@ -367,12 +367,12 @@ extension HalfOpenInterval where Bound: _SQLExpressionType {
 
 // MARK: - Operator IN
 
-extension SequenceType where Self.Generator.Element: _SQLExpressionType {
+extension Sequence where Self.Iterator.Element: _SQLExpressionType {
     /// Returns an SQL expression that checks the inclusion of a value in
     /// a sequence.
     ///
     /// See https://github.com/groue/GRDB.swift/#sql-operators
-    public func contains(element: _SQLDerivedExpressionType) -> _SQLExpression {
+    public func contains(_ element: _SQLDerivedExpressionType) -> _SQLExpression {
         return .In(map { $0.sqlExpression }, element.sqlExpression)
     }
 }

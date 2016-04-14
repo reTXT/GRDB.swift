@@ -5,7 +5,7 @@ extension NSNumber: DatabaseValueConvertible {
     
     /// Returns a value that can be stored in the database.
     public var databaseValue: DatabaseValue {
-        switch String.fromCString(objCType)! {
+        switch String(validatingUTF8: objCType)! {
         case "c":
             return Int64(charValue).databaseValue
         case "C":
@@ -38,7 +38,7 @@ extension NSNumber: DatabaseValueConvertible {
     }
     
     /// Returns an NSNumber initialized from *databaseValue*, if possible.
-    public static func fromDatabaseValue(databaseValue: DatabaseValue) -> Self? {
+    public static func from(databaseValue: DatabaseValue) -> Self? {
         switch databaseValue.storage {
         case .Int64(let int64):
             return self.init(longLong: int64)

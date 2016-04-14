@@ -75,10 +75,10 @@ public protocol DatabaseReader : class {
     ///     }
     ///     reader.addFunction(fn)
     ///     Int.fetchOne(reader, "SELECT succ(1)")! // 2
-    func addFunction(function: DatabaseFunction)
+    func addFunction(_ function: DatabaseFunction)
     
     /// Remove an SQL function.
-    func removeFunction(function: DatabaseFunction)
+    func removeFunction(_ function: DatabaseFunction)
     
     
     // MARK: - Collations
@@ -90,8 +90,8 @@ public protocol DatabaseReader : class {
     ///     }
     ///     reader.addCollation(collation)
     ///     try reader.execute("SELECT * FROM files ORDER BY name COLLATE localized_standard")
-    func addCollation(collation: DatabaseCollation)
+    func addCollation(_ collation: DatabaseCollation)
     
     /// Remove a collation.
-    func removeCollation(collation: DatabaseCollation)
+    func removeCollation(_ collation: DatabaseCollation)
 }

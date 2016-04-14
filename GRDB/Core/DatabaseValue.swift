@@ -142,7 +142,7 @@ public struct DatabaseValue {
             storage = .Double(sqlite3_value_double(sqliteValue))
         case SQLITE_TEXT:
             let cString = UnsafePointer<Int8>(sqlite3_value_text(sqliteValue))
-            storage = .String(Swift.String.fromCString(cString)!)
+            storage = .String(Swift.String(validatingUTF8: cString)!)
         case SQLITE_BLOB:
             let bytes = sqlite3_value_blob(sqliteValue)
             let length = sqlite3_value_bytes(sqliteValue)
@@ -220,7 +220,7 @@ extension DatabaseValue : DatabaseValueConvertible {
     }
     
     /// Returns *databaseValue*, or nil for NULL input.
-    public static func fromDatabaseValue(databaseValue: DatabaseValue) -> DatabaseValue? {
+    public static func from(databaseValue: DatabaseValue) -> DatabaseValue? {
         // Follow protocol semantics: DatabaseValueConvertible types turn NULL
         // into nil:
         //
@@ -245,7 +245,7 @@ extension DatabaseValue : StatementColumnConvertible {
             storage = .Double(sqlite3_column_double(sqliteStatement, Int32(index)))
         case SQLITE_TEXT:
             let cString = UnsafePointer<Int8>(sqlite3_column_text(sqliteStatement, Int32(index)))
-            storage = .String(String.fromCString(cString)!)
+            storage = .String(String(validatingUTF8: cString)!)
         case SQLITE_BLOB:
             let bytes = sqlite3_column_blob(sqliteStatement, Int32(index))
             let length = sqlite3_column_bytes(sqliteStatement, Int32(index))

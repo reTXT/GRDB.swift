@@ -16,7 +16,7 @@ struct Migration {
     let disabledForeignKeyChecks: Bool
     let migrate: (db: Database) throws -> Void
     
-    func run(db: Database) throws {
+    func run(_ db: Database) throws {
         if disabledForeignKeyChecks && Bool.fetchOne(db, "PRAGMA foreign_keys")! {
             try runWithDisabledForeignKeys(db)
         } else {
@@ -24,7 +24,7 @@ struct Migration {
         }
     }
     
-    private func runWithoutDisabledForeignKeys(db: Database) throws {
+    private func runWithoutDisabledForeignKeys(_ db: Database) throws {
         try db.inTransaction(.Immediate) {
             try self.migrate(db: db)
             try self.insertAppliedIdentifier(db)
@@ -32,7 +32,7 @@ struct Migration {
         }
     }
     
-    private func runWithDisabledForeignKeys(db: Database) throws {
+    private func runWithDisabledForeignKeys(_ db: Database) throws {
         // Support for database alterations described at
         // https://www.sqlite.org/lang_altertable.html#otheralter
         //
@@ -69,7 +69,7 @@ struct Migration {
         }
     }
     
-    private func insertAppliedIdentifier(db: Database) throws {
+    private func insertAppliedIdentifier(_ db: Database) throws {
         try db.execute("INSERT INTO grdb_migrations (identifier) VALUES (?)", arguments: [identifier])
     }
 }
