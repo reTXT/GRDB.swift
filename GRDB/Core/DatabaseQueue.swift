@@ -24,7 +24,7 @@ public final class DatabaseQueue {
         serializedDatabase = try SerializedDatabase(
             path: path,
             configuration: configuration,
-            schemaCache: DatabaseSchemaCache())
+            schemaCache: SimpleDatabaseSchemaCache())
     }
     
     /// Opens an in-memory SQLite database.
@@ -39,7 +39,7 @@ public final class DatabaseQueue {
         serializedDatabase = try! SerializedDatabase(
             path: ":memory:",
             configuration: configuration,
-            schemaCache: DatabaseSchemaCache())
+            schemaCache: SimpleDatabaseSchemaCache())
     }
     
     #if os(iOS)

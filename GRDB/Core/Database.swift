@@ -43,7 +43,7 @@ public final class Database {
     private var functions = Set<DatabaseFunction>()
     private var collations = Set<DatabaseCollation>()
     
-    var schemaCache: DatabaseSchemaCacheType    // internal so that it can be tested
+    var schemaCache: DatabaseSchemaCache    // @testable
     
     /// See setupTransactionHooks(), updateStatementDidFail(), updateStatementDidExecute()
     private var transactionState: TransactionState = .waitForTransactionCompletion
@@ -58,7 +58,7 @@ public final class Database {
     /// See preconditionValidQueue.
     var dispatchQueueID: UnsafeMutablePointer<Void>? = nil
     
-    init(path: String, configuration: Configuration, schemaCache: DatabaseSchemaCacheType) throws {
+    init(path: String, configuration: Configuration, schemaCache: DatabaseSchemaCache) throws {
         // See https://www.sqlite.org/c3ref/open.html
         var sqliteConnection: SQLiteConnection? = nil
         let code = sqlite3_open_v2(path, &sqliteConnection, configuration.sqliteOpenFlags, nil)
@@ -690,19 +690,6 @@ extension Database {
 
 // =========================================================================
 // MARK: - Database Schema
-
-protocol DatabaseSchemaCacheType {
-    mutating func clear()
-    
-    func primaryKey(forTableName tableName: String) -> PrimaryKey?
-    mutating func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String)
-
-    func updateStatement(sql: String) -> UpdateStatement?
-    mutating func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String)
-    
-    func selectStatement(sql: String) -> SelectStatement?
-    mutating func setSelectStatement(_ statement: SelectStatement, forSQL sql: String)
-}
 
 extension Database {
     

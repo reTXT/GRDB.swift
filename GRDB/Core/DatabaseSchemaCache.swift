@@ -1,5 +1,19 @@
-/// An thread-unsafe database schema cache
-class DatabaseSchemaCache: DatabaseSchemaCacheType {
+/// The protocol for all database schema caches
+protocol DatabaseSchemaCache {
+    mutating func clear()
+    
+    func primaryKey(forTableName tableName: String) -> PrimaryKey?
+    mutating func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String)
+
+    func updateStatement(sql: String) -> UpdateStatement?
+    mutating func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String)
+    
+    func selectStatement(sql: String) -> SelectStatement?
+    mutating func setSelectStatement(_ statement: SelectStatement, forSQL sql: String)
+}
+
+/// A thread-unsafe database schema cache
+class SimpleDatabaseSchemaCache: DatabaseSchemaCache {
     private var primaryKeys: [String: PrimaryKey] = [:]
     private var updateStatements: [String: UpdateStatement] = [:]
     private var selectStatements: [String: SelectStatement] = [:]
@@ -41,8 +55,8 @@ class DatabaseSchemaCache: DatabaseSchemaCacheType {
 }
 
 /// A thread-safe database schema cache
-struct SharedDatabaseSchemaCache: DatabaseSchemaCacheType {
-    private let cache = ReadWriteBox(DatabaseSchemaCache())
+struct SharedDatabaseSchemaCache: DatabaseSchemaCache {
+    private let cache = ReadWriteBox(SimpleDatabaseSchemaCache())
     
     mutating func clear() {
         cache.write { $0.clear() }
