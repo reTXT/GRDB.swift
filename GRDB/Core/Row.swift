@@ -381,7 +381,7 @@ extension Row {
     
     // MARK: - Extracting DatabaseValue
     
-    /// Returns the `DatabaseValue` at given column, if the row contains the
+    /// Accesses the `DatabaseValue` at given column, if the row contains the
     /// requested column.
     ///
     /// Column name lookup is case-insensitive, and when several columns have
@@ -581,7 +581,7 @@ extension Row : Collection {
         return Index(impl.count)
     }
     
-    /// Returns the (ColumnName, DatabaseValue) pair at given index.
+    /// Accesses the (ColumnName, DatabaseValue) pair at given index.
     public subscript(index: RowIndex) -> (String, DatabaseValue) {
         return (
             impl.columnName(atIndex: index.index),
