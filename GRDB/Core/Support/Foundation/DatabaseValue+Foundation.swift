@@ -19,15 +19,15 @@ extension DatabaseValue {
     /// - returns: NSNull, NSNumber, NSString, or NSData.
     public func toAnyObject() -> AnyObject {
         switch storage {
-        case .Null:
+        case .null:
             return NSNull()
-        case .Int64(let int64):
+        case .int64(let int64):
             return NSNumber(value: int64)
-        case .Double(let double):
+        case .double(let double):
             return NSNumber(value: double)
-        case .String(let string):
+        case .string(let string):
             return string as NSString
-        case .Blob(let data):
+        case .blob(let data):
             return data
         }
     }

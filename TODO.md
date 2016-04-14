@@ -1,5 +1,5 @@
 - [ ] Swift 3
-    - [ ] lowercased enum cases
+    - [X] lowercased enum cases
     - [ ] XXXType protocol: remove Type. Compare with Sequence vs IteratorProtocol 
     - [ ] Compare FechtedRecordsController.record(at:NSIndexPath) with NSFetchedResultsController
     - [ ] FetchedRecordsController: configure(_ cell: UITableViewCell, at indexPath: NSIndexPath)

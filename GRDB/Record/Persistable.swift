@@ -5,14 +5,14 @@ public enum PersistenceError: ErrorProtocol {
     
     /// Thrown by MutablePersistable.update() when no matching row could be
     /// found in the database.
-    case NotFound(MutablePersistable)
+    case notFound(MutablePersistable)
 }
 
 extension PersistenceError : CustomStringConvertible {
     /// A textual representation of `self`.
     public var description: String {
         switch self {
-        case .NotFound(let persistable):
+        case .notFound(let persistable):
             return "Not found: \(persistable)"
         }
     }
@@ -20,13 +20,13 @@ extension PersistenceError : CustomStringConvertible {
 
 private func databaseValue(forColumn column: String, inDictionary dictionary: [String: DatabaseValueConvertible?]) -> DatabaseValue {
     if let value = dictionary[column] {
-        return value?.databaseValue ?? .Null
+        return value?.databaseValue ?? .null
     }
     let column = column.lowercased()
     for (key, value) in dictionary where key.lowercased() == column {
-        return value?.databaseValue ?? .Null
+        return value?.databaseValue ?? .null
     }
-    return .Null
+    return .null
 }
 
 private func databaseValues(forColumns columns: [String], inDictionary dictionary: [String: DatabaseValueConvertible?]) -> [DatabaseValue] {
@@ -117,7 +117,7 @@ public protocol MutablePersistable : TableMapping {
     ///
     /// - parameter db: A database connection.
     /// - throws: A DatabaseError is thrown whenever an SQLite error occurs.
-    ///   PersistenceError.NotFound is thrown if the primary key does not
+    ///   PersistenceError.notFound is thrown if the primary key does not
     ///   match any row in the database.
     func update(_ db: Database) throws
     
@@ -255,7 +255,7 @@ public extension MutablePersistable {
     func performUpdate(_ db: Database) throws {
         let changes = try DataMapper(db, self).updateStatement().execute()
         if changes.changedRowCount == 0 {
-            throw PersistenceError.NotFound(self)
+            throw PersistenceError.notFound(self)
         }
     }
     
@@ -276,7 +276,7 @@ public extension MutablePersistable {
         if self.canUpdateInDatabase(db) {
             do {
                 try update(db)
-            } catch PersistenceError.NotFound {
+            } catch PersistenceError.notFound {
                 // TODO: check that the not persisted objet is self
                 //
                 // Why? Adopting types could override update() and update
@@ -485,7 +485,7 @@ public extension Persistable {
         if canUpdateInDatabase(db) {
             do {
                 try update(db)
-            } catch PersistenceError.NotFound {
+            } catch PersistenceError.notFound {
                 // TODO: check that the not persisted objet is self
                 //
                 // Why? Adopting types could override update() and update another

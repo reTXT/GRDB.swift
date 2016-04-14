@@ -123,7 +123,7 @@ import UIKit
 ///     try dbQueue.inTransaction { db in
 ///         /* Change a person's attributes */
 ///         try person.save(db)
-///         return .Commit      // Explicit transaction
+///         return .commit      // Explicit transaction
 ///     }
 ///
 ///     try dbQueue.inDatabase { db in
@@ -631,14 +631,14 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
         
         var changes = [ItemChange<Record>]()
         for (row, item) in s.enumerated() {
-            let deletion = ItemChange.Deletion(item: item, indexPath: NSIndexPath(forRow: row, inSection: 0))
+            let deletion = ItemChange.deletion(item: item, indexPath: NSIndexPath(forRow: row, inSection: 0))
             changes.append(deletion)
             d[row + 1][0] = changes
         }
         
         changes.removeAll()
         for (col, item) in t.enumerated() {
-            let insertion = ItemChange.Insertion(item: item, indexPath: NSIndexPath(forRow: col, inSection: 0))
+            let insertion = ItemChange.insertion(item: item, indexPath: NSIndexPath(forRow: col, inSection: 0))
             changes.append(insertion)
             d[0][col + 1] = changes
         }
@@ -661,16 +661,16 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
                     // Record operation.
                     let minimumCount = min(del.count, ins.count, sub.count)
                     if del.count == minimumCount {
-                        let deletion = ItemChange.Deletion(item: s[sx], indexPath: NSIndexPath(forRow: sx, inSection: 0))
+                        let deletion = ItemChange.deletion(item: s[sx], indexPath: NSIndexPath(forRow: sx, inSection: 0))
                         del.append(deletion)
                         d[sx+1][tx+1] = del
                     } else if ins.count == minimumCount {
-                        let insertion = ItemChange.Insertion(item: t[tx], indexPath: NSIndexPath(forRow: tx, inSection: 0))
+                        let insertion = ItemChange.insertion(item: t[tx], indexPath: NSIndexPath(forRow: tx, inSection: 0))
                         ins.append(insertion)
                         d[sx+1][tx+1] = ins
                     } else {
-                        let deletion = ItemChange.Deletion(item: s[sx], indexPath: NSIndexPath(forRow: sx, inSection: 0))
-                        let insertion = ItemChange.Insertion(item: t[tx], indexPath: NSIndexPath(forRow: tx, inSection: 0))
+                        let deletion = ItemChange.deletion(item: s[sx], indexPath: NSIndexPath(forRow: sx, inSection: 0))
+                        let insertion = ItemChange.insertion(item: t[tx], indexPath: NSIndexPath(forRow: tx, inSection: 0))
                         sub.append(deletion)
                         sub.append(insertion)
                         d[sx+1][tx+1] = sub
@@ -679,12 +679,12 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
             }
         }
         
-        /// Returns an array where deletion/insertion pairs of the same element are replaced by `.Move` change.
+        /// Returns an array where deletion/insertion pairs of the same element are replaced by `.move` change.
         func standardize(changes: [ItemChange<Record>]) -> [ItemChange<Record>] {
             
-            /// Returns a potential .Move or .Update if *change* has a matching change in *changes*:
+            /// Returns a potential .move or .update if *change* has a matching change in *changes*:
             /// If *change* is a deletion or an insertion, and there is a matching inverse
-            /// insertion/deletion with the same value in *changes*, a corresponding .Move or .Update is returned.
+            /// insertion/deletion with the same value in *changes*, a corresponding .move or .update is returned.
             /// As a convenience, the index of the matched change is returned as well.
             func mergedChange(_ change: ItemChange<Record>, inChanges changes: [ItemChange<Record>]) -> (mergedChange: ItemChange<Record>, mergedIndex: Int)? {
                 
@@ -702,30 +702,30 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
                 }
                 
                 switch change {
-                case .Insertion(let newItem, let newIndexPath):
+                case .insertion(let newItem, let newIndexPath):
                     // Look for a matching deletion
                     for (index, otherChange) in changes.enumerated() {
-                        guard case .Deletion(let oldItem, let oldIndexPath) = otherChange else { continue }
+                        guard case .deletion(let oldItem, let oldIndexPath) = otherChange else { continue }
                         guard isSameRecord(oldItem.record, newItem.record) else { continue }
                         let rowChanges = changedValues(from: oldItem.row, to: newItem.row)
                         if oldIndexPath == newIndexPath {
-                            return (ItemChange.Update(item: newItem, indexPath: oldIndexPath, changes: rowChanges), index)
+                            return (ItemChange.update(item: newItem, indexPath: oldIndexPath, changes: rowChanges), index)
                         } else {
-                            return (ItemChange.Move(item: newItem, indexPath: oldIndexPath, newIndexPath: newIndexPath, changes: rowChanges), index)
+                            return (ItemChange.move(item: newItem, indexPath: oldIndexPath, newIndexPath: newIndexPath, changes: rowChanges), index)
                         }
                     }
                     return nil
                     
-                case .Deletion(let oldItem, let oldIndexPath):
+                case .deletion(let oldItem, let oldIndexPath):
                     // Look for a matching insertion
                     for (index, otherChange) in changes.enumerated() {
-                        guard case .Insertion(let newItem, let newIndexPath) = otherChange else { continue }
+                        guard case .insertion(let newItem, let newIndexPath) = otherChange else { continue }
                         guard isSameRecord(oldItem.record, newItem.record) else { continue }
                         let rowChanges = changedValues(from: oldItem.row, to: newItem.row)
                         if oldIndexPath == newIndexPath {
-                            return (ItemChange.Update(item: newItem, indexPath: oldIndexPath, changes: rowChanges), index)
+                            return (ItemChange.update(item: newItem, indexPath: oldIndexPath, changes: rowChanges), index)
                         } else {
-                            return (ItemChange.Move(item: newItem, indexPath: oldIndexPath, newIndexPath: newIndexPath, changes: rowChanges), index)
+                            return (ItemChange.move(item: newItem, indexPath: oldIndexPath, newIndexPath: newIndexPath, changes: rowChanges), index)
                         }
                     }
                     return nil
@@ -742,7 +742,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
                 if let (mergedChange, mergedIndex) = mergedChange(change, inChanges: mergedChanges) {
                     mergedChanges.remove(at: mergedIndex)
                     switch mergedChange {
-                    case .Update:
+                    case .update:
                         updateChanges.append(mergedChange)
                     default:
                         mergedChanges.append(mergedChange)
@@ -774,7 +774,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
 /// records controller as illustrated in the following example:
 ///
 ///     // Assume self has a tableView property, and a
-///     // configureCell(_:atIndexPath:) method which updates the contents of a
+///     // configure(_:at:) method which updates the contents of a
 ///     // given cell.
 ///
 ///     func controllerWillChangeRecords<T>(controller: FetchedRecordsController<T>) {
@@ -783,26 +783,26 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
 ///
 ///     func controller<T>(controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent) {
 ///         switch event {
-///         case .Insertion(let indexPath):
-///             tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+///         case .insertion(let indexPath):
+///             tableView.insertRows(at: [indexPath], with: .fade)
 ///
-///         case .Deletion(let indexPath):
-///             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+///         case .deletion(let indexPath):
+///             tableView.deleteRows(at: [indexPath], with: .fade)
 ///
-///         case .Update(let indexPath, _):
-///             if let cell = tableView.cellForRowAtIndexPath(indexPath) {
-///                 configureCell(cell, atIndexPath: indexPath)
+///         case .update(let indexPath, _):
+///             if let cell = tableView.cellForRow(at: indexPath) {
+///                 configure(cell, at: indexPath)
 ///             }
 ///
-///         case .Move(let indexPath, let newIndexPath, _):
-///             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-///             tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Fade)
+///         case .move(let indexPath, let newIndexPath, _):
+///             tableView.deleteRows(at: [indexPath], with: .fade)
+///             tableView.insertRows(at: [newIndexPath], with: .fade)
 ///
 ///             // // Alternate technique (which actually moves cells around):
-///             // let cell = tableView.cellForRowAtIndexPath(indexPath)
-///             // tableView.moveRowAtIndexPath(indexPath, toIndexPath: newIndexPath)
+///             // let cell = tableView.cellForRow(at: indexPath)
+///             // tableView.moveRow(at: indexPath, to: newIndexPath)
 ///             // if let cell = cell {
-///             //     configureCell(cell, atIndexPath: newIndexPath)
+///             //     configure(cell, at: newIndexPath)
 ///             // }
 ///         }
 ///     }
@@ -896,20 +896,20 @@ public struct FetchedRecordsSectionInfo<T: RowConvertible> {
 public enum FetchedRecordsEvent {
     
     /// An insertion event, at given indexPath.
-    case Insertion(indexPath: NSIndexPath)
+    case insertion(indexPath: NSIndexPath)
     
     /// A deletion event, at given indexPath.
-    case Deletion(indexPath: NSIndexPath)
+    case deletion(indexPath: NSIndexPath)
     
     /// A move event, from indexPath to newIndexPath. The *changes* are a
     /// dictionary whose keys are column names, and values the old values that
     /// have been changed.
-    case Move(indexPath: NSIndexPath, newIndexPath: NSIndexPath, changes: [String: DatabaseValue])
+    case move(indexPath: NSIndexPath, newIndexPath: NSIndexPath, changes: [String: DatabaseValue])
     
     /// An update event, at given indexPath. The *changes* are a dictionary
     /// whose keys are column names, and values the old values that have
     /// been changed.
-    case Update(indexPath: NSIndexPath, changes: [String: DatabaseValue])
+    case update(indexPath: NSIndexPath, changes: [String: DatabaseValue])
 }
 
 extension FetchedRecordsEvent: CustomStringConvertible {
@@ -917,16 +917,16 @@ extension FetchedRecordsEvent: CustomStringConvertible {
     /// A textual representation of `self`.
     public var description: String {
         switch self {
-        case .Insertion(let indexPath):
+        case .insertion(let indexPath):
             return "Insertion at \(indexPath)"
             
-        case .Deletion(let indexPath):
+        case .deletion(let indexPath):
             return "Deletion from \(indexPath)"
             
-        case .Move(let indexPath, let newIndexPath, changes: let changes):
+        case .move(let indexPath, let newIndexPath, changes: let changes):
             return "Move from \(indexPath) to \(newIndexPath) with changes: \(changes)"
             
-        case .Update(let indexPath, let changes):
+        case .update(let indexPath, let changes):
             return "Update at \(indexPath) with changes: \(changes)"
         }
     }
@@ -983,36 +983,36 @@ private func ==<T>(lhs: Item<T>, rhs: Item<T>) -> Bool {
 // MARK: - ItemChange
 
 private enum ItemChange<T: RowConvertible> {
-    case Insertion(item: Item<T>, indexPath: NSIndexPath)
-    case Deletion(item: Item<T>, indexPath: NSIndexPath)
-    case Move(item: Item<T>, indexPath: NSIndexPath, newIndexPath: NSIndexPath, changes: [String: DatabaseValue])
-    case Update(item: Item<T>, indexPath: NSIndexPath, changes: [String: DatabaseValue])
+    case insertion(item: Item<T>, indexPath: NSIndexPath)
+    case deletion(item: Item<T>, indexPath: NSIndexPath)
+    case move(item: Item<T>, indexPath: NSIndexPath, newIndexPath: NSIndexPath, changes: [String: DatabaseValue])
+    case update(item: Item<T>, indexPath: NSIndexPath, changes: [String: DatabaseValue])
 }
 
 extension ItemChange {
     var record: T {
         switch self {
-        case .Insertion(item: let item, indexPath: _):
+        case .insertion(item: let item, indexPath: _):
             return item.record
-        case .Deletion(item: let item, indexPath: _):
+        case .deletion(item: let item, indexPath: _):
             return item.record
-        case .Move(item: let item, indexPath: _, newIndexPath: _, changes: _):
+        case .move(item: let item, indexPath: _, newIndexPath: _, changes: _):
             return item.record
-        case .Update(item: let item, indexPath: _, changes: _):
+        case .update(item: let item, indexPath: _, changes: _):
             return item.record
         }
     }
     
     var event: FetchedRecordsEvent {
         switch self {
-        case .Insertion(item: _, indexPath: let indexPath):
-            return .Insertion(indexPath: indexPath)
-        case .Deletion(item: _, indexPath: let indexPath):
-            return .Deletion(indexPath: indexPath)
-        case .Move(item: _, indexPath: let indexPath, newIndexPath: let newIndexPath, changes: let changes):
-            return .Move(indexPath: indexPath, newIndexPath: newIndexPath, changes: changes)
-        case .Update(item: _, indexPath: let indexPath, changes: let changes):
-            return .Update(indexPath: indexPath, changes: changes)
+        case .insertion(item: _, indexPath: let indexPath):
+            return .insertion(indexPath: indexPath)
+        case .deletion(item: _, indexPath: let indexPath):
+            return .deletion(indexPath: indexPath)
+        case .move(item: _, indexPath: let indexPath, newIndexPath: let newIndexPath, changes: let changes):
+            return .move(indexPath: indexPath, newIndexPath: newIndexPath, changes: changes)
+        case .update(item: _, indexPath: let indexPath, changes: let changes):
+            return .update(indexPath: indexPath, changes: changes)
         }
     }
 }
@@ -1020,16 +1020,16 @@ extension ItemChange {
 extension ItemChange: CustomStringConvertible {
     var description: String {
         switch self {
-        case .Insertion(let item, let indexPath):
+        case .insertion(let item, let indexPath):
             return "Insert \(item) at \(indexPath)"
             
-        case .Deletion(let item, let indexPath):
+        case .deletion(let item, let indexPath):
             return "Delete \(item) from \(indexPath)"
             
-        case .Move(let item, let indexPath, let newIndexPath, changes: let changes):
+        case .move(let item, let indexPath, let newIndexPath, changes: let changes):
             return "Move \(item) from \(indexPath) to \(newIndexPath) with changes: \(changes)"
             
-        case .Update(let item, let indexPath, let changes):
+        case .update(let item, let indexPath, let changes):
             return "Update \(item) at \(indexPath) with changes: \(changes)"
         }
     }

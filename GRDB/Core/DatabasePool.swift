@@ -58,7 +58,7 @@ public final class DatabasePool {
         // Readers
         readerConfig = configuration
         readerConfig.readonly = true
-        readerConfig.defaultTransactionKind = .Deferred // Make it the default. Other transaction kinds are forbidden by SQLite in read-only connections.
+        readerConfig.defaultTransactionKind = .deferred // Make it the default. Other transaction kinds are forbidden by SQLite in read-only connections.
         
         readerPool = Pool<SerializedDatabase>(maximumCount: maximumReaderCount)
         readerPool.makeElement = { [unowned self] in
@@ -107,11 +107,11 @@ public final class DatabasePool {
     /// more information.
     ///
     /// - parameter kind: The checkpoint mode (default passive)
-    public func checkpoint(kind: CheckpointMode = .Passive) throws {
+    public func checkpoint(kind: CheckpointMode = .passive) throws {
         try writer.performSync { db in
             // TODO: read https://www.sqlite.org/c3ref/wal_checkpoint_v2.html and
             // check whether we need a busy handler on writer and/or readers
-            // when kind is not .Passive.
+            // when kind is not .passive.
             let code = sqlite3_wal_checkpoint_v2(db.sqliteConnection, nil, kind.rawValue, nil, nil)
             guard code == SQLITE_OK else {
                 throw DatabaseError(code: code, message: db.lastErrorMessage, sql: nil)
@@ -201,10 +201,10 @@ public final class DatabasePool {
 
 /// The available [checkpoint modes](https://www.sqlite.org/c3ref/wal_checkpoint_v2.html).
 public enum CheckpointMode: Int32 {
-    case Passive = 0    // SQLITE_CHECKPOINT_PASSIVE
-    case Full = 1       // SQLITE_CHECKPOINT_FULL
-    case Restart = 2    // SQLITE_CHECKPOINT_RESTART
-    case Truncate = 3   // SQLITE_CHECKPOINT_TRUNCATE
+    case passive = 0    // SQLITE_CHECKPOINT_PASSIVE
+    case full = 1       // SQLITE_CHECKPOINT_FULL
+    case restart = 2    // SQLITE_CHECKPOINT_RESTART
+    case truncate = 3   // SQLITE_CHECKPOINT_TRUNCATE
 }
 
 
@@ -266,9 +266,9 @@ extension DatabasePool : DatabaseReader {
         return try readerPool.get { reader in
             try reader.performSync { db in
                 var result: T? = nil
-                try db.inTransaction(.Deferred) {
+                try db.inTransaction(.deferred) {
                     result = try block(db: db)
-                    return .Commit
+                    return .commit
                 }
                 return result!
             }
@@ -391,7 +391,7 @@ extension DatabasePool : DatabaseWriter {
     ///
     ///     try dbPool.writeInTransaction { db in
     ///         db.execute(...)
-    ///         return .Commit
+    ///         return .commit
     ///     }
     ///
     /// This method is *not* reentrant.
@@ -399,10 +399,10 @@ extension DatabasePool : DatabaseWriter {
     /// - parameters:
     ///     - kind: The transaction type (default nil). If nil, the transaction
     ///       type is configuration.defaultTransactionKind, which itself
-    ///       defaults to .Immediate. See https://www.sqlite.org/lang_transaction.html
+    ///       defaults to .immediate. See https://www.sqlite.org/lang_transaction.html
     ///       for more information.
     ///     - block: A block that executes SQL statements and return either
-    ///       .Commit or .Rollback.
+    ///       .commit or .rollback.
     /// - throws: The error thrown by the block.
     public func writeInTransaction(kind: TransactionKind? = nil, _ block: (db: Database) throws -> TransactionCompletion) throws {
         try writer.performSync { db in
@@ -445,11 +445,11 @@ extension DatabasePool : DatabaseWriter {
         self.readerPool.get { reader in
             reader.performAsync { db in
                 // Assume COMMIT DEFERRED TRANSACTION does not throw error.
-                try! db.inTransaction(.Deferred) {
+                try! db.inTransaction(.deferred) {
                     // Now we're isolated: release the writing queue
                     dispatch_semaphore_signal(semaphore)
                     block(db: db)
-                    return .Commit
+                    return .commit
                 }
             }
         }

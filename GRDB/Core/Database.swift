@@ -46,7 +46,7 @@ public final class Database {
     var schemaCache: DatabaseSchemaCacheType    // internal so that it can be tested
     
     /// See setupTransactionHooks(), updateStatementDidFail(), updateStatementDidExecute()
-    private var transactionState: TransactionState = .WaitForTransactionCompletion
+    private var transactionState: TransactionState = .waitForTransactionCompletion
     
     /// The transaction observers
     private var transactionObservers = [WeakTransactionObserver]()
@@ -128,14 +128,14 @@ public final class Database {
     
     private func setupBusyMode() {
         switch configuration.busyMode {
-        case .ImmediateError:
+        case .immediateError:
             break
             
-        case .Timeout(let duration):
+        case .timeout(let duration):
             let milliseconds = Int32(duration * 1000)
             sqlite3_busy_timeout(sqliteConnection, milliseconds)
             
-        case .Callback(let callback):
+        case .callback(let callback):
             let dbPointer = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
             busyCallback = callback
             
@@ -192,17 +192,17 @@ public final class Database {
 
 /// An SQLite threading mode. See https://www.sqlite.org/threadsafe.html.
 enum ThreadingMode {
-    case Default
-    case MultiThread
-    case Serialized
+    case SQLiteDefault
+    case multiThread
+    case serialized
     
     var sqliteOpenFlags: Int32 {
         switch self {
-        case .Default:
+        case .SQLiteDefault:
             return 0
-        case .MultiThread:
+        case .multiThread:
             return SQLITE_OPEN_NOMUTEX
-        case .Serialized:
+        case .serialized:
             return SQLITE_OPEN_FULLMUTEX
         }
     }
@@ -218,17 +218,17 @@ public typealias BusyCallback = (numberOfTries: Int) -> Bool
 /// The BusyMode enum describes the behavior of GRDB when such a situation
 /// occurs:
 ///
-/// - .ImmediateError: The SQLITE_BUSY error is immediately returned to the
+/// - .immediateError: The SQLITE_BUSY error is immediately returned to the
 ///   connection that tries to access the locked database.
 ///
-/// - .Timeout: The SQLITE_BUSY error will be returned only if the database
+/// - .timeout: The SQLITE_BUSY error will be returned only if the database
 ///   remains locked for more than the specified duration.
 ///
-/// - .Callback: Perform your custom lock handling.
+/// - .callback: Perform your custom lock handling.
 ///
 /// To set the busy mode of a database, use Configuration:
 ///
-///     let configuration = Configuration(busyMode: .Timeout(1))
+///     let configuration = Configuration(busyMode: .timeout(1))
 ///     let dbQueue = DatabaseQueue(path: "...", configuration: configuration)
 ///
 /// Relevant SQLite documentation:
@@ -240,15 +240,15 @@ public typealias BusyCallback = (numberOfTries: Int) -> Bool
 public enum BusyMode {
     /// The SQLITE_BUSY error is immediately returned to the connection that
     /// tries to access the locked database.
-    case ImmediateError
+    case immediateError
     
     /// The SQLITE_BUSY error will be returned only if the database remains
     /// locked for more than the specified duration.
-    case Timeout(NSTimeInterval)
+    case timeout(NSTimeInterval)
     
     /// A custom callback that is called when a database is locked.
     /// See https://www.sqlite.org/c3ref/busy_handler.html
-    case Callback(BusyCallback)
+    case callback(BusyCallback)
 }
 
 
@@ -358,7 +358,7 @@ extension Database {
         
         if let arguments = arguments {
             switch arguments.kind {
-            case .Values(let values):
+            case .values(let values):
                 // Extract as many values as needed, statement after statement:
                 var remainingValues = values
                 consumeArguments = { (statement: UpdateStatement) -> StatementArguments in
@@ -378,7 +378,7 @@ extension Database {
                         throw DatabaseError(code: SQLITE_MISUSE, message: "wrong number of statement arguments: \(values.count)")
                     }
                 }
-            case .NamedValues:
+            case .namedValues:
                 // Reuse the dictionary argument for all statements:
                 consumeArguments = { _ in return arguments }
                 validateRemainingArguments = { _ in }
@@ -481,15 +481,15 @@ extension Database {
                 do {
                     let result = try function.function(argc, argv)
                     switch result.storage {
-                    case .Null:
+                    case .null:
                         sqlite3_result_null(context)
-                    case .Int64(let int64):
+                    case .int64(let int64):
                         sqlite3_result_int64(context, int64)
-                    case .Double(let double):
+                    case .double(let double):
                         sqlite3_result_double(context, double)
-                    case .String(let string):
+                    case .string(let string):
                         sqlite3_result_text(context, string, -1, SQLITE_TRANSIENT)
-                    case .Blob(let data):
+                    case .blob(let data):
                         sqlite3_result_blob(context, data.bytes, Int32(data.length), SQLITE_TRANSIENT)
                     }
                 } catch let error as DatabaseError {
@@ -562,7 +562,7 @@ public final class DatabaseFunction {
         self.pure = pure
         self.function = { (argc, argv) in
             let arguments = (0..<Int(argc)).map { index in DatabaseValue(sqliteValue: argv[index]!) }
-            return try function(arguments)?.databaseValue ?? .Null
+            return try function(arguments)?.databaseValue ?? .null
         }
     }
 }
@@ -773,7 +773,7 @@ extension Database {
         switch pkColumnInfos.count {
         case 0:
             // No primary key column
-            primaryKey = PrimaryKey.None
+            primaryKey = PrimaryKey.none
         case 1:
             // Single column
             let pkColumnInfo = pkColumnInfos.first!
@@ -799,13 +799,13 @@ extension Database {
             // FIXME: We ignore the exception, and consider all INTEGER primary
             // keys as aliases for the rowid:
             if pkColumnInfo.type.uppercased() == "INTEGER" {
-                primaryKey = .RowID(pkColumnInfo.name)
+                primaryKey = .rowID(pkColumnInfo.name)
             } else {
-                primaryKey = .Regular([pkColumnInfo.name])
+                primaryKey = .regular([pkColumnInfo.name])
             }
         default:
             // Multi-columns primary key
-            primaryKey = .Regular(pkColumnInfos.map { $0.name })
+            primaryKey = .regular(pkColumnInfos.map { $0.name })
         }
         
         schemaCache.setPrimaryKey(primaryKey, forTableName: tableName)
@@ -844,24 +844,24 @@ extension Database {
 enum PrimaryKey {
     
     /// No primary key
-    case None
+    case none
     
     /// An INTEGER PRIMARY KEY column that aliases the Row ID.
     /// Associated string is the column name.
-    case RowID(String)
+    case rowID(String)
     
     /// Any primary key, but INTEGER PRIMARY KEY.
     /// Associated strings are column names.
-    case Regular([String])
+    case regular([String])
     
     /// The columns in the primary key. May be empty.
     var columns: [String] {
         switch self {
-        case .None:
+        case .none:
             return []
-        case .RowID(let column):
+        case .rowID(let column):
             return [column]
-        case .Regular(let columns):
+        case .regular(let columns):
             return columns
         }
     }
@@ -869,11 +869,11 @@ enum PrimaryKey {
     /// The name of the INTEGER PRIMARY KEY
     var rowIDColumn: String? {
         switch self {
-        case .None:
+        case .none:
             return nil
-        case .RowID(let column):
+        case .rowID(let column):
             return column
-        case .Regular:
+        case .regular:
             return nil
         }
     }
@@ -930,7 +930,7 @@ extension Database {
     ///     try dbQueue.inDatabase do {
     ///         try db.inTransaction {
     ///             try db.execute("INSERT ...")
-    ///             return .Commit
+    ///             return .commit
     ///         }
     ///     }
     ///
@@ -942,27 +942,27 @@ extension Database {
     /// - parameters:
     ///     - kind: The transaction type (default nil). If nil, the transaction
     ///       type is configuration.defaultTransactionKind, which itself
-    ///       defaults to .Immediate. See https://www.sqlite.org/lang_transaction.html
+    ///       defaults to .immediate. See https://www.sqlite.org/lang_transaction.html
     ///       for more information.
     ///     - block: A block that executes SQL statements and return either
-    ///       .Commit or .Rollback.
+    ///       .commit or .rollback.
     /// - throws: The error thrown by the block.
     public func inTransaction(_ kind: TransactionKind? = nil, @noescape _ block: () throws -> TransactionCompletion) throws {
         try beginTransaction(kind ?? configuration.defaultTransactionKind)
         
-        var completion: TransactionCompletion = .Rollback
+        var completion: TransactionCompletion = .rollback
         var blockError: ErrorProtocol? = nil
         do {
             completion = try block()
         } catch {
-            completion = .Rollback
+            completion = .rollback
             blockError = error
         }
         
         switch completion {
-        case .Commit:
+        case .commit:
             try commit()
-        case .Rollback:
+        case .rollback:
             // https://www.sqlite.org/lang_transaction.html#immediate
             //
             // > Response To Errors Within A Transaction
@@ -1000,11 +1000,11 @@ extension Database {
     
     private func beginTransaction(_ kind: TransactionKind) throws {
         switch kind {
-        case .Deferred:
+        case .deferred:
             try execute("BEGIN DEFERRED TRANSACTION")
-        case .Immediate:
+        case .immediate:
             try execute("BEGIN IMMEDIATE TRANSACTION")
-        case .Exclusive:
+        case .exclusive:
             try execute("BEGIN EXCLUSIVE TRANSACTION")
         }
     }
@@ -1050,10 +1050,10 @@ extension Database {
         // Reset transactionState before didRollback eventually executes
         // other statements.
         let transactionState = self.transactionState
-        self.transactionState = .WaitForTransactionCompletion
+        self.transactionState = .waitForTransactionCompletion
         
         switch transactionState {
-        case .RollbackFromTransactionObserver(let error):
+        case .rollbackFromTransactionObserver(let error):
             didRollback()
             throw error
         default:
@@ -1065,12 +1065,12 @@ extension Database {
         // Reset transactionState before didCommit or didRollback eventually
         // execute other statements.
         let transactionState = self.transactionState
-        self.transactionState = .WaitForTransactionCompletion
+        self.transactionState = .waitForTransactionCompletion
         
         switch transactionState {
-        case .Commit:
+        case .commit:
             didCommit()
-        case .Rollback:
+        case .rollback:
             didRollback()
         default:
             break
@@ -1120,11 +1120,11 @@ extension Database {
             let db = unsafeBitCast(dbPointer, to: Database.self)
             do {
                 try db.willCommit()
-                db.transactionState = .Commit
+                db.transactionState = .commit
                 // Next step: updateStatementDidExecute()
                 return 0
             } catch {
-                db.transactionState = .RollbackFromTransactionObserver(error)
+                db.transactionState = .rollbackFromTransactionObserver(error)
                 // Next step: sqlite3_rollback_hook callback
                 return 1
             }
@@ -1134,11 +1134,11 @@ extension Database {
         sqlite3_rollback_hook(sqliteConnection, { dbPointer in
             let db = unsafeBitCast(dbPointer, to: Database.self)
             switch db.transactionState {
-            case .RollbackFromTransactionObserver:
+            case .rollbackFromTransactionObserver:
                 // Next step: updateStatementDidFail()
                 break
             default:
-                db.transactionState = .Rollback
+                db.transactionState = .rollback
                 // Next step: updateStatementDidExecute()
             }
             }, dbPointer)
@@ -1154,25 +1154,25 @@ extension Database {
 
 /// An SQLite transaction kind. See https://www.sqlite.org/lang_transaction.html
 public enum TransactionKind {
-    case Deferred
-    case Immediate
-    case Exclusive
+    case deferred
+    case immediate
+    case exclusive
 }
 
 
 /// The end of a transaction: Commit, or Rollback
 public enum TransactionCompletion {
-    case Commit
-    case Rollback
+    case commit
+    case rollback
 }
 
 /// The states that keep track of transaction completions in order to notify
 /// transaction observers.
 private enum TransactionState {
-    case WaitForTransactionCompletion
-    case Commit
-    case Rollback
-    case RollbackFromTransactionObserver(ErrorProtocol)
+    case waitForTransactionCompletion
+    case commit
+    case rollback
+    case rollbackFromTransactionObserver(ErrorProtocol)
 }
 
 /// A transaction observer is notified of all changes and transactions committed
@@ -1232,9 +1232,9 @@ public struct DatabaseEvent {
     
     /// An event kind
     public enum Kind: Int32 {
-        case Insert = 18    // SQLITE_INSERT
-        case Delete = 9     // SQLITE_DELETE
-        case Update = 23    // SQLITE_UPDATE
+        case insert = 18    // SQLITE_INSERT
+        case delete = 9     // SQLITE_DELETE
+        case update = 23    // SQLITE_UPDATE
     }
     
     /// The event kind

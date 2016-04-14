@@ -49,17 +49,17 @@ public struct Configuration {
     // MARK: - Transactions
     
     /// The default kind of transaction.
-    public var defaultTransactionKind: TransactionKind = .Immediate
+    public var defaultTransactionKind: TransactionKind = .immediate
     
     
     // MARK: - Concurrency
     
-    public var busyMode: BusyMode = .ImmediateError
+    public var busyMode: BusyMode = .immediateError
     
     
     // MARK: - Internal
     
-    var threadingMode: ThreadingMode = .Default
+    var threadingMode: ThreadingMode = .SQLiteDefault
     var SQLiteConnectionDidOpen: (() -> ())?
     var SQLiteConnectionDidClose: (() -> ())?
     
@@ -72,8 +72,8 @@ public struct Configuration {
     /// - fileAttributes: nil
     /// - foreignKeysEnabled: true
     /// - trace: nil
-    /// - defaultTransactionKind: .Immediate
-    /// - busyMode: .ImmediateError
+    /// - defaultTransactionKind: .immediate
+    /// - busyMode: .immediateError
     public init() { }
     
     

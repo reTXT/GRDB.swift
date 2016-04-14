@@ -6,7 +6,7 @@ public struct FetchRequest<T> {
     
     /// Initializes a FetchRequest based on table *tableName*.
     public init(tableName: String) {
-        self.init(query: _SQLSelectQuery(select: [_SQLResultColumn.Star(nil)], from: .Table(name: tableName, alias: nil)))
+        self.init(query: _SQLSelectQuery(select: [_SQLResultColumn.star(nil)], from: .table(name: tableName, alias: nil)))
     }
     
     /// Returns a prepared statement that is ready to be executed.
@@ -66,7 +66,7 @@ extension FetchRequest {
     public func filter(_ predicate: _SQLExpressionType) -> FetchRequest<T> {
         var query = self.query
         if let whereExpression = query.whereExpression {
-            query.whereExpression = .InfixOperator("AND", whereExpression, predicate.sqlExpression)
+            query.whereExpression = .infixOperator("AND", whereExpression, predicate.sqlExpression)
         } else {
             query.whereExpression = predicate.sqlExpression
         }
@@ -183,13 +183,13 @@ extension FetchRequest {
     /// Returns an SQL expression that checks the inclusion of a value in
     /// the results of another request.
     public func contains(_ element: _SQLExpressionType) -> _SQLExpression {
-        return .InSubQuery(query, element.sqlExpression)
+        return .inSubQuery(query, element.sqlExpression)
     }
     
     /// Returns an SQL expression that checks whether the receiver, as a
     /// subquery, returns any row.
     public var exists: _SQLExpression {
-        return .Exists(query)
+        return .exists(query)
     }
 }
 

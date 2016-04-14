@@ -32,7 +32,7 @@ final class SerializedDatabase {
         // Since our database connection is only used via our serial dispatch
         // queue, there is no purpose using the default serialized mode.
         var config = configuration
-        config.threadingMode = .MultiThread
+        config.threadingMode = .multiThread
         
         db = try Database(path: path, configuration: config, schemaCache: schemaCache)
         queue = dispatch_queue_create("GRDB.SerializedDatabase", nil)

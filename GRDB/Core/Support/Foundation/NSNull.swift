@@ -3,9 +3,9 @@ import Foundation
 /// NSNull adopts DatabaseValueConvertible
 extension NSNull: DatabaseValueConvertible {
     
-    /// Returns DatabaseValue.Null.
+    /// Returns DatabaseValue.null.
     public var databaseValue: DatabaseValue {
-        return .Null
+        return .null
     }
     
     /// Returns nil.

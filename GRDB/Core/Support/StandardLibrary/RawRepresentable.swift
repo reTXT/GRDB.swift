@@ -2,16 +2,16 @@
 /// is itself DatabaseValueConvertible:
 ///
 ///     enum Color : Int {
-///         case Red
-///         case White
-///         case Rose
+///         case red
+///         case white
+///         case rose
 ///     }
 ///
 ///     // Declare DatabaseValueConvertible adoption:
 ///     extension Color : DatabaseValueConvertible { }
 ///
 ///     // Gain full GRDB.swift support:
-///     db.execute("INSERT INTO colors (color) VALUES (?)", [Color.Red])
+///     db.execute("INSERT INTO colors (color) VALUES (?)", [Color.red])
 ///     let color: Color? = Color.fetchOne(db, "SELECT ...")
 public extension RawRepresentable where Self: DatabaseValueConvertible, Self.RawValue: DatabaseValueConvertible {
     

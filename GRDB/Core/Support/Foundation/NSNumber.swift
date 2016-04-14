@@ -30,9 +30,9 @@ extension NSNumber: DatabaseValueConvertible {
     /// Returns an NSNumber initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> Self? {
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return self.init(value: int64)
-        case .Double(let double):
+        case .double(let double):
             return self.init(value: double)
         default:
             return nil

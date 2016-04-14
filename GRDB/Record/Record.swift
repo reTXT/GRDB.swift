@@ -170,7 +170,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
         return AnyIterator {
             // Loop until we find a change, or exhaust columns:
             while let (column, newValue) = newValueIterator.next() {
-                let new = newValue?.databaseValue ?? .Null
+                let new = newValue?.databaseValue ?? .null
                 guard let old = oldRow?[column] else {
                     return (column: column, old: nil)
                 }
@@ -252,7 +252,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     ///
     /// - parameter db: A database connection.
     /// - throws: A DatabaseError is thrown whenever an SQLite error occurs.
-    ///   PersistenceError.NotFound is thrown if the primary key does not match
+    ///   PersistenceError.notFound is thrown if the primary key does not match
     ///   any row in the database and record could not be updated.
     public func update(_ db: Database) throws {
         // The simplest code would be:
@@ -269,7 +269,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
         let dataMapper = DataMapper(db, self)
         let changes = try dataMapper.updateStatement().execute()
         if changes.changedRowCount == 0 {
-            throw PersistenceError.NotFound(self)
+            throw PersistenceError.notFound(self)
         }
         
         // Set hasPersistentChangedValues to false

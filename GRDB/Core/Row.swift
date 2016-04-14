@@ -692,7 +692,7 @@ private struct DictionaryRowImpl : RowImpl {
     }
     
     func databaseValue(at index: Int) -> DatabaseValue {
-        return dictionary[dictionary.startIndex.advanced(by: index)].1?.databaseValue ?? .Null
+        return dictionary[dictionary.startIndex.advanced(by: index)].1?.databaseValue ?? .null
     }
     
     func columnName(at index: Int) -> String {

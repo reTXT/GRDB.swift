@@ -120,15 +120,15 @@ public class Statement {
         try! clearBindings()
         
         switch arguments.kind {
-        case .Values(let values):
+        case .values(let values):
             for (index, value) in values.enumerated() {
-                try! bind(databaseValue: value?.databaseValue ?? .Null, atIndex: Int32(index + 1))
+                try! bind(databaseValue: value?.databaseValue ?? .null, at: Int32(index + 1))
             }
             break
-        case .NamedValues(let namedValues):
+        case .namedValues(let namedValues):
             for (index, argumentName) in sqliteArgumentNames.enumerated() {
                 if let argumentName = argumentName, let value = namedValues[argumentName] {
-                    try! bind(databaseValue: value?.databaseValue ?? .Null, atIndex: Int32(index + 1))
+                    try! bind(databaseValue: value?.databaseValue ?? .null, at: Int32(index + 1))
                 }
             }
         }
@@ -144,22 +144,22 @@ public class Statement {
         try! reset()
         try! clearBindings()
         for (index, databaseValue) in bindings.enumerated() {
-            try bind(databaseValue: databaseValue, atIndex: Int32(index + 1))
+            try bind(databaseValue: databaseValue, at: Int32(index + 1))
         }
     }
     
-    private func bind(databaseValue: DatabaseValue, atIndex index: Int32) throws {
+    private func bind(databaseValue: DatabaseValue, at index: Int32) throws {
         let code: Int32
         switch databaseValue.storage {
-        case .Null:
+        case .null:
             code = sqlite3_bind_null(sqliteStatement, index)
-        case .Int64(let int64):
+        case .int64(let int64):
             code = sqlite3_bind_int64(sqliteStatement, index, int64)
-        case .Double(let double):
+        case .double(let double):
             code = sqlite3_bind_double(sqliteStatement, index, double)
-        case .String(let string):
+        case .string(let string):
             code = sqlite3_bind_text(sqliteStatement, index, string, -1, SQLITE_TRANSIENT)
-        case .Blob(let data):
+        case .blob(let data):
             code = sqlite3_bind_blob(sqliteStatement, index, data.bytes, Int32(data.length), SQLITE_TRANSIENT)
         }
         
@@ -185,10 +185,10 @@ public class Statement {
         // If one of the values is nil, then we have a missing argument.
         let keyValueBindings: [(String?, DatabaseValue?)] = {
             switch arguments.kind {
-            case .Values(let values):
+            case .values(let values):
                 var keyValueBindings: [(String?, DatabaseValue?)] = []
                 var argumentNameIter = sqliteArgumentNames.makeIterator()
-                var valuesIter = values.map { $0?.databaseValue ?? .Null }.makeIterator()
+                var valuesIter = values.map { $0?.databaseValue ?? .null }.makeIterator()
                 var argumentNameOpt = argumentNameIter.next()
                 var valueOpt = valuesIter.next()
                 outer: while true {
@@ -209,11 +209,11 @@ public class Statement {
                 }
                 return keyValueBindings
                 
-            case .NamedValues(let namedValues):
+            case .namedValues(let namedValues):
                 return sqliteArgumentNames.map { argumentName in
                     if let argumentName = argumentName {
                         if let value = namedValues[argumentName] {
-                            return (argumentName, value?.databaseValue ?? .Null)
+                            return (argumentName, value?.databaseValue ?? .null)
                         } else {
                             return (argumentName, nil)
                         }
@@ -413,7 +413,7 @@ public class DatabaseIterator<Element>: IteratorProtocol {
 ///         let statement = try db.updateStatement("INSERT INTO persons (name) VALUES (?)")
 ///         try statement.execute(arguments: ["Arthur"])
 ///         try statement.execute(arguments: ["Barbara"])
-///         return .Commit
+///         return .commit
 ///     }
 public final class UpdateStatement : Statement {
     /// If true, the database schema cache gets invalidated after this statement
@@ -542,9 +542,9 @@ public struct StatementArguments {
     
     public var isEmpty: Bool {
         switch kind {
-        case .Values(let values):
+        case .values(let values):
             return values.isEmpty
-        case .NamedValues(let namedValues):
+        case .namedValues(let namedValues):
             return namedValues.isEmpty
         }
     }
@@ -560,7 +560,7 @@ public struct StatementArguments {
     /// - parameter sequence: A sequence of DatabaseValueConvertible values.
     /// - returns: A StatementArguments.
     public init<S: Sequence where S.Iterator.Element == DatabaseValueConvertible?>(_ sequence: S) {
-        kind = .Values(Array(sequence))
+        kind = .values(Array(sequence))
     }
     
     /// Initializes arguments from a sequence of optional values.
@@ -571,7 +571,7 @@ public struct StatementArguments {
     /// - parameter sequence: A sequence of DatabaseValueConvertible values.
     /// - returns: A StatementArguments.
     public init<S: Sequence where S.Iterator.Element: DatabaseValueConvertible>(_ sequence: S) {
-        kind = .Values(sequence.map { $0 })
+        kind = .values(sequence.map { $0 })
     }
     
     
@@ -586,7 +586,7 @@ public struct StatementArguments {
     /// - parameter sequence: A sequence of (key, value) pairs
     /// - returns: A StatementArguments.
     public init(_ dictionary: [String: DatabaseValueConvertible?]) {
-        kind = .NamedValues(dictionary)
+        kind = .namedValues(dictionary)
     }
     
     /// Initializes arguments from a sequence of (key, value) pairs.
@@ -597,7 +597,7 @@ public struct StatementArguments {
     /// - parameter sequence: A sequence of (key, value) pairs
     /// - returns: A StatementArguments.
     public init<S: Sequence where S.Iterator.Element == (String, DatabaseValueConvertible?)>(_ sequence: S) {
-        kind = .NamedValues(Dictionary(keyValueSequence: sequence))
+        kind = .namedValues(Dictionary(keyValueSequence: sequence))
     }
     
     
@@ -606,16 +606,16 @@ public struct StatementArguments {
     /// Returns a double optional
     func value(named name: String) -> DatabaseValueConvertible?? {
         switch kind {
-        case .Values:
+        case .values:
             return nil
-        case .NamedValues(let dictionary):
+        case .namedValues(let dictionary):
             return dictionary[name]
         }
     }
     
     enum Kind {
-        case Values([DatabaseValueConvertible?])
-        case NamedValues(Dictionary<String, DatabaseValueConvertible?>)
+        case values([DatabaseValueConvertible?])
+        case namedValues(Dictionary<String, DatabaseValueConvertible?>)
     }
     
     let kind: Kind
@@ -643,7 +643,7 @@ extension StatementArguments : CustomStringConvertible {
     /// A textual representation of `self`.
     public var description: String {
         switch kind {
-        case .Values(let values):
+        case .values(let values):
             return "["
                 + values
                     .map { value in
@@ -656,7 +656,7 @@ extension StatementArguments : CustomStringConvertible {
                     .joined(separator: ", ")
                 + "]"
             
-        case .NamedValues(let namedValues):
+        case .namedValues(let namedValues):
             return "["
                 + namedValues.map { (key, value) in
                     if let value = value {

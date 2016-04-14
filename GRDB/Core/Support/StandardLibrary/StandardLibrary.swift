@@ -91,9 +91,9 @@ extension Bool: DatabaseValueConvertible, StatementColumnConvertible {
         // store big numbers as Real.
         
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return (int64 != 0)
-        case .Double(let double):
+        case .double(let double):
             return (double != 0.0)
         default:
             return nil
@@ -121,9 +121,9 @@ extension Int: DatabaseValueConvertible, StatementColumnConvertible {
     /// Returns an Int initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> Int? {
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return Int(int64)
-        case .Double(let double):
+        case .double(let double):
             return Int(double)
         default:
             return nil
@@ -151,9 +151,9 @@ extension Int32: DatabaseValueConvertible, StatementColumnConvertible {
     /// Returns an Int32 initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> Int32? {
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return Int32(int64)
-        case .Double(let double):
+        case .double(let double):
             return Int32(double)
         default:
             return nil
@@ -175,15 +175,15 @@ extension Int64: DatabaseValueConvertible, StatementColumnConvertible {
     
     /// Returns a value that can be stored in the database.
     public var databaseValue: DatabaseValue {
-        return DatabaseValue(storage: .Int64(self))
+        return DatabaseValue(storage: .int64(self))
     }
     
     /// Returns an Int64 initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> Int64? {
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return int64
-        case .Double(let double):
+        case .double(let double):
             return Int64(double)
         default:
             return nil
@@ -205,15 +205,15 @@ extension Double: DatabaseValueConvertible, StatementColumnConvertible {
     
     /// Returns a value that can be stored in the database.
     public var databaseValue: DatabaseValue {
-        return DatabaseValue(storage: .Double(self))
+        return DatabaseValue(storage: .double(self))
     }
     
     /// Returns a Double initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> Double? {
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return Double(int64)
-        case .Double(let double):
+        case .double(let double):
             return double
         default:
             return nil
@@ -241,9 +241,9 @@ extension Float: DatabaseValueConvertible, StatementColumnConvertible {
     /// Returns a Float initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> Float? {
         switch databaseValue.storage {
-        case .Int64(let int64):
+        case .int64(let int64):
             return Float(int64)
-        case .Double(let double):
+        case .double(let double):
             return Float(double)
         default:
             return nil
@@ -266,13 +266,13 @@ extension String: DatabaseValueConvertible, StatementColumnConvertible {
     
     /// Returns a value that can be stored in the database.
     public var databaseValue: DatabaseValue {
-        return DatabaseValue(storage: .String(self))
+        return DatabaseValue(storage: .string(self))
     }
     
     /// Returns a String initialized from *databaseValue*, if possible.
     public static func from(databaseValue: DatabaseValue) -> String? {
         switch databaseValue.storage {
-        case .String(let string):
+        case .string(let string):
             return string
         default:
             return nil

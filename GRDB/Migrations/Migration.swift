@@ -25,10 +25,10 @@ struct Migration {
     }
     
     private func runWithoutDisabledForeignKeys(_ db: Database) throws {
-        try db.inTransaction(.Immediate) {
+        try db.inTransaction(.immediate) {
             try self.migrate(db: db)
             try self.insertAppliedIdentifier(db)
-            return .Commit
+            return .commit
         }
     }
     
@@ -46,7 +46,7 @@ struct Migration {
         }
         
         // > 2. Start a transaction.
-        try db.inTransaction(.Immediate) {
+        try db.inTransaction(.immediate) {
             try self.migrate(db: db)
             try self.insertAppliedIdentifier(db)
             
@@ -65,7 +65,7 @@ struct Migration {
             }
             
             // > 11. Commit the transaction started in step 2.
-            return .Commit
+            return .commit
         }
     }
     
