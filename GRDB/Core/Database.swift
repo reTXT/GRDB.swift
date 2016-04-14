@@ -1009,7 +1009,7 @@ extension Database {
     ///
     /// The transaction observer is weakly referenced: it is not retained, and
     /// stops getting notifications after it is deallocated.
-    public func addTransactionObserver(_ transactionObserver: TransactionObserverType) {
+    public func addTransactionObserver(_ transactionObserver: TransactionObserver) {
         preconditionValidQueue()
         transactionObservers.append(WeakTransactionObserver(transactionObserver))
         if transactionObservers.count == 1 {
@@ -1018,7 +1018,7 @@ extension Database {
     }
     
     /// Remove a transaction observer.
-    public func removeTransactionObserver(_ transactionObserver: TransactionObserverType) {
+    public func removeTransactionObserver(_ transactionObserver: TransactionObserver) {
         preconditionValidQueue()
         transactionObservers.removeFirst { $0.observer === transactionObserver }
         if transactionObservers.isEmpty {
@@ -1166,7 +1166,7 @@ private enum TransactionState {
 /// or rollbacked on a database.
 ///
 /// Adopting types must be a class.
-public protocol TransactionObserverType : class {
+public protocol TransactionObserver : class {
     
     /// Notifies a database change (insert, update, or delete).
     ///
@@ -1203,14 +1203,14 @@ public protocol TransactionObserverType : class {
 }
 
 class WeakTransactionObserver {
-    weak var observer: TransactionObserverType?
-    init(_ observer: TransactionObserverType) {
+    weak var observer: TransactionObserver?
+    init(_ observer: TransactionObserver) {
         self.observer = observer
     }
 }
 
 
-/// A database event, notified to TransactionObserverType.
+/// A database event, notified to TransactionObserver.
 ///
 /// See https://www.sqlite.org/c3ref/update_hook.html for more information.
 public struct DatabaseEvent {

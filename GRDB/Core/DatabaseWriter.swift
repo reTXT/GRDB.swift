@@ -66,14 +66,14 @@ extension DatabaseWriter {
     ///
     /// The transaction observer is weakly referenced: it is not retained, and
     /// stops getting notifications after it is deallocated.
-    public func addTransactionObserver(_ transactionObserver: TransactionObserverType) {
+    public func addTransactionObserver(_ transactionObserver: TransactionObserver) {
         write { db in
             db.addTransactionObserver(transactionObserver)
         }
     }
     
     /// Remove a transaction observer.
-    public func removeTransactionObserver(_ transactionObserver: TransactionObserverType) {
+    public func removeTransactionObserver(_ transactionObserver: TransactionObserver) {
         write { db in
             db.removeTransactionObserver(transactionObserver)
         }

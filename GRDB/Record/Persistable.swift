@@ -559,7 +559,7 @@ final class DataMapper {
             // IMPLEMENTATION NOTE
             //
             // It is important to update something, so that
-            // TransactionObserverType can observe a change even though this
+            // TransactionObserver can observe a change even though this
             // change is useless.
             //
             // The goal is to be able to write tests with minimal tables,

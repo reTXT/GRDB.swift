@@ -494,9 +494,9 @@ extension FetchedRecordsController where Record: MutablePersistable {
 
 // MARK: - FetchedRecordsObserver
 
-/// FetchedRecordsController adopts TransactionObserverType so that it can
+/// FetchedRecordsController adopts TransactionObserver so that it can
 /// monitor changes to its fetched records.
-private final class FetchedRecordsObserver<Record: RowConvertible> : TransactionObserverType {
+private final class FetchedRecordsObserver<Record: RowConvertible> : TransactionObserver {
     weak var controller: FetchedRecordsController<Record>?  // If nil, self is invalidated.
     let observedTables: Set<String>
     let isSameRecord: (Record, Record) -> Bool
@@ -517,22 +517,22 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
         controller = nil
     }
     
-    /// Part of the TransactionObserverType protocol
+    /// Part of the TransactionObserver protocol
     func databaseDidChange(withEvent event: DatabaseEvent) {
         if observedTables.contains(event.tableName) {
             needsComputeChanges = true
         }
     }
     
-    /// Part of the TransactionObserverType protocol
+    /// Part of the TransactionObserver protocol
     func databaseWillCommit() throws { }
     
-    /// Part of the TransactionObserverType protocol
+    /// Part of the TransactionObserver protocol
     func databaseDidRollback(_ db: Database) {
         needsComputeChanges = false
     }
     
-    /// Part of the TransactionObserverType protocol
+    /// Part of the TransactionObserver protocol
     func databaseDidCommit(_ db: Database) {
         // The databaseDidCommit callback is called in the database writer
         // dispatch queue, which is serialized: it is guaranteed to process the
