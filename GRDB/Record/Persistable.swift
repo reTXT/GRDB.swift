@@ -18,7 +18,7 @@ extension PersistenceError : CustomStringConvertible {
     }
 }
 
-private func databaseValue(forColumn column: String, inDictionary dictionary: [String: DatabaseValueConvertible?]) -> DatabaseValue {
+private func databaseValue(for column: String, inDictionary dictionary: [String: DatabaseValueConvertible?]) -> DatabaseValue {
     if let value = dictionary[column] {
         return value?.databaseValue ?? .null
     }
@@ -29,8 +29,8 @@ private func databaseValue(forColumn column: String, inDictionary dictionary: [S
     return .null
 }
 
-private func databaseValues(forColumns columns: [String], inDictionary dictionary: [String: DatabaseValueConvertible?]) -> [DatabaseValue] {
-    return columns.map { databaseValue(forColumn: $0, inDictionary: dictionary) }
+private func databaseValues(for columns: [String], inDictionary dictionary: [String: DatabaseValueConvertible?]) -> [DatabaseValue] {
+    return columns.map { databaseValue(for: $0, inDictionary: dictionary) }
 }
 
 
@@ -40,7 +40,7 @@ private func databaseValues(forColumns columns: [String], inDictionary dictionar
 ///
 /// This protocol is intented for types that have an INTEGER PRIMARY KEY, and
 /// are interested in the inserted RowID: they can mutate themselves upon
-/// successful insertion with the didInsert(withRowID:forColumn:) method.
+/// successful insertion with the didInsert(with:for:) method.
 ///
 /// The insert() and save() methods are mutating methods.
 public protocol MutablePersistable : TableMapping {
@@ -74,7 +74,7 @@ public protocol MutablePersistable : TableMapping {
     ///         var id: Int64?
     ///         var name: String?
     ///
-    ///         mutating func didInsert(withRowID rowID: Int64, forColumn column: String?) {
+    ///         mutating func didInsert(with rowID: Int64, for column: String?) {
     ///             self.id = rowID
     ///         }
     ///     }
@@ -82,7 +82,7 @@ public protocol MutablePersistable : TableMapping {
     /// - parameters:
     ///     - rowID: The inserted rowID.
     ///     - column: The name of the eventual INTEGER PRIMARY KEY column.
-    mutating func didInsert(withRowID rowID: Int64, forColumn column: String?)
+    mutating func didInsert(with rowID: Int64, for column: String?)
     
     
     // MARK: - CRUD
@@ -92,7 +92,7 @@ public protocol MutablePersistable : TableMapping {
     /// This method is guaranteed to have inserted a row in the database if it
     /// returns without error.
     ///
-    /// Upon successful insertion, the didInsert(withRowID:forColumn:) method
+    /// Upon successful insertion, the didInsert(with:for:) method
     /// is called with the inserted RowID and the eventual INTEGER PRIMARY KEY
     /// column name.
     ///
@@ -172,7 +172,7 @@ public extension MutablePersistable {
     /// Notifies the record that it was succesfully inserted.
     ///
     /// The default implementation does nothing.
-    mutating func didInsert(withRowID rowID: Int64, forColumn column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
     }
     
     
@@ -224,7 +224,7 @@ public extension MutablePersistable {
         let primaryKey = try! db.primaryKey(forTableName: databaseTableName)
         
         let persistentDictionary = self.persistentDictionary
-        for column in primaryKey.columns where !databaseValue(forColumn: column, inDictionary: persistentDictionary).isNull {
+        for column in primaryKey.columns where !databaseValue(for: column, inDictionary: persistentDictionary).isNull {
             return true
         }
         return false
@@ -241,7 +241,7 @@ public extension MutablePersistable {
         let dataMapper = DataMapper(db, self)
         let changes = try dataMapper.insertStatement().execute()
         if let rowID = changes.insertedRowID {
-            didInsert(withRowID: rowID, forColumn: dataMapper.primaryKey.rowIDColumn)
+            didInsert(with: rowID, for: dataMapper.primaryKey.rowIDColumn)
         }
     }
     
@@ -328,7 +328,7 @@ extension MutablePersistable {
         let columns = try db.primaryKey(forTableName: databaseTableName()).columns
         return { record in
             let dictionary = record.persistentDictionary
-            return Dictionary<String, DatabaseValue>(keys: columns) { databaseValue(forColumn: $0, inDictionary: dictionary) }
+            return Dictionary<String, DatabaseValue>(keys: columns) { databaseValue(for: $0, inDictionary: dictionary) }
         }
     }
     
@@ -384,14 +384,14 @@ public protocol Persistable : MutablePersistable {
     /// - parameters:
     ///     - rowID: The inserted rowID.
     ///     - column: The name of the eventual INTEGER PRIMARY KEY column.
-    func didInsert(withRowID rowID: Int64, forColumn column: String?)
+    func didInsert(with rowID: Int64, for column: String?)
     
     /// Executes an INSERT statement.
     ///
     /// This method is guaranteed to have inserted a row in the database if it
     /// returns without error.
     ///
-    /// Upon successful insertion, the didInsert(withRowID:forColumn:) method
+    /// Upon successful insertion, the didInsert(with:for:) method
     /// is called with the inserted RowID and the eventual INTEGER PRIMARY KEY
     /// column name.
     ///
@@ -431,7 +431,7 @@ public extension Persistable {
     /// Notifies the record that it was succesfully inserted.
     ///
     /// The default implementation does nothing.
-    func didInsert(withRowID rowID: Int64, forColumn column: String?) {
+    func didInsert(with rowID: Int64, for column: String?) {
     }
     
     // MARK: - Immutable CRUD
@@ -465,7 +465,7 @@ public extension Persistable {
         let dataMapper = DataMapper(db, self)
         let changes = try dataMapper.insertStatement().execute()
         if let rowID = changes.insertedRowID {
-            didInsert(withRowID: rowID, forColumn: dataMapper.primaryKey.rowIDColumn)
+            didInsert(with: rowID, for: dataMapper.primaryKey.rowIDColumn)
         }
     }
     
@@ -550,7 +550,7 @@ final class DataMapper {
     func updateStatement() -> UpdateStatement {
         // Fail early if primary key does not resolve to a database row.
         let primaryKeyColumns = primaryKey.columns
-        let primaryKeyValues = databaseValues(forColumns: primaryKeyColumns, inDictionary: persistentDictionary)
+        let primaryKeyValues = databaseValues(for: primaryKeyColumns, inDictionary: persistentDictionary)
         GRDBPrecondition(primaryKeyValues.contains { !$0.isNull }, "invalid primary key in \(persistable)")
         
         // Update everything but primary key
@@ -566,7 +566,7 @@ final class DataMapper {
             // including tables made of a single primary key column.
             updatedColumns = primaryKeyColumns
         }
-        let updatedValues = databaseValues(forColumns: updatedColumns, inDictionary: persistentDictionary)
+        let updatedValues = databaseValues(for: updatedColumns, inDictionary: persistentDictionary)
         
         let query = UpdateQuery(
             tableName: databaseTableName,
@@ -580,7 +580,7 @@ final class DataMapper {
     func deleteStatement() -> UpdateStatement {
         // Fail early if primary key does not resolve to a database row.
         let primaryKeyColumns = primaryKey.columns
-        let primaryKeyValues = databaseValues(forColumns: primaryKeyColumns, inDictionary: persistentDictionary)
+        let primaryKeyValues = databaseValues(for: primaryKeyColumns, inDictionary: persistentDictionary)
         GRDBPrecondition(primaryKeyValues.contains { !$0.isNull }, "invalid primary key in \(persistable)")
         
         let query = DeleteQuery(
@@ -594,7 +594,7 @@ final class DataMapper {
     func existsStatement() -> SelectStatement {
         // Fail early if primary key does not resolve to a database row.
         let primaryKeyColumns = primaryKey.columns
-        let primaryKeyValues = databaseValues(forColumns: primaryKeyColumns, inDictionary: persistentDictionary)
+        let primaryKeyValues = databaseValues(for: primaryKeyColumns, inDictionary: persistentDictionary)
         GRDBPrecondition(primaryKeyValues.contains { !$0.isNull }, "invalid primary key in \(persistable)")
         
         let query = ExistsQuery(
