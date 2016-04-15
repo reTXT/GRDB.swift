@@ -592,16 +592,6 @@ public struct StatementArguments {
     
     // MARK: Not Public
     
-    /// Returns a double optional
-    func value(named name: String) -> DatabaseValueConvertible?? {
-        switch kind {
-        case .values:
-            return nil
-        case .namedValues(let dictionary):
-            return dictionary[name]
-        }
-    }
-    
     enum Kind {
         case values([DatabaseValueConvertible?])
         case namedValues(Dictionary<String, DatabaseValueConvertible?>)
