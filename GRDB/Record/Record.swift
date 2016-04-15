@@ -101,7 +101,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// - parameters:
     ///     - rowID: The inserted rowID.
     ///     - column: The name of the eventual INTEGER PRIMARY KEY column.
-    public func didInsert(withRowID rowID: Int64, forColumn column: String?) {
+    public func didInsert(with rowID: Int64, for column: String?) {
     }
     
     
@@ -221,7 +221,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
         let changes = try dataMapper.insertStatement.execute()
         if let rowID = changes.insertedRowID {
             let rowIDColumn = dataMapper.primaryKey.rowIDColumn
-            didInsert(withRowID: rowID, forColumn: rowIDColumn)
+            didInsert(with: rowID, for: rowIDColumn)
             
             // Update persistentDictionary with inserted id, so that we can
             // set hasPersistentChangedValues to false:
