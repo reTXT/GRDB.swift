@@ -296,7 +296,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.capitalized())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let capitalized = DatabaseFunction("swift_capitalized", argumentCount: 1, pure: true) { databaseValues in
+    public static let capitalized = DatabaseFunction(name: "swift_capitalized", argumentCount: 1, pure: true) { databaseValues in
         guard let string: NSString = databaseValues[0].failableValue() else {
             return nil
         }
@@ -315,7 +315,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.lowercased())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let lowercased = DatabaseFunction("swift_lowercased", argumentCount: 1, pure: true) { databaseValues in
+    public static let lowercased = DatabaseFunction(name: "swift_lowercased", argumentCount: 1, pure: true) { databaseValues in
         guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }
@@ -334,7 +334,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.uppercased())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let uppercased = DatabaseFunction("swift_uppercased", argumentCount: 1, pure: true) { databaseValues in
+    public static let uppercased = DatabaseFunction(name: "swift_uppercased", argumentCount: 1, pure: true) { databaseValues in
         guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }
@@ -356,7 +356,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedCapitalized())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let localizedCapitalized = DatabaseFunction("swift_localizedCapitalized", argumentCount: 1, pure: true) { databaseValues in
+    public static let localizedCapitalized = DatabaseFunction(name: "swift_localizedCapitalized", argumentCount: 1, pure: true) { databaseValues in
         guard let string: NSString = databaseValues[0].failableValue() else {
             return nil
         }
@@ -375,7 +375,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedLowercase())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let localizedLowercase = DatabaseFunction("swift_localizedLowercase", argumentCount: 1, pure: true) { databaseValues in
+    public static let localizedLowercase = DatabaseFunction(name: "swift_localizedLowercase", argumentCount: 1, pure: true) { databaseValues in
         guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }
@@ -394,7 +394,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedUppercase())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let localizedUppercase = DatabaseFunction("swift_localizedUppercase", argumentCount: 1, pure: true) { databaseValues in
+    public static let localizedUppercase = DatabaseFunction(name: "swift_localizedUppercase", argumentCount: 1, pure: true) { databaseValues in
         guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }

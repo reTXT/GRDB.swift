@@ -457,7 +457,7 @@ extension Database {
     
     /// Add or redefine an SQL function.
     ///
-    ///     let fn = DatabaseFunction("succ", argumentCount: 1) { databaseValues in
+    ///     let fn = DatabaseFunction(name: "succ", argumentCount: 1) { databaseValues in
     ///         let dbv = databaseValues.first!
     ///         guard let int = dbv.value() as Int? else {
     ///             return nil
@@ -533,7 +533,7 @@ public final class DatabaseFunction {
     
     /// Returns an SQL function.
     ///
-    ///     let fn = DatabaseFunction("succ", argumentCount: 1) { databaseValues in
+    ///     let fn = DatabaseFunction(name: "succ", argumentCount: 1) { databaseValues in
     ///         let dbv = databaseValues.first!
     ///         guard let int = dbv.value() as Int? else {
     ///             return nil
@@ -556,7 +556,7 @@ public final class DatabaseFunction {
     ///       as Int, String, NSDate, etc. The array is guaranteed to have
     ///       exactly *argumentCount* elements, provided *argumentCount* is
     ///       not nil.
-    public init(_ name: String, argumentCount: Int32? = nil, pure: Bool = false, function: [DatabaseValue] throws -> DatabaseValueConvertible?) {
+    public init(name: String, argumentCount: Int32? = nil, pure: Bool = false, function: [DatabaseValue] throws -> DatabaseValueConvertible?) {
         self.name = name
         self.argumentCount = argumentCount ?? -1
         self.pure = pure

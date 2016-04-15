@@ -66,7 +66,7 @@ public protocol DatabaseReader : class {
     
     /// Add or redefine an SQL function.
     ///
-    ///     let fn = DatabaseFunction("succ", argumentCount: 1) { databaseValues in
+    ///     let fn = DatabaseFunction(name: "succ", argumentCount: 1) { databaseValues in
     ///         let dbv = databaseValues.first!
     ///         guard let int = dbv.value() as Int? else {
     ///             return nil
