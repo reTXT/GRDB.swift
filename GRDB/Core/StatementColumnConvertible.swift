@@ -48,7 +48,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     
     /// Returns a sequence of values fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT name FROM ...")
+    ///     let statement = db.makeSelectStatement("SELECT name FROM ...")
     ///     let names = String.fetch(statement) // DatabaseSequence<String>
     ///
     /// The returned sequence can be consumed several times, but it may yield
@@ -80,7 +80,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     
     /// Returns an array of values fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT name FROM ...")
+    ///     let statement = db.makeSelectStatement("SELECT name FROM ...")
     ///     let names = String.fetchAll(statement)  // [String]
     ///
     /// - parameters:
@@ -94,7 +94,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     
     /// Returns a single value fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT name FROM ...")
+    ///     let statement = db.makeSelectStatement("SELECT name FROM ...")
     ///     let name = String.fetchOne(statement)   // String?
     ///
     /// - parameters:
@@ -141,7 +141,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     /// - returns: A sequence of values.
     @warn_unused_result
     public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
-        return fetch(try! db.selectStatement(sql), arguments: arguments)
+        return fetch(try! db.makeSelectStatement(sql), arguments: arguments)
     }
     
     /// Returns an array of values fetched from an SQL query.
@@ -155,7 +155,7 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     /// - returns: An array of values.
     @warn_unused_result
     public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Self] {
-        return fetchAll(try! db.selectStatement(sql), arguments: arguments)
+        return fetchAll(try! db.makeSelectStatement(sql), arguments: arguments)
     }
     
     /// Returns a single value fetched from an SQL query.
@@ -169,6 +169,6 @@ public extension DatabaseValueConvertible where Self: StatementColumnConvertible
     /// - returns: An optional value.
     @warn_unused_result
     public static func fetchOne(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Self? {
-        return fetchOne(try! db.selectStatement(sql), arguments: arguments)
+        return fetchOne(try! db.makeSelectStatement(sql), arguments: arguments)
     }
 }

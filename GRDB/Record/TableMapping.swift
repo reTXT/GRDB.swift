@@ -91,14 +91,14 @@ extension RowConvertible where Self: TableMapping {
         case 1:
             // SELECT * FROM table WHERE id = ?
             let sql = "SELECT * FROM \(databaseTableName.quotedDatabaseIdentifier) WHERE \(column.quotedDatabaseIdentifier) = ?"
-            let statement = try! db.selectStatement(sql)
+            let statement = try! db.makeSelectStatement(sql)
             statement.arguments = StatementArguments(values)
             return statement
         case let count:
             // SELECT * FROM table WHERE id IN (?,?,?)
             let valuesSQL = databaseQuestionMarks(count: count)
             let sql = "SELECT * FROM \(databaseTableName.quotedDatabaseIdentifier) WHERE \(column.quotedDatabaseIdentifier) IN (\(valuesSQL))"
-            let statement = try! db.selectStatement(sql)
+            let statement = try! db.makeSelectStatement(sql)
             statement.arguments = StatementArguments(values)
             return statement
         }
@@ -177,7 +177,7 @@ extension RowConvertible where Self: TableMapping {
         let databaseTableName = self.databaseTableName()
         let whereClause = whereClauses.joined(separator: " OR ")
         let sql = "SELECT * FROM \(databaseTableName.quotedDatabaseIdentifier) WHERE \(whereClause)"
-        let statement = try! db.selectStatement(sql)
+        let statement = try! db.makeSelectStatement(sql)
         statement.arguments = StatementArguments(arguments)
         return statement
     }

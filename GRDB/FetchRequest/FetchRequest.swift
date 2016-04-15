@@ -17,7 +17,7 @@ public struct FetchRequest<T> {
         // TODO: split statement generation from arguments building
         var bindings: [DatabaseValueConvertible?] = []
         let sql = try query.sql(database, &bindings)
-        let statement = try database.selectStatement(sql)
+        let statement = try database.makeSelectStatement(sql)
         try statement.setArgumentsWithValidation(StatementArguments(bindings))
         return statement
     }

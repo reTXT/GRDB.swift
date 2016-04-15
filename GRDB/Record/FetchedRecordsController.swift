@@ -943,7 +943,7 @@ private enum DatabaseSource<T> {
     func selectStatement(_ db: Database) throws -> SelectStatement {
         switch self {
         case .sql(let sql, let arguments):
-            let statement = try db.selectStatement(sql)
+            let statement = try db.makeSelectStatement(sql)
             if let arguments = arguments {
                 try statement.validate(arguments: arguments)
                 statement.unsafeSetArguments(arguments)

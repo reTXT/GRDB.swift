@@ -10,7 +10,7 @@
 ///     Person.fetchAll(db, "SELECT ...", arguments:...) // [Person]
 ///     Person.fetchOne(db, "SELECT ...", arguments:...) // Person?
 ///
-///     let statement = db.selectStatement("SELECT ...")
+///     let statement = db.makeSelectStatement("SELECT ...")
 ///     Person.fetch(statement, arguments:...)           // DatabaseSequence<Person>
 ///     Person.fetchAll(statement, arguments:...)        // [Person]
 ///     Person.fetchOne(statement, arguments:...)        // Person?
@@ -45,7 +45,7 @@ extension RowConvertible {
     
     /// Returns a sequence of records fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT * FROM persons")
+    ///     let statement = db.makeSelectStatement("SELECT * FROM persons")
     ///     let persons = Person.fetch(statement) // DatabaseSequence<Person>
     ///
     /// The returned sequence can be consumed several times, but it may yield
@@ -76,7 +76,7 @@ extension RowConvertible {
     
     /// Returns an array of records fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT * FROM persons")
+    ///     let statement = db.makeSelectStatement("SELECT * FROM persons")
     ///     let persons = Person.fetchAll(statement) // [Person]
     ///
     /// - parameters:
@@ -90,7 +90,7 @@ extension RowConvertible {
     
     /// Returns a single record fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT * FROM persons")
+    ///     let statement = db.makeSelectStatement("SELECT * FROM persons")
     ///     let person = Person.fetchOne(statement) // Person?
     ///
     /// - parameters:
@@ -128,7 +128,7 @@ extension RowConvertible {
     /// - returns: A sequence of records.
     @warn_unused_result
     public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
-        return fetch(try! db.selectStatement(sql), arguments: arguments)
+        return fetch(try! db.makeSelectStatement(sql), arguments: arguments)
     }
     
     /// Returns an array of records fetched from an SQL query.
@@ -142,7 +142,7 @@ extension RowConvertible {
     /// - returns: An array of records.
     @warn_unused_result
     public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Self] {
-        return fetchAll(try! db.selectStatement(sql), arguments: arguments)
+        return fetchAll(try! db.makeSelectStatement(sql), arguments: arguments)
     }
     
     /// Returns a single record fetched from an SQL query.
@@ -156,6 +156,6 @@ extension RowConvertible {
     /// - returns: An optional record.
     @warn_unused_result
     public static func fetchOne(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Self? {
-        return fetchOne(try! db.selectStatement(sql), arguments: arguments)
+        return fetchOne(try! db.makeSelectStatement(sql), arguments: arguments)
     }
 }

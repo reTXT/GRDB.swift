@@ -411,7 +411,7 @@ extension Row {
     
     /// Returns a sequence of rows fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT ...")
+    ///     let statement = db.makeSelectStatement("SELECT ...")
     ///     for row in Row.fetch(statement) {
     ///         let id: Int64 = row.value(at: 0)
     ///         let name: String = row.value(at: 1)
@@ -453,7 +453,7 @@ extension Row {
     
     /// Returns an array of rows fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT ...")
+    ///     let statement = db.makeSelectStatement("SELECT ...")
     ///     let rows = Row.fetchAll(statement)
     ///
     /// - parameters:
@@ -472,7 +472,7 @@ extension Row {
     
     /// Returns a single row fetched from a prepared statement.
     ///
-    ///     let statement = db.selectStatement("SELECT ...")
+    ///     let statement = db.makeSelectStatement("SELECT ...")
     ///     let row = Row.fetchOne(statement)
     ///
     /// - parameters:
@@ -526,7 +526,7 @@ extension Row {
     /// - returns: A sequence of rows.
     @warn_unused_result
     public static func fetch(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> DatabaseSequence<Row> {
-        return fetch(try! db.selectStatement(sql), arguments: arguments)
+        return fetch(try! db.makeSelectStatement(sql), arguments: arguments)
     }
     
     /// Returns an array of rows fetched from an SQL query.
@@ -540,7 +540,7 @@ extension Row {
     /// - returns: An array of rows.
     @warn_unused_result
     public static func fetchAll(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> [Row] {
-        return fetchAll(try! db.selectStatement(sql), arguments: arguments)
+        return fetchAll(try! db.makeSelectStatement(sql), arguments: arguments)
     }
     
     /// Returns a single row fetched from an SQL query.
@@ -554,7 +554,7 @@ extension Row {
     /// - returns: An optional row.
     @warn_unused_result
     public static func fetchOne(_ db: Database, _ sql: String, arguments: StatementArguments? = nil) -> Row? {
-        return fetchOne(try! db.selectStatement(sql), arguments: arguments)
+        return fetchOne(try! db.makeSelectStatement(sql), arguments: arguments)
     }
 }
 

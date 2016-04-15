@@ -272,9 +272,9 @@ extension Database {
 
 extension Database {
     
-    /// Returns a prepared statement that can be reused.
+    /// Creates a prepared statement that can be reused.
     ///
-    ///     let statement = try db.selectStatement("SELECT COUNT(*) FROM persons WHERE age > ?")
+    ///     let statement = try db.makeSelectStatement("SELECT COUNT(*) FROM persons WHERE age > ?")
     ///     let moreThanTwentyCount = Int.fetchOne(statement, arguments: [20])!
     ///     let moreThanThirtyCount = Int.fetchOne(statement, arguments: [30])!
     ///
@@ -282,7 +282,7 @@ extension Database {
     /// - returns: A SelectStatement.
     /// - throws: A DatabaseError whenever SQLite could not parse the sql query.
     @warn_unused_result
-    public func selectStatement(_ sql: String) throws -> SelectStatement {
+    public func makeSelectStatement(_ sql: String) throws -> SelectStatement {
         return try SelectStatement(database: self, sql: sql)
     }
     
@@ -292,12 +292,12 @@ extension Database {
             return statement
         }
         
-        let statement = try selectStatement(sql)
+        let statement = try makeSelectStatement(sql)
         schemaCache.setSelectStatement(statement, forSQL: sql)
         return statement
     }
     
-    /// Returns a prepared statement that can be reused.
+    /// Creates a prepared statement that can be reused.
     ///
     ///     let statement = try db.updateStatement("INSERT INTO persons (name) VALUES (?)")
     ///     try statement.execute(arguments: ["Arthur"])
@@ -309,7 +309,7 @@ extension Database {
     /// - returns: An UpdateStatement.
     /// - throws: A DatabaseError whenever SQLite could not parse the sql query.
     @warn_unused_result
-    public func updateStatement(_ sql: String) throws -> UpdateStatement {
+    public func makeUpdateStatement(_ sql: String) throws -> UpdateStatement {
         return try UpdateStatement(database: self, sql: sql)
     }
     
@@ -319,7 +319,7 @@ extension Database {
             return statement
         }
         
-        let statement = try updateStatement(sql)
+        let statement = try makeUpdateStatement(sql)
         schemaCache.setUpdateStatement(statement, forSQL: sql)
         return statement
     }
