@@ -363,7 +363,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
     ///
     /// - returns: The index path of *record* in the fetched records, or nil if
     ///   record could not be found.
-    public func indexPathForRecord(record: Record) -> NSIndexPath? {
+    public func indexPath(for record: Record) -> NSIndexPath? {
         guard let fetchedItems = fetchedItems, let index = fetchedItems.index(where: { isSameRecord($0.record, record) }) else {
             return nil
         }
