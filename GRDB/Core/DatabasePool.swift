@@ -73,10 +73,10 @@ public final class DatabasePool {
             
             serializedDatabase.performSync { db in
                 for function in self.functions {
-                    db.addFunction(function)
+                    db.add(function: function)
                 }
                 for collation in self.collations {
-                    db.addCollation(collation)
+                    db.add(collation: collation)
                 }
             }
             
@@ -319,22 +319,22 @@ extension DatabasePool : DatabaseReader {
     ///         }
     ///         return int + 1
     ///     }
-    ///     dbPool.addFunction(fn)
+    ///     dbPool.add(function: fn)
     ///     dbPool.read { db in
     ///         Int.fetchOne(db, "SELECT succ(1)") // 2
     ///     }
-    public func addFunction(_ function: DatabaseFunction) {
+    public func add(function: DatabaseFunction) {
         functions.remove(function)
         functions.insert(function)
-        writer.performSync { db in db.addFunction(function) }
-        readerPool.forEach { $0.performSync { db in db.addFunction(function) } }
+        writer.performSync { db in db.add(function: function) }
+        readerPool.forEach { $0.performSync { db in db.add(function: function) } }
     }
     
     /// Remove an SQL function.
-    public func removeFunction(_ function: DatabaseFunction) {
+    public func remove(function: DatabaseFunction) {
         functions.remove(function)
-        writer.performSync { db in db.removeFunction(function) }
-        readerPool.forEach { $0.performSync { db in db.removeFunction(function) } }
+        writer.performSync { db in db.remove(function: function) }
+        readerPool.forEach { $0.performSync { db in db.remove(function: function) } }
     }
     
     
@@ -345,22 +345,22 @@ extension DatabasePool : DatabaseReader {
     ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
-    ///     dbPool.addCollation(collation)
+    ///     dbPool.add(collation: collation)
     ///     dbPool.write { db in
     ///         try db.execute("CREATE TABLE files (name TEXT COLLATE LOCALIZED_STANDARD")
     ///     }
-    public func addCollation(_ collation: DatabaseCollation) {
+    public func add(collation: DatabaseCollation) {
         collations.remove(collation)
         collations.insert(collation)
-        writer.performSync { db in db.addCollation(collation) }
-        readerPool.forEach { $0.performSync { db in db.addCollation(collation) } }
+        writer.performSync { db in db.add(collation: collation) }
+        readerPool.forEach { $0.performSync { db in db.add(collation: collation) } }
     }
     
     /// Remove a collation.
-    public func removeCollation(_ collation: DatabaseCollation) {
+    public func remove(collation: DatabaseCollation) {
         collations.remove(collation)
-        writer.performSync { db in db.removeCollation(collation) }
-        readerPool.forEach { $0.performSync { db in db.removeCollation(collation) } }
+        writer.performSync { db in db.remove(collation: collation) }
+        readerPool.forEach { $0.performSync { db in db.remove(collation: collation) } }
     }
 }
 

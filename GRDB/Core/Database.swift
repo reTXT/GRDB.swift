@@ -159,14 +159,14 @@ public final class Database {
         ///     let request = Person.select(nameColumn.capitalized())
         ///     let names = String.fetchAll(dbQueue, request)   // [String]
         
-        addFunction(.capitalized)
-        addFunction(.lowercased)
-        addFunction(.uppercased)
+        add(function: .capitalized)
+        add(function: .lowercased)
+        add(function: .uppercased)
         
         if #available(iOS 9.0, OSX 10.11, *) {
-            addFunction(.localizedCapitalized)
-            addFunction(.localizedLowercase)
-            addFunction(.localizedUppercase)
+            add(function: .localizedCapitalized)
+            add(function: .localizedLowercase)
+            add(function: .localizedUppercase)
         }
     }
     
@@ -182,11 +182,11 @@ public final class Database {
         //          ")"
         //      )
         
-        addCollation(.unicodeCompare)
-        addCollation(.caseInsensitiveCompare)
-        addCollation(.localizedCaseInsensitiveCompare)
-        addCollation(.localizedCompare)
-        addCollation(.localizedStandardCompare)
+        add(collation: .unicodeCompare)
+        add(collation: .caseInsensitiveCompare)
+        add(collation: .localizedCaseInsensitiveCompare)
+        add(collation: .localizedCompare)
+        add(collation: .localizedStandardCompare)
     }
 }
 
@@ -464,9 +464,9 @@ extension Database {
     ///         }
     ///         return int + 1
     ///     }
-    ///     db.addFunction(fn)
+    ///     db.add(function: fn)
     ///     Int.fetchOne(db, "SELECT succ(1)")! // 2
-    public func addFunction(_ function: DatabaseFunction) {
+    public func add(function: DatabaseFunction) {
         functions.remove(function)
         functions.insert(function)
         let functionPointer = unsafeBitCast(function, to: UnsafeMutablePointer<Void>.self)
@@ -508,7 +508,7 @@ extension Database {
     }
     
     /// Remove an SQL function.
-    public func removeFunction(_ function: DatabaseFunction) {
+    public func remove(function: DatabaseFunction) {
         functions.remove(function)
         let code = sqlite3_create_function_v2(
             sqliteConnection,
@@ -540,7 +540,7 @@ public final class DatabaseFunction {
     ///         }
     ///         return int + 1
     ///     }
-    ///     db.addFunction(fn)
+    ///     db.add(function: fn)
     ///     Int.fetchOne(db, "SELECT succ(1)")! // 2
     ///
     /// - parameters:
@@ -590,9 +590,9 @@ extension Database {
     ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
-    ///     db.addCollation(collation)
+    ///     db.add(collation: collation)
     ///     try db.execute("CREATE TABLE files (name TEXT COLLATE localized_standard")
-    public func addCollation(_ collation: DatabaseCollation) {
+    public func add(collation: DatabaseCollation) {
         collations.remove(collation)
         collations.insert(collation)
         let collationPointer = unsafeBitCast(collation, to: UnsafeMutablePointer<Void>.self)
@@ -611,7 +611,7 @@ extension Database {
     }
     
     /// Remove a collation.
-    public func removeCollation(_ collation: DatabaseCollation) {
+    public func remove(collation: DatabaseCollation) {
         collations.remove(collation)
         sqlite3_create_collation_v2(
             sqliteConnection,
@@ -631,7 +631,7 @@ public final class DatabaseCollation {
     ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
-    ///     db.addCollation(collation)
+    ///     db.add(collation: collation)
     ///     try db.execute("CREATE TABLE files (name TEXT COLLATE localized_standard")
     ///
     /// - parameters:
@@ -1009,7 +1009,7 @@ extension Database {
     ///
     /// The transaction observer is weakly referenced: it is not retained, and
     /// stops getting notifications after it is deallocated.
-    public func addTransactionObserver(_ transactionObserver: TransactionObserver) {
+    public func add(transactionObserver: TransactionObserver) {
         preconditionValidQueue()
         transactionObservers.append(WeakTransactionObserver(transactionObserver))
         if transactionObservers.count == 1 {
@@ -1018,7 +1018,7 @@ extension Database {
     }
     
     /// Remove a transaction observer.
-    public func removeTransactionObserver(_ transactionObserver: TransactionObserver) {
+    public func remove(transactionObserver: TransactionObserver) {
         preconditionValidQueue()
         transactionObservers.removeFirst { $0.observer === transactionObserver }
         if transactionObservers.isEmpty {

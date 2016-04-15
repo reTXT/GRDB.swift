@@ -248,20 +248,20 @@ extension DatabaseQueue : DatabaseReader {
     ///         }
     ///         return int + 1
     ///     }
-    ///     dbQueue.addFunction(fn)
+    ///     dbQueue.add(function: fn)
     ///     dbQueue.inDatabase { db in
     ///         Int.fetchOne(db, "SELECT succ(1)") // 2
     ///     }
-    public func addFunction(_ function: DatabaseFunction) {
+    public func add(function: DatabaseFunction) {
         serializedDatabase.performSync { db in
-            db.addFunction(function)
+            db.add(function: function)
         }
     }
     
     /// Remove an SQL function.
-    public func removeFunction(_ function: DatabaseFunction) {
+    public func remove(function: DatabaseFunction) {
         serializedDatabase.performSync { db in
-            db.removeFunction(function)
+            db.remove(function: function)
         }
     }
     
@@ -273,20 +273,20 @@ extension DatabaseQueue : DatabaseReader {
     ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
-    ///     dbQueue.addCollation(collation)
+    ///     dbQueue.add(collation: collation)
     ///     try dbQueue.inDatabase { db in
     ///         try db.execute("CREATE TABLE files (name TEXT COLLATE LOCALIZED_STANDARD")
     ///     }
-    public func addCollation(_ collation: DatabaseCollation) {
+    public func add(collation: DatabaseCollation) {
         serializedDatabase.performSync { db in
-            db.addCollation(collation)
+            db.add(collation: collation)
         }
     }
     
     /// Remove a collation.
-    public func removeCollation(_ collation: DatabaseCollation) {
+    public func remove(collation: DatabaseCollation) {
         serializedDatabase.performSync { db in
-            db.removeCollation(collation)
+            db.remove(collation: collation)
         }
     }
 }

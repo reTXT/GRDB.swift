@@ -73,12 +73,12 @@ public protocol DatabaseReader : class {
     ///         }
     ///         return int + 1
     ///     }
-    ///     reader.addFunction(fn)
+    ///     reader.add(function: fn)
     ///     Int.fetchOne(reader, "SELECT succ(1)")! // 2
-    func addFunction(_ function: DatabaseFunction)
+    func add(function: DatabaseFunction)
     
     /// Remove an SQL function.
-    func removeFunction(_ function: DatabaseFunction)
+    func remove(function: DatabaseFunction)
     
     
     // MARK: - Collations
@@ -88,10 +88,10 @@ public protocol DatabaseReader : class {
     ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
-    ///     reader.addCollation(collation)
+    ///     reader.add(collation: collation)
     ///     try reader.execute("SELECT * FROM files ORDER BY name COLLATE localized_standard")
-    func addCollation(_ collation: DatabaseCollation)
+    func add(collation: DatabaseCollation)
     
     /// Remove a collation.
-    func removeCollation(_ collation: DatabaseCollation)
+    func remove(collation: DatabaseCollation)
 }

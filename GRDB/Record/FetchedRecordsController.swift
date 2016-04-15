@@ -261,7 +261,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
                     observedTables: statement.sourceTables,
                     isSameRecord: self.isSameRecord)
                 self.observer = observer
-                db.addTransactionObserver(observer)
+                db.add(transactionObserver: observer)
             }
         }
     }
@@ -293,7 +293,7 @@ public final class FetchedRecordsController<Record: RowConvertible> {
                         observedTables: statement.sourceTables,
                         isSameRecord: self.isSameRecordBuilder(db))
                     self.observer = observer
-                    db.addTransactionObserver(observer)
+                    db.add(transactionObserver: observer)
                 }
             }
         }
