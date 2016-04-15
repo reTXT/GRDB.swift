@@ -299,17 +299,6 @@ public final class SelectStatement : Statement {
         return (0..<self.columnCount).map { String(validatingUTF8: sqlite3_column_name(sqliteStatement, Int32($0)))! }
     }()
     
-    /// Cache for indexOfColumn(). Keys are lowercase.
-    private lazy var columnIndexes: [String: Int] = {
-        return Dictionary(keyValueSequence: self.columnNames.enumerated().map { ($1.lowercased(), $0) }.reversed())
-    }()
-    
-    // This method MUST be case-insensitive, and returns the index of the
-    // leftmost column that matches *name*.
-    func indexOfColumn(named name: String) -> Int? {
-        return columnIndexes[name.lowercased()]
-    }
-    
     /// Creates a DatabaseSequence
     @warn_unused_result
     func fetchSequence<Element>(arguments: StatementArguments?, element: () -> Element) -> DatabaseSequence<Element> {
