@@ -270,7 +270,7 @@ extension DatabaseQueue : DatabaseReader {
     
     /// Add or redefine a collation.
     ///
-    ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
+    ///     let collation = DatabaseCollation(name: "localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
     ///     dbQueue.add(collation: collation)

@@ -427,7 +427,7 @@ extension DatabaseCollation {
     ///             "name TEXT COLLATE \(collationName)" +
     ///         ")"
     ///     )
-    public static let unicodeCompare = DatabaseCollation(unicodeCompareCollationName) { (lhs, rhs) in
+    public static let unicodeCompare = DatabaseCollation(name: unicodeCompareCollationName) { (lhs, rhs) in
         return (lhs < rhs) ? .orderedAscending : ((lhs == rhs) ? .orderedSame : .orderedDescending)
     }
     
@@ -445,7 +445,7 @@ extension DatabaseCollation {
     ///             "name TEXT COLLATE \(collationName)" +
     ///         ")"
     ///     )
-    public static let caseInsensitiveCompare = DatabaseCollation(caseInsensitiveCompareCollationName) { (lhs, rhs) in
+    public static let caseInsensitiveCompare = DatabaseCollation(name: caseInsensitiveCompareCollationName) { (lhs, rhs) in
         return lhs.caseInsensitiveCompare(rhs)
     }
     
@@ -463,7 +463,7 @@ extension DatabaseCollation {
     ///             "name TEXT COLLATE \(collationName)" +
     ///         ")"
     ///     )
-    public static let localizedCaseInsensitiveCompare = DatabaseCollation(localizedCaseInsensitiveCompareCollationName) { (lhs, rhs) in
+    public static let localizedCaseInsensitiveCompare = DatabaseCollation(name: localizedCaseInsensitiveCompareCollationName) { (lhs, rhs) in
         return lhs.localizedCaseInsensitiveCompare(rhs)
     }
     
@@ -481,7 +481,7 @@ extension DatabaseCollation {
     ///             "name TEXT COLLATE \(collationName)" +
     ///         ")"
     ///     )
-    public static let localizedCompare = DatabaseCollation(localizedCompareCollationName) { (lhs, rhs) in
+    public static let localizedCompare = DatabaseCollation(name: localizedCompareCollationName) { (lhs, rhs) in
         return lhs.localizedCompare(rhs)
     }
     
@@ -499,7 +499,7 @@ extension DatabaseCollation {
     ///             "name TEXT COLLATE \(collationName)" +
     ///         ")"
     ///     )
-    public static let localizedStandardCompare = DatabaseCollation(localizedStandardCompareCollationName) { (lhs, rhs) in
+    public static let localizedStandardCompare = DatabaseCollation(name: localizedStandardCompareCollationName) { (lhs, rhs) in
         return lhs.localizedStandardCompare(rhs)
     }
 }

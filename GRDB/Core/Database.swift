@@ -587,7 +587,7 @@ extension Database {
     
     /// Add or redefine a collation.
     ///
-    ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
+    ///     let collation = DatabaseCollation(name: "localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
     ///     db.add(collation: collation)
@@ -628,7 +628,7 @@ public final class DatabaseCollation {
     
     /// Returns a collation.
     ///
-    ///     let collation = DatabaseCollation("localized_standard") { (string1, string2) in
+    ///     let collation = DatabaseCollation(name: "localized_standard") { (string1, string2) in
     ///         return (string1 as NSString).localizedStandardCompare(string2)
     ///     }
     ///     db.add(collation: collation)
@@ -637,7 +637,7 @@ public final class DatabaseCollation {
     /// - parameters:
     ///     - name: The function name.
     ///     - function: A function that compares two strings.
-    public init(_ name: String, function: (String, String) -> NSComparisonResult) {
+    public init(name: String, function: (String, String) -> NSComparisonResult) {
         self.name = name
         self.function = { (length1, buffer1, length2, buffer2) in
             // Buffers are not C strings: they do not end with \0.
