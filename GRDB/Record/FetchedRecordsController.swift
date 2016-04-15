@@ -448,7 +448,7 @@ extension FetchedRecordsController where Record: MutablePersistable {
     ///
     ///     - compareRecordsByPrimaryKey: A boolean that tells if two records
     ///         share the same identity if they share the same primay key.
-    public convenience init(_ databaseWriter: DatabaseWriter, sql: String, arguments: StatementArguments? = nil, queue: dispatch_queue_t = dispatch_get_main_queue(), compareRecordsByPrimaryKey: Bool) {   // TODO: try to remove this compareRecordsByPrimaryKey dummy argument 
+    public convenience init(_ databaseWriter: DatabaseWriter, sql: String, arguments: StatementArguments? = nil, queue: dispatch_queue_t = dispatch_get_main_queue(), compareRecordsByPrimaryKey: Bool) {   // TODO: try to remove this compareRecordsByPrimaryKey dummy argument
         let source: DatabaseSource<Record> = .sql(sql, arguments)
         if compareRecordsByPrimaryKey {
             self.init(databaseWriter: databaseWriter, source: source, queue: queue, isSameRecordBuilder: { db in try! Record.primaryKeyComparator(db) })
@@ -518,7 +518,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
     }
     
     /// Part of the TransactionObserver protocol
-    func databaseDidChange(withEvent event: DatabaseEvent) {
+    func databaseDidChange(with event: DatabaseEvent) {
         if observedTables.contains(event.tableName) {
             needsComputeChanges = true
         }
@@ -609,7 +609,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
                     delegate.controllerWillChangeRecords(controller)
                     controller.fetchedItems = fetchedItems
                     for change in changes {
-                        delegate.controller(controller, didChangeRecord: change.record, withEvent: change.event)
+                        delegate.controller(controller, didChange: change.record, with: change.event)
                     }
                     delegate.controllerDidChangeRecords(controller)
                 } else {
@@ -769,7 +769,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
 ///
 /// # Typical Use
 ///
-/// You can use controllerWillChangeRecords: and controllerDidChangeRecord: to
+/// You can use controllerWillChangeRecords: and controllerDidChangeRecords: to
 /// bracket updates to a table view whose content is provided by the fetched
 /// records controller as illustrated in the following example:
 ///
@@ -777,11 +777,11 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
 ///     // configure(_:at:) method which updates the contents of a
 ///     // given cell.
 ///
-///     func controllerWillChangeRecords<T>(controller: FetchedRecordsController<T>) {
+///     func controllerWillChangeRecords<T>(_ controller: FetchedRecordsController<T>) {
 ///         tableView.beginUpdates()
 ///     }
 ///
-///     func controller<T>(controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent) {
+///     func controller<T>(_ controller: FetchedRecordsController<T>, didChange record: T, with event:FetchedRecordsEvent) {
 ///         switch event {
 ///         case .insertion(let indexPath):
 ///             tableView.insertRows(at: [indexPath], with: .fade)
@@ -807,7 +807,7 @@ private final class FetchedRecordsObserver<Record: RowConvertible> : Transaction
 ///         }
 ///     }
 ///
-///     func controllerDidChangeRecords<T>(controller: FetchedRecordsController<T>) {
+///     func controllerDidChangeRecords<T>(_ controller: FetchedRecordsController<T>) {
 ///         tableView.endUpdates()
 ///     }
 public protocol FetchedRecordsControllerDelegate : class {
@@ -832,7 +832,7 @@ public protocol FetchedRecordsControllerDelegate : class {
     ///
     ///     let personsController: FetchedRecordsController<Person>
     ///
-    ///     func controller<T>(controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent) {
+    ///     func controller<T>(_ controller: FetchedRecordsController<T>, didChange record: T, with event:FetchedRecordsEvent) {
     ///         if controller === personsController {
     ///             let person = record as! Person // Explicit cast
     ///         }
@@ -842,7 +842,7 @@ public protocol FetchedRecordsControllerDelegate : class {
     ///     - controller: The fetched records controller that sent the message.
     ///     - record: The record that changed.
     ///     - event: The type of change (see FetchedRecordsEvent).
-    func controller<T>(_ controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent)
+    func controller<T>(_ controller: FetchedRecordsController<T>, didChange record: T, with event:FetchedRecordsEvent)
     
     /// Notifies that the fetched records controller has completed processing
     /// of one or more changes due to an add, remove, move, or update.
@@ -857,7 +857,7 @@ public extension FetchedRecordsControllerDelegate {
     func controllerWillChangeRecords<T>(_ controller: FetchedRecordsController<T>) { }
 
     /// The default implementation does nothing.
-    func controller<T>(_ controller: FetchedRecordsController<T>, didChangeRecord record: T, withEvent event:FetchedRecordsEvent) { }
+    func controller<T>(_ controller: FetchedRecordsController<T>, didChange record: T, with event:FetchedRecordsEvent) { }
     
     /// The default implementation does nothing.
     func controllerDidChangeRecords<T>(_ controller: FetchedRecordsController<T>) { }

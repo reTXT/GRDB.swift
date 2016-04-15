@@ -1070,9 +1070,9 @@ extension Database {
         }
     }
     
-    private func didChange(withEvent event: DatabaseEvent) {
+    private func didChange(with event: DatabaseEvent) {
         for observer in transactionObservers.flatMap({ $0.observer }) {
-            observer.databaseDidChange(withEvent: event)
+            observer.databaseDidChange(with: event)
         }
     }
     
@@ -1095,7 +1095,7 @@ extension Database {
         
         sqlite3_update_hook(sqliteConnection, { (dbPointer, updateKind, databaseNameCString, tableNameCString, rowID) in
             let db = unsafeBitCast(dbPointer, to: Database.self)
-            db.didChange(withEvent: DatabaseEvent(
+            db.didChange(with: DatabaseEvent(
                 databaseNameCString: databaseNameCString,
                 tableNameCString: tableNameCString,
                 kind: DatabaseEvent.Kind(rawValue: updateKind)!,
@@ -1179,7 +1179,7 @@ public protocol TransactionObserver : class {
     /// need to keep it longer, store a copy of its properties.
     ///
     /// - warning: this method must not change the database.
-    func databaseDidChange(withEvent event: DatabaseEvent)
+    func databaseDidChange(with event: DatabaseEvent)
     
     /// When a transaction is about to be committed, the transaction observer
     /// has an opportunity to rollback pending changes by throwing an error.
