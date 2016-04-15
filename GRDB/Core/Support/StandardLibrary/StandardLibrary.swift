@@ -284,7 +284,7 @@ extension String: DatabaseValueConvertible, StatementColumnConvertible {
 // MARK: - SQL Functions
 
 extension DatabaseFunction {
-    /// An SQL function that returns the Swift built-in capitalized NSString
+    /// An SQL function that returns the Swift built-in capitalized String
     /// property.
     ///
     /// The function returns NULL for non-strings values.
@@ -297,7 +297,7 @@ extension DatabaseFunction {
     ///     let request = Person.select(nameColumn.capitalized())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
     public static let capitalized = DatabaseFunction(name: "swift_capitalized", argumentCount: 1, pure: true) { databaseValues in
-        guard let string: NSString = databaseValues[0].failableValue() else {
+        guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }
         return string.capitalized
@@ -345,7 +345,7 @@ extension DatabaseFunction {
 @available(iOS 9.0, OSX 10.11, *)
 extension DatabaseFunction {
     /// An SQL function that returns the Swift built-in
-    /// string.localizedCapitalized NSString property.
+    /// localizedCapitalized String property.
     ///
     /// The function returns NULL for non-strings values.
     ///
@@ -357,14 +357,14 @@ extension DatabaseFunction {
     ///     let request = Person.select(nameColumn.localizedCapitalized())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
     public static let localizedCapitalized = DatabaseFunction(name: "swift_localizedCapitalized", argumentCount: 1, pure: true) { databaseValues in
-        guard let string: NSString = databaseValues[0].failableValue() else {
+        guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }
         return string.localizedCapitalized
     }
     
     /// An SQL function that returns the Swift built-in
-    /// localizedLowercase NSString property.
+    /// localizedLowercase String property.
     ///
     /// The function returns NULL for non-strings values.
     ///
@@ -375,7 +375,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedLowercase())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let localizedLowercase = DatabaseFunction(name: "swift_localizedLowercase", argumentCount: 1, pure: true) { databaseValues in
+    public static let localizedLowercased = DatabaseFunction(name: "swift_localizedLowercased", argumentCount: 1, pure: true) { databaseValues in
         guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }
@@ -383,7 +383,7 @@ extension DatabaseFunction {
     }
     
     /// An SQL function that returns the Swift built-in
-    /// localizedUppercase NSString property.
+    /// localizedUppercase String property.
     ///
     /// The function returns NULL for non-strings values.
     ///
@@ -394,7 +394,7 @@ extension DatabaseFunction {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedUppercase())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public static let localizedUppercase = DatabaseFunction(name: "swift_localizedUppercase", argumentCount: 1, pure: true) { databaseValues in
+    public static let localizedUppercased = DatabaseFunction(name: "swift_localizedUppercased", argumentCount: 1, pure: true) { databaseValues in
         guard let string: String = databaseValues[0].failableValue() else {
             return nil
         }

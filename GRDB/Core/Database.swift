@@ -165,8 +165,8 @@ public final class Database {
         
         if #available(iOS 9.0, OSX 10.11, *) {
             add(function: .localizedCapitalized)
-            add(function: .localizedLowercase)
-            add(function: .localizedUppercase)
+            add(function: .localizedLowercased)
+            add(function: .localizedUppercased)
         }
     }
     

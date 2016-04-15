@@ -105,14 +105,12 @@ public func sum(_ value: _PrivateSQLExpressible) -> _SQLExpression {
 
 extension _PrivateSQLExpressible {
     /// Returns an SQL expression that applies the Swift's built-in
-    /// capitalized NSString property. It is NULL for non-String arguments.
+    /// capitalized String property. It is NULL for non-String arguments.
     ///
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.capitalized())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public func capitalized() -> _SQLExpression {
-        // TODO: decide if it should be a property or a function.
-        // TODO: Open a bugs.swift.org issue about String/NSString var/function inconsistencies
+    public var capitalized: _SQLExpression {
         return DatabaseFunction.capitalized.apply(sqlExpression)
     }
 
@@ -122,8 +120,7 @@ extension _PrivateSQLExpressible {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.lowercased())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public func lowercased() -> _SQLExpression {
-        // TODO: decide if it should be a property or a function.
+    public var lowercased: _SQLExpression {
         return DatabaseFunction.lowercased.apply(sqlExpression)
     }
 
@@ -133,8 +130,7 @@ extension _PrivateSQLExpressible {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.uppercased())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public func uppercased() -> _SQLExpression {
-        // TODO: decide if it should be a property or a function.
+    public var uppercased: _SQLExpression {
         return DatabaseFunction.uppercased.apply(sqlExpression)
     }
 }
@@ -142,25 +138,23 @@ extension _PrivateSQLExpressible {
 @available(iOS 9.0, OSX 10.11, *)
 extension _PrivateSQLExpressible {
     /// Returns an SQL expression that applies the Swift's built-in
-    /// localizedCapitalized NSString property. It is NULL for non-String arguments.
+    /// localizedCapitalized String property. It is NULL for non-String arguments.
     ///
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedCapitalized())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public func localizedCapitalized() -> _SQLExpression {
-        // TODO: decide if it should be a property or a function.
+    public var localizedCapitalized: _SQLExpression {
         return DatabaseFunction.localizedCapitalized.apply(sqlExpression)
     }
     
     /// Returns an SQL expression that applies the Swift's built-in
-    /// localizedLowercase NSString property. It is NULL for non-String arguments.
+    /// localizedLowercase String property. It is NULL for non-String arguments.
     ///
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedLowercase())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public func localizedLowercase() -> _SQLExpression {
-        // TODO: decide if it should be a property or a function.
-        return DatabaseFunction.localizedLowercase.apply(sqlExpression)
+    public var localizedLowercased: _SQLExpression {
+        return DatabaseFunction.localizedLowercased.apply(sqlExpression)
     }
     
     /// Returns an SQL expression that applies the Swift's built-in
@@ -169,8 +163,8 @@ extension _PrivateSQLExpressible {
     ///     let nameColumn = SQLColumn("name")
     ///     let request = Person.select(nameColumn.localizedUppercase())
     ///     let names = String.fetchAll(dbQueue, request)   // [String]
-    public func localizedUppercase() -> _SQLExpression {
+    public var localizedUppercased: _SQLExpression {
         // TODO: decide if it should be a property or a function.
-        return DatabaseFunction.localizedUppercase.apply(sqlExpression)
+        return DatabaseFunction.localizedUppercased.apply(sqlExpression)
     }
 }
