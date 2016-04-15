@@ -113,8 +113,8 @@ extension Row {
     /// Returns true if and only if the row has that column.
     ///
     /// This method is case-insensitive.
-    public func hasColumn(columnName: String) -> Bool {
-        return impl.indexOfColumn(named: columnName) != nil
+    public func hasColumn(_ columnName: String) -> Bool {
+        return impl.indexOfColumn(columnName) != nil
     }
 }
 
@@ -211,7 +211,7 @@ extension Row {
         //     if row.value(named: "foo") != nil { ... }
         //
         // Without this method, the code above would not compile.
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             return nil
         }
         return impl.databaseValue(at: index).value()
@@ -227,7 +227,7 @@ extension Row {
     /// `Value`. Should this conversion fail, a fatal error is raised.
     @warn_unused_result
     public func value<Value: DatabaseValueConvertible>(named columnName: String) -> Value? {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             return nil
         }
         return impl.databaseValue(at: index).value()
@@ -247,7 +247,7 @@ extension Row {
     /// (see https://www.sqlite.org/datatype3.html).
     @warn_unused_result
     public func value<Value: protocol<DatabaseValueConvertible, StatementColumnConvertible>>(named columnName: String) -> Value? {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             return nil
         }
         return fastValue(atUncheckedIndex: index)
@@ -264,7 +264,7 @@ extension Row {
     /// SQLite value can not be converted to `Value`.
     @warn_unused_result
     public func value<Value: DatabaseValueConvertible>(named columnName: String) -> Value {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             fatalError("no such column: \(columnName)")
         }
         return impl.databaseValue(at: index).value()
@@ -285,7 +285,7 @@ extension Row {
     /// (see https://www.sqlite.org/datatype3.html).
     @warn_unused_result
     public func value<Value: protocol<DatabaseValueConvertible, StatementColumnConvertible>>(named columnName: String) -> Value {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             fatalError("no such column: \(columnName)")
         }
         return fastValue(atUncheckedIndex: index)
@@ -320,7 +320,7 @@ extension Row {
     /// than the row's lifetime.
     @warn_unused_result
     public func dataNoCopy(named columnName: String) -> NSData? {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             return nil
         }
         return impl.dataNoCopy(at: index)
@@ -345,7 +345,7 @@ extension Row {
     /// the same name, the leftmost column is considered.
     @warn_unused_result
     public func databaseValue(named columnName: String) -> DatabaseValue {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             fatalError("no such column: \(columnName)")
         }
         return impl.databaseValue(at: index)
@@ -390,7 +390,7 @@ extension Row {
     /// - parameter columnName: A column name.
     /// - returns: A DatabaseValue if the row contains the requested column.
     public subscript(columnName: String) -> DatabaseValue? {
-        guard let index = impl.indexOfColumn(named: columnName) else {
+        guard let index = impl.indexOfColumn(columnName) else {
             return nil
         }
         return impl.databaseValue(at: index)
@@ -668,7 +668,7 @@ protocol RowImpl {
     
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
-    func indexOfColumn(named name: String) -> Int?
+    func indexOfColumn(_ name: String) -> Int?
     
     // row.impl is guaranteed to be self.
     func copy(row: Row) -> Row
@@ -701,7 +701,7 @@ private struct DictionaryRowImpl : RowImpl {
     
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
-    func indexOfColumn(named name: String) -> Int? {
+    func indexOfColumn(_ name: String) -> Int? {
         let lowercaseName = name.lowercased()
         guard let index = dictionary.index(where: { (column, value) in column.lowercased() == lowercaseName }) else {
             return nil
@@ -743,7 +743,7 @@ private struct StatementCopyRowImpl : RowImpl {
     
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
-    func indexOfColumn(named name: String) -> Int? {
+    func indexOfColumn(_ name: String) -> Int? {
         let lowercaseName = name.lowercased()
         return columnNames.index { $0.lowercased() == lowercaseName }
     }
@@ -791,7 +791,7 @@ private struct StatementRowImpl : RowImpl {
     
     // This method MUST be case-insensitive, and returns the index of the
     // leftmost column that matches *name*.
-    func indexOfColumn(named name: String) -> Int? {
+    func indexOfColumn(_ name: String) -> Int? {
         if let index = lowercaseColumnIndexes[name] {
             return index
         }
@@ -820,7 +820,7 @@ private struct EmptyRowImpl : RowImpl {
         fatalError("row index out of range")
     }
     
-    func indexOfColumn(named name: String) -> Int? {
+    func indexOfColumn(_ name: String) -> Int? {
         return nil
     }
     
