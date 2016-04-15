@@ -448,7 +448,7 @@ extension FetchedRecordsController where Record: MutablePersistable {
     ///
     ///     - compareRecordsByPrimaryKey: A boolean that tells if two records
     ///         share the same identity if they share the same primay key.
-    public convenience init(_ databaseWriter: DatabaseWriter, sql: String, arguments: StatementArguments? = nil, queue: dispatch_queue_t = dispatch_get_main_queue(), compareRecordsByPrimaryKey: Bool) {
+    public convenience init(_ databaseWriter: DatabaseWriter, sql: String, arguments: StatementArguments? = nil, queue: dispatch_queue_t = dispatch_get_main_queue(), compareRecordsByPrimaryKey: Bool) {   // TODO: try to remove this compareRecordsByPrimaryKey dummy argument 
         let source: DatabaseSource<Record> = .sql(sql, arguments)
         if compareRecordsByPrimaryKey {
             self.init(databaseWriter: databaseWriter, source: source, queue: queue, isSameRecordBuilder: { db in try! Record.primaryKeyComparator(db) })
