@@ -155,7 +155,7 @@ public final class DatabasePool {
     /// - param application: The UIApplication that will start a background
     ///   task to let the database pool release its memory when the application
     ///   enters background.
-    public func setupMemoryManagement(application: UIApplication) {
+    public func setupMemoryManagement(in application: UIApplication) {
         self.application = application
         let center = NSNotificationCenter.defaultCenter()
         center.addObserver(self, selector: #selector(DatabasePool.applicationDidReceiveMemoryWarning(_:)), name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)

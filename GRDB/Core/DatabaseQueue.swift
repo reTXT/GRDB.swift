@@ -137,7 +137,7 @@ public final class DatabaseQueue {
     /// - param application: The UIApplication that will start a background
     ///   task to let the database queue release its memory when the application
     ///   enters background.
-    public func setupMemoryManagement(application: UIApplication) {
+    public func setupMemoryManagement(in application: UIApplication) {
         self.application = application
         let center = NSNotificationCenter.defaultCenter()
         center.addObserver(self, selector: #selector(DatabaseQueue.applicationDidReceiveMemoryWarning(_:)), name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
