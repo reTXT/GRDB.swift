@@ -288,7 +288,7 @@ extension Database {
     
     @warn_unused_result
     func cachedSelectStatement(_ sql: String) throws -> SelectStatement {
-        if let statement = schemaCache.selectStatement(sql: sql) {
+        if let statement = schemaCache.selectStatement(sql) {
             return statement
         }
         
@@ -315,7 +315,7 @@ extension Database {
     
     @warn_unused_result
     func cachedUpdateStatement(_ sql: String) throws -> UpdateStatement {
-        if let statement = schemaCache.updateStatement(sql: sql) {
+        if let statement = schemaCache.updateStatement(sql) {
             return statement
         }
         
@@ -719,7 +719,7 @@ extension Database {
     ///
     /// - throws: A DatabaseError if table does not exist.
     func primaryKey(forTableName tableName: String) throws -> PrimaryKey {
-        if let primaryKey = schemaCache.primaryKey(forTableName: tableName) {
+        if let primaryKey = schemaCache.primaryKey(tableName) {
             return primaryKey
         }
         

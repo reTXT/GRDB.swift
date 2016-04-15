@@ -2,13 +2,13 @@
 protocol DatabaseSchemaCache {
     mutating func clear()
     
-    func primaryKey(forTableName tableName: String) -> PrimaryKey?
+    func primaryKey(_ tableName: String) -> PrimaryKey?
     mutating func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String)
 
-    func updateStatement(sql: String) -> UpdateStatement?
+    func updateStatement(_ sql: String) -> UpdateStatement?
     mutating func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String)
     
-    func selectStatement(sql: String) -> SelectStatement?
+    func selectStatement(_ sql: String) -> SelectStatement?
     mutating func setSelectStatement(_ statement: SelectStatement, forSQL sql: String)
 }
 
@@ -29,7 +29,7 @@ class SimpleDatabaseSchemaCache: DatabaseSchemaCache {
         selectStatements = [:]
     }
     
-    func primaryKey(forTableName tableName: String) -> PrimaryKey? {
+    func primaryKey(_ tableName: String) -> PrimaryKey? {
         return primaryKeys[tableName]
     }
     
@@ -37,7 +37,7 @@ class SimpleDatabaseSchemaCache: DatabaseSchemaCache {
         primaryKeys[tableName] = primaryKey
     }
     
-    func updateStatement(sql: String) -> UpdateStatement? {
+    func updateStatement(_ sql: String) -> UpdateStatement? {
         return updateStatements[sql]
     }
     
@@ -45,7 +45,7 @@ class SimpleDatabaseSchemaCache: DatabaseSchemaCache {
         updateStatements[sql] = statement
     }
     
-    func selectStatement(sql: String) -> SelectStatement? {
+    func selectStatement(_ sql: String) -> SelectStatement? {
         return selectStatements[sql]
     }
     
@@ -62,24 +62,24 @@ struct SharedDatabaseSchemaCache: DatabaseSchemaCache {
         cache.write { $0.clear() }
     }
     
-    func primaryKey(forTableName tableName: String) -> PrimaryKey? {
-        return cache.read { $0.primaryKey(forTableName: tableName) }
+    func primaryKey(_ tableName: String) -> PrimaryKey? {
+        return cache.read { $0.primaryKey(tableName) }
     }
     
     mutating func setPrimaryKey(_ primaryKey: PrimaryKey, forTableName tableName: String) {
         cache.write { $0.setPrimaryKey(primaryKey, forTableName: tableName) }
     }
     
-    func updateStatement(sql: String) -> UpdateStatement? {
-        return cache.read { $0.updateStatement(sql: sql) }
+    func updateStatement(_ sql: String) -> UpdateStatement? {
+        return cache.read { $0.updateStatement(sql) }
     }
     
     mutating func setUpdateStatement(_ statement: UpdateStatement, forSQL sql: String) {
         cache.write { $0.setUpdateStatement(statement, forSQL: sql) }
     }
     
-    func selectStatement(sql: String) -> SelectStatement? {
-        return cache.read { $0.selectStatement(sql: sql) }
+    func selectStatement(_ sql: String) -> SelectStatement? {
+        return cache.read { $0.selectStatement(sql) }
     }
     
     mutating func setSelectStatement(_ statement: SelectStatement, forSQL sql: String) {
