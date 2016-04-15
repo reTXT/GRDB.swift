@@ -401,7 +401,7 @@ public indirect enum _SQLExpression {
     case SQLLiteral(String)
     
     /// For example: `1` or `'foo'`
-    case value(DatabaseValueConvertible?)
+    case value(DatabaseValueConvertible?)   // TODO: switch to DatabaseValue?
     
     /// For example: `name`, `table.name`
     case identifier(identifier: String, sourceName: String?)
