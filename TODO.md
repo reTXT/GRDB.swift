@@ -2,7 +2,8 @@
     - [X] lowercased enum cases
     - [X] XXXType protocol: remove Type. Compare with Sequence vs IteratorProtocol 
     - [X] Compare FetchedRecordsController.record(at:NSIndexPath) with NSFetchedResultsController
-    - [ ] add(function:), add(collation:), add(transactionObserver:)
+    - [X] add(function:), add(collation:), add(transactionObserver:)
+    - [ ] init(row: Row)
     - [ ] make- for factories
     - [ ] is- for flags
     - [ ] -ed for methods that return a variant
