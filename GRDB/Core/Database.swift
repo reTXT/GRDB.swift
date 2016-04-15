@@ -69,7 +69,7 @@ public final class Database {
         #if SQLITE_HAS_CODEC
             do {
                 if let passphrase = configuration.passphrase {
-                    try Database.setPassphrase(passphrase, forConnection: sqliteConnection)
+                    try Database.encrypt(sqliteConnection: sqliteConnection!, withPassphrase: passphrase)
                 }
                 
                 // Fail early if key is wrong or missing
@@ -669,16 +669,16 @@ public func ==(lhs: DatabaseCollation, rhs: DatabaseCollation) -> Bool {
 
 #if SQLITE_HAS_CODEC
 extension Database {
-    private class func setPassphrase(passphrase: String, forConnection sqliteConnection: SQLiteConnection) throws {
-        let data = passphrase.dataUsingEncoding(NSUTF8StringEncoding)!
+    private class func encrypt(sqliteConnection: SQLiteConnection, withPassphrase passphrase: String) throws {
+        let data = passphrase.data(using: NSUTF8StringEncoding)!
         let code = sqlite3_key(sqliteConnection, data.bytes, Int32(data.length))
         guard code == SQLITE_OK else {
             throw DatabaseError(code: code, message: String(validatingUTF8: sqlite3_errmsg(sqliteConnection)))
         }
     }
 
-    func changePassphrase(passphrase: String) throws {
-        let data = passphrase.dataUsingEncoding(NSUTF8StringEncoding)!
+    func encrypt(newPassphrase passphrase: String) throws {
+        let data = passphrase.data(using: NSUTF8StringEncoding)!
         let code = sqlite3_rekey(sqliteConnection, data.bytes, Int32(data.length))
         guard code == SQLITE_OK else {
             throw DatabaseError(code: code, message: String(validatingUTF8: sqlite3_errmsg(sqliteConnection)))

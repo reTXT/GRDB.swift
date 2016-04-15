@@ -206,9 +206,9 @@ public final class DatabaseQueue {
     extension DatabaseQueue {
         
         /// Changes the passphrase of an encrypted database
-        public func changePassphrase(passphrase: String) throws {
+        func encrypt(newPassphrase passphrase: String) throws {
             try serializedDatabase.performSync { db in
-                try db.changePassphrase(passphrase)
+                try db.encrypt(newPassphrase: passphrase)
             }
         }
     }

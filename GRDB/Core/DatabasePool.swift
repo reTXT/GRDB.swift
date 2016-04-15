@@ -219,10 +219,10 @@ public enum CheckpointMode: Int32 {
     extension DatabasePool {
         
         /// Changes the passphrase of an encrypted database
-        public func changePassphrase(passphrase: String) throws {
+        func encrypt(newPassphrase passphrase: String) throws {
             try readerPool.clear {
                 try self.writer.performSync { db in
-                    try db.changePassphrase(passphrase)
+                    try db.encrypt(newPassphrase: passphrase)
                 }
                 self.readerConfig.passphrase = passphrase
             }
