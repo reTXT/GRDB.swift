@@ -270,6 +270,10 @@ struct _SQLLimit {
 
 // MARK: - _SQLExpressible
 
+/// This protocol is an implementation detail of the query interface.
+/// Do not use it directly.
+///
+/// See https://github.com/groue/GRDB.swift/#the-query-interface
 public protocol _SQLExpressible {
     
     /// This property is an implementation detail of the query interface.
@@ -300,11 +304,19 @@ public protocol _PrivateSQLExpressible : _SQLExpressible, _SQLOrdering, _SQLSele
     // through the DatabaseValueConvertible protocol, which inherits
     // from _SQLExpressible.
     //
-    // For example, Int adopts DatabaseValueConvertible.
+    // For example, Int adopts _SQLExpressible through DatabaseValueConvertible.
     //
     // _PrivateSQLExpressible, on the other side, is not adopted by any
-    // Swift standard type or any user type. It is only adopted by GRDB
-    // types, such as SQLColumn, _SQLExpression and _SQLLiteral.
+    // Swift standard type or any user type. It is only adopted by GRDB types,
+    // such as SQLColumn, _SQLExpression and _SQLLiteral.
+    //
+    // This separation lets us define functions and operators that do not
+    // spill out. The three declarations below have no chance overloading a
+    // Swift-defined operator, or a user-defined operator:
+    //
+    // - ==(_SQLExpressible, _PrivateSQLExpressible)
+    // - ==(_PrivateSQLExpressible, _SQLExpressible)
+    // - ==(_PrivateSQLExpressible, _PrivateSQLExpressible)
 }
 
 // Conformance to _SQLOrdering
@@ -386,7 +398,7 @@ extension _PrivateSQLExpressible {
 /// See https://github.com/groue/GRDB.swift/#the-query-interface
 public indirect enum _SQLExpression {
     /// For example: `name || 'rrr' AS pirateName`
-    case literal(String)
+    case SQLLiteral(String)
     
     /// For example: `1` or `'foo'`
     case value(DatabaseValueConvertible?)
@@ -442,7 +454,7 @@ public indirect enum _SQLExpression {
     ///
     func sql(_ db: Database, _ bindings: inout [DatabaseValueConvertible?]) throws -> String {
         switch self {
-        case .literal(let sql):
+        case .SQLLiteral(let sql):
             return sql
             
         case .value(let value):
@@ -665,7 +677,7 @@ struct _SQLLiteral {
 
 extension _SQLLiteral : _PrivateSQLExpressible {
     var sqlExpression: _SQLExpression {
-        return .literal(sql)
+        return .SQLLiteral(sql)
     }
 }
 
