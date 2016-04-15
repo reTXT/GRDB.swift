@@ -964,12 +964,12 @@ private final class Item<T: RowConvertible> : RowConvertible, Equatable {
     
     // TODO: Is is a good idea to lazily load records?
     lazy var record: T = {
-        var record = T(self.row)
+        var record = T(row: self.row)
         record.awakeFromFetch(row: self.row)
         return record
     }()
     
-    init(_ row: Row) {
+    init(row: Row) {
         self.row = row.copy()
     }
 }

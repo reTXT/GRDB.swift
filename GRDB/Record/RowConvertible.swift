@@ -23,7 +23,7 @@ public protocol RowConvertible {
     /// For performance reasons, the row argument may be reused during the
     /// iteration of a fetch query. If you want to keep the row for later use,
     /// make sure to store a copy: `self.row = row.copy()`.
-    init(_ row: Row)
+    init(row: Row)
     
     /// Do not call this method directly.
     ///
@@ -68,7 +68,7 @@ extension RowConvertible {
     public static func fetch(_ statement: SelectStatement, arguments: StatementArguments? = nil) -> DatabaseSequence<Self> {
         let row = Row(statement: statement)
         return statement.fetchSequence(arguments: arguments) {
-            var value = self.init(row)
+            var value = self.init(row: row)
             value.awakeFromFetch(row: row)
             return value
         }

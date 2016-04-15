@@ -817,7 +817,7 @@ extension Database {
         let defaultDatabaseValue: DatabaseValue
         let primaryKeyIndex: Int
         
-        init(_ row: Row) {
+        init(row: Row) {
             name = row.value(named: "name")
             type = row.value(named: "type")
             notNull = row.value(named: "notnull")

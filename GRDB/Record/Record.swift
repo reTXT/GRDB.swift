@@ -19,7 +19,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// The input row may not come straight from the database. When you want to
     /// complete your initialization after being fetched, override
     /// awakeFromFetch(row:).
-    required public init(_ row: Row) {
+    required public init(row: Row) {
     }
     
     /// Do not call this method directly.
@@ -116,7 +116,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
     /// - returns: A copy of self.
     @warn_unused_result
     public func copy() -> Self {
-        let copy = self.dynamicType.init(Row(persistentDictionary))
+        let copy = self.dynamicType.init(row: Row(persistentDictionary))
         copy.referenceRow = referenceRow
         return copy
     }
