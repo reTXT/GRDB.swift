@@ -53,7 +53,7 @@ extension FetchRequest {
     }
     
     /// Returns a new FetchRequest which returns distinct rows.
-    public var distinct: FetchRequest<T> {
+    public func distinct() -> FetchRequest<T> {
         /// TODO: turn into a function
         var query = self.query
         query.distinct = true
@@ -145,7 +145,7 @@ extension FetchRequest {
     
     /// Returns a new FetchRequest sorted in reversed order.
     @warn_unused_result
-    public func reverse() -> FetchRequest<T> {
+    public func reversed() -> FetchRequest<T> {
         var query = self.query
         query.reversed = !query.reversed
         return FetchRequest(query: query)
