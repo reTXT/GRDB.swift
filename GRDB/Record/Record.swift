@@ -218,7 +218,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
         
         let dataMapper = DataMapper(db, self)
         var persistentDictionary = dataMapper.persistentDictionary
-        let changes = try dataMapper.insertStatement().execute()
+        let changes = try dataMapper.insertStatement.execute()
         if let rowID = changes.insertedRowID {
             let rowIDColumn = dataMapper.primaryKey.rowIDColumn
             didInsert(withRowID: rowID, forColumn: rowIDColumn)
@@ -267,7 +267,7 @@ public class Record : RowConvertible, TableMapping, Persistable {
         // So let's provide our custom implementation of insert, which uses the
         // same persistentDictionary for both update, and change tracking.
         let dataMapper = DataMapper(db, self)
-        let changes = try dataMapper.updateStatement().execute()
+        let changes = try dataMapper.updateStatement.execute()
         if changes.changedRowCount == 0 {
             throw PersistenceError.notFound(self)
         }

@@ -218,7 +218,7 @@ public extension MutablePersistable {
     
     // MARK: - CRUD Internals
     
-    private func canUpdateInDatabase(_ db: Database) -> Bool {
+    private func canUpdate(_ db: Database) -> Bool {
         // Fail early if database table does not exist.
         let databaseTableName = self.dynamicType.databaseTableName()
         let primaryKey = try! db.primaryKey(forTableName: databaseTableName)
@@ -239,7 +239,7 @@ public extension MutablePersistable {
     /// implementation of performInsert().
     mutating func performInsert(_ db: Database) throws {
         let dataMapper = DataMapper(db, self)
-        let changes = try dataMapper.insertStatement().execute()
+        let changes = try dataMapper.insertStatement.execute()
         if let rowID = changes.insertedRowID {
             didInsert(with: rowID, for: dataMapper.primaryKey.rowIDColumn)
         }
@@ -253,7 +253,7 @@ public extension MutablePersistable {
     /// implementation of update(). They should not provide their own
     /// implementation of performUpdate().
     func performUpdate(_ db: Database) throws {
-        let changes = try DataMapper(db, self).updateStatement().execute()
+        let changes = try DataMapper(db, self).updateStatement.execute()
         if changes.changedRowCount == 0 {
             throw PersistenceError.notFound(self)
         }
@@ -273,7 +273,7 @@ public extension MutablePersistable {
         // that override insert or save have opportunity to perform their
         // custom job.
         
-        if self.canUpdateInDatabase(db) {
+        if self.canUpdate(db) {
             do {
                 try update(db)
             } catch PersistenceError.notFound {
@@ -296,7 +296,7 @@ public extension MutablePersistable {
     /// their implementation of delete(). They should not provide their own
     /// implementation of performDelete().
     func performDelete(_ db: Database) throws -> Bool {
-        return try DataMapper(db, self).deleteStatement().execute().changedRowCount > 0
+        return try DataMapper(db, self).deleteStatement.execute().changedRowCount > 0
     }
     
     /// Don't invoke this method directly: it is an internal method for types
@@ -307,7 +307,7 @@ public extension MutablePersistable {
     /// their implementation of exists(). They should not provide their own
     /// implementation of performExists().
     func performExists(_ db: Database) -> Bool {
-        return (Row.fetchOne(DataMapper(db, self).existsStatement()) != nil)
+        return (Row.fetchOne(DataMapper(db, self).existsStatement) != nil)
     }
     
 }
@@ -463,7 +463,7 @@ public extension Persistable {
     /// implementation of performInsert().
     func performInsert(_ db: Database) throws {
         let dataMapper = DataMapper(db, self)
-        let changes = try dataMapper.insertStatement().execute()
+        let changes = try dataMapper.insertStatement.execute()
         if let rowID = changes.insertedRowID {
             didInsert(with: rowID, for: dataMapper.primaryKey.rowIDColumn)
         }
@@ -482,7 +482,7 @@ public extension Persistable {
         // Make sure we call self.insert and self.update so that classes that
         // override insert or save have opportunity to perform their custom job.
         
-        if canUpdateInDatabase(db) {
+        if canUpdate(db) {
             do {
                 try update(db)
             } catch PersistenceError.notFound {
@@ -538,7 +538,7 @@ final class DataMapper {
         self.primaryKey = primaryKey
     }
     
-    func insertStatement() -> UpdateStatement {
+    var insertStatement: UpdateStatement {
         let query = InsertQuery(
             tableName: databaseTableName,
             insertedColumns: Array(persistentDictionary.keys))
@@ -547,7 +547,7 @@ final class DataMapper {
         return statement
     }
     
-    func updateStatement() -> UpdateStatement {
+    var updateStatement: UpdateStatement {
         // Fail early if primary key does not resolve to a database row.
         let primaryKeyColumns = primaryKey.columns
         let primaryKeyValues = databaseValues(for: primaryKeyColumns, inDictionary: persistentDictionary)
@@ -577,7 +577,7 @@ final class DataMapper {
         return statement
     }
     
-    func deleteStatement() -> UpdateStatement {
+    var deleteStatement: UpdateStatement {
         // Fail early if primary key does not resolve to a database row.
         let primaryKeyColumns = primaryKey.columns
         let primaryKeyValues = databaseValues(for: primaryKeyColumns, inDictionary: persistentDictionary)
@@ -591,7 +591,7 @@ final class DataMapper {
         return statement
     }
     
-    func existsStatement() -> SelectStatement {
+    var existsStatement: SelectStatement {
         // Fail early if primary key does not resolve to a database row.
         let primaryKeyColumns = primaryKey.columns
         let primaryKeyValues = databaseValues(for: primaryKeyColumns, inDictionary: persistentDictionary)
