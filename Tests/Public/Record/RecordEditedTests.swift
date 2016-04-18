@@ -555,7 +555,7 @@ class RecordEditedTests: GRDBTestCase {
                     case "name":
                         XCTAssertEqual(old, "Arthur".databaseValue)
                     case "age":
-                        XCTAssertEqual(old, DatabaseValue.Null)
+                        XCTAssertEqual(old, DatabaseValue.null)
                     case "creationDate":
                         XCTAssertTrue((old?.value() as NSDate?) != nil)
                     default:
@@ -577,7 +577,7 @@ class RecordEditedTests: GRDBTestCase {
                     case "NAME":
                         XCTAssertEqual(old, "Arthur".databaseValue)
                     case "AGE":
-                        XCTAssertEqual(old, DatabaseValue.Null)
+                        XCTAssertEqual(old, DatabaseValue.null)
                     case "CREATIONDATE":
                         XCTAssertTrue((old?.value() as NSDate?) != nil)
                     default:

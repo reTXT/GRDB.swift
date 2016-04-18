@@ -32,6 +32,8 @@
 -        case Blob(NSData)
 +        case blob(NSData)
      }
+-    static let Null: DatabaseValue
++    static let null: DatabaseValue
  }
 
  protocol MutablePersistable {
