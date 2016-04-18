@@ -154,7 +154,7 @@ private struct UserDefaultsItem {
 }
 
 extension UserDefaultsItem: RowConvertible {
-    init(_ row: Row) {
+    init(row: Row) {
         let data = row.dataNoCopy(named: "value")!
         let value = try! NSPropertyListSerialization.propertyListWithData(data, options: .Immutable, format: nil)
         self.key = row.value(named: "key")

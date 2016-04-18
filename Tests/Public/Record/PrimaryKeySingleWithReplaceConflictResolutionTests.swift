@@ -29,10 +29,10 @@ class Email : Record {
         return "emails"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         email = row.value(named: "email")
         label = row.value(named: "label")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

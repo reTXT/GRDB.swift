@@ -27,9 +27,9 @@ private class Item : Record {
         return "items"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         name = row.value(named: "name")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

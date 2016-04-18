@@ -217,7 +217,7 @@ class Item : Record {
         i7 = row.value(named: "i7")
         i8 = row.value(named: "i8")
         i9 = row.value(named: "i9")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

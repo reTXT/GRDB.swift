@@ -30,10 +30,10 @@ class Pet : Record {
         return "pets"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         UUID = row.value(named: "UUID")
         name = row.value(named: "name")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

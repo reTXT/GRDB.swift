@@ -17,11 +17,11 @@ private class Reader : Record {
         super.init()
     }
     
-    required init(_ row: Row){
+    required init(row: Row) {
         self.id = row.value(named: "id")
         self.name = row.value(named: "name")
         self.age = row.value(named: "age")
-        super.init(row)
+        super.init(row: row)
     }
     
     override static func databaseTableName() -> String {

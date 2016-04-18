@@ -12,7 +12,7 @@ private struct Reader {
 }
 
 extension Reader : RowConvertible {
-    init(_ row: Row) {
+    init(row: Row) {
         id = row.value(named: "id")
         name = row.value(named: "name")
         age = row.value(named: "age")
@@ -40,7 +40,7 @@ private struct AltReader {
 }
 
 extension AltReader : RowConvertible {
-    init(_ row: Row) {
+    init(row: Row) {
         id = row.value(named: "id")
         name = row.value(named: "name")
         age = row.value(named: "age")

@@ -10,9 +10,9 @@ class MinimalPersonWithOverrides : Person {
     
     // Record
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         extra = row.value(named: "extra")
-        super.init(row)
+        super.init(row: row)
     }
 }
 
@@ -31,9 +31,9 @@ class PersonWithOverrides : Person {
     
     // Record
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         extra = row.value(named: "extra")
-        super.init(row)
+        super.init(row: row)
     }
     
     override func insert(db: Database) throws {

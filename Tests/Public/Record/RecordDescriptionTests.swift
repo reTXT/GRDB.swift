@@ -42,7 +42,7 @@ class RecordDescriptionTests: GRDBTestCase {
         let record = DoubleColumnRecord()
         record.name = "foo"
         record.age = 35
-        XCTAssertTrue(["<DoubleColumnRecord name:\"foo\" age:35>", "<DoubleColumnRecord age:35 name:\"foo\">"].indexOf(record.description) != nil)
+        XCTAssertTrue(["<DoubleColumnRecord name:\"foo\" age:35>", "<DoubleColumnRecord age:35 name:\"foo\">"].index(of: record.description) != nil)
     }
 
 }

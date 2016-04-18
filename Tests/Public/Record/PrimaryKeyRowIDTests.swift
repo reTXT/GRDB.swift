@@ -36,12 +36,12 @@ class Person : Record {
         return "persons"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         id = row.value(named: "id")
         age = row.value(named: "age")
         name = row.value(named: "name")
         creationDate = row.value(named: "creationDate")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

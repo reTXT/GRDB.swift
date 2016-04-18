@@ -12,7 +12,7 @@ struct SimpleRowConvertible {
 }
 
 extension SimpleRowConvertible : RowConvertible {
-    init(_ row: Row) {
+    init(row: Row) {
         firstName = row.value(named: "firstName")
         lastName = row.value(named: "lastName")
         fetched = false

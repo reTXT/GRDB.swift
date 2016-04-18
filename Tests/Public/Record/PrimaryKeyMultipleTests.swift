@@ -34,11 +34,11 @@ class Citizenship : Record {
         return "citizenships"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         personName = row.value(named: "personName")
         countryName = row.value(named: "countryName")
         native = row.value(named: "native")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

@@ -1,0 +1,8 @@
+ protocol RowConvertible {
+-    init(_ row: Row)
++    init(row: Row)
+ }
+ class Record {
+-    init(_ row: Row)
++    init(row: Row)
+ }

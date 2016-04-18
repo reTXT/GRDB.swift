@@ -19,11 +19,11 @@ class Person : Record {
         return "persons"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         id = row.value(named: "id")
         firstName = row.value(named: "firstName")
         lastName = row.value(named: "lastName")
-        super.init(row)
+        super.init(row: row)
         
     }
     

@@ -13,7 +13,7 @@
 //    init() {
 //        direction = .Save
 //    }
-//    init(_ row: Row) {
+//    init(row: Row) {
 //        direction = .Fetch(row)
 //    }
 //    subscript(name: String) -> Binding {
@@ -129,8 +129,8 @@
 //        return mapping.dictionary
 //    }
 //    
-//    required init(_ row: Row) {
-//        super.init(row)
+//    required init(row: Row) {
+//        super.init(row: row)
 //    }
 //}
 //

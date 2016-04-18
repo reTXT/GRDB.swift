@@ -26,9 +26,9 @@ class MinimalSingle: Record {
         return "minimalSingles"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         UUID = row.value(named: "UUID")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

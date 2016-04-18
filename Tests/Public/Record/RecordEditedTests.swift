@@ -15,9 +15,9 @@ class IntegerPropertyOnRealAffinityColumn : Record {
     
     // Record
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         value = row.value(named: "value")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {
@@ -45,12 +45,12 @@ class PersonWithModifiedCaseColumns: Record {
         return "persons"
     }
     
-    required init(_ row: Row) {
+    required init(row: Row) {
         id = row.value(named: "ID")
         age = row.value(named: "AGE")
         name = row.value(named: "NAME")
         creationDate = row.value(named: "CREATIONDATE")
-        super.init(row)
+        super.init(row: row)
     }
     
     override var persistentDictionary: [String: DatabaseValueConvertible?] {

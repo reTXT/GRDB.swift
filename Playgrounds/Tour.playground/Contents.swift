@@ -64,7 +64,7 @@ struct PointOfInterest {
 
 // Adopt RowConvertible
 extension PointOfInterest : RowConvertible {
-    init(_ row: Row) {
+    init(row: Row) {
         id = row.value(named: "id")
         title = row.value(named: "title")
         favorite = row.value(named: "favorite")
