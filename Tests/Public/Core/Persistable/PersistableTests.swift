@@ -37,7 +37,7 @@ private class PersistablePersonClass : Persistable {
         return ["id": id, "name": name, "age": age]
     }
     
-    func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    func didInsert(with rowID: Int64, for column: String?) {
         self.id = rowID
     }
 }

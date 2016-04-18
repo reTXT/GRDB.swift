@@ -74,7 +74,7 @@ class Person : Record {
     
 //: 4. When relevant, update the person's id after a database row has been inserted:
     
-    override func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    override func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 }

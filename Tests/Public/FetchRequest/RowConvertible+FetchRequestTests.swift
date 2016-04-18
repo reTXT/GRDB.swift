@@ -28,7 +28,7 @@ extension Reader : MutablePersistable {
         return ["id": id, "name": name, "age": age]
     }
     
-    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 }

@@ -1,8 +1,21 @@
+ protocol MutablePersistable {
+-    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?)
++    mutating func didInsert(with rowID: Int64, for column: String?)
+ }
+
+ protocol Persistable {
+-    func didInsertWithRowID(rowID: Int64, forColumn column: String?)
++    func didInsert(with rowID: Int64, for column: String?)
+ }
+
  protocol RowConvertible {
 -    init(_ row: Row)
 +    init(row: Row)
  }
+
  class Record {
 -    init(_ row: Row)
 +    init(row: Row)
+-    func didInsertWithRowID(rowID: Int64, forColumn column: String?)
++    func didInsert(with rowID: Int64, for column: String?)
  }

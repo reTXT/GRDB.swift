@@ -32,7 +32,7 @@ private class Reader : Record {
         return ["id": id, "name": name, "age": age]
     }
     
-    override func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    override func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 }

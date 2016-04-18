@@ -17,7 +17,7 @@ private struct MutablePersistablePerson : MutablePersistable {
         return ["id": id, "name": name]
     }
     
-    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         self.id = rowID
     }
 }
@@ -35,7 +35,7 @@ private struct MutablePersistableCountry : MutablePersistable {
         return ["isoCode": isoCode, "name": name]
     }
     
-    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         self.rowID = rowID
     }
 }
@@ -58,7 +58,7 @@ private struct MutablePersistableCustomizedCountry : MutablePersistable {
         return ["isoCode": isoCode, "name": name]
     }
     
-    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?) {
+    mutating func didInsert(with rowID: Int64, for column: String?) {
         self.rowID = rowID
     }
     
