@@ -162,7 +162,7 @@ class DatabaseTests : GRDBTestCase {
                 try db.execute("INSERT INTO persons (name, age) VALUES (:name, :age)", arguments: ["name": "Arthur", "age": 41])
                 try db.execute("INSERT INTO persons (name, age) VALUES (:name, :age)", arguments: ["name": "Barbara", "age": nil])
                 
-                let statement = try db.selectStatement("SELECT * FROM persons")
+                let statement = try db.makeSelectStatement("SELECT * FROM persons")
                 let rows = Row.fetchAll(statement)
                 XCTAssertEqual(rows.count, 2)
             }
@@ -177,7 +177,7 @@ class DatabaseTests : GRDBTestCase {
                 try db.execute("INSERT INTO persons (name, age) VALUES (:name, :age)", arguments: ["name": "Arthur", "age": 41])
                 try db.execute("INSERT INTO persons (name, age) VALUES (:name, :age)", arguments: ["name": "Barbara", "age": nil])
                 
-                let statement = try db.selectStatement("SELECT * FROM persons WHERE name = ?")
+                let statement = try db.makeSelectStatement("SELECT * FROM persons WHERE name = ?")
                 let rows = Row.fetchAll(statement, arguments: ["Arthur"])
                 XCTAssertEqual(rows.count, 1)
             }
@@ -192,7 +192,7 @@ class DatabaseTests : GRDBTestCase {
                 try db.execute("INSERT INTO persons (name, age) VALUES (:name, :age)", arguments: ["name": "Arthur", "age": 41])
                 try db.execute("INSERT INTO persons (name, age) VALUES (:name, :age)", arguments: ["name": "Barbara", "age": nil])
                 
-                let statement = try db.selectStatement("SELECT * FROM persons WHERE name = :name")
+                let statement = try db.makeSelectStatement("SELECT * FROM persons WHERE name = :name")
                 let rows = Row.fetchAll(statement, arguments: ["name": "Arthur"])
                 XCTAssertEqual(rows.count, 1)
             }

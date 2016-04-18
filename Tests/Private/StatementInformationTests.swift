@@ -13,7 +13,7 @@ class StatementInformationTests : GRDBTestCase {
             try dbQueue.inDatabase { db in
                 try db.execute("CREATE TABLE foo (id INTEGER)")
                 try db.execute("CREATE TABLE bar (id INTEGER, fooId INTEGER)")
-                let statement = try db.selectStatement("SELECT * FROM FOO JOIN BAR ON fooId = foo.id")
+                let statement = try db.makeSelectStatement("SELECT * FROM FOO JOIN BAR ON fooId = foo.id")
                 XCTAssertTrue(statement.sourceTables.count == 2)
                 XCTAssertTrue(statement.sourceTables.contains("foo"))
                 XCTAssertTrue(statement.sourceTables.contains("bar"))

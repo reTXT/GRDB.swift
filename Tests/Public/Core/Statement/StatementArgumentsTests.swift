@@ -99,7 +99,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 updateStatement.arguments = arguments
                 try updateStatement.execute()
                 
-                let selectStatement = try db.selectStatement("SELECT * FROM persons WHERE firstName = ? AND age = ?")
+                let selectStatement = try db.makeSelectStatement("SELECT * FROM persons WHERE firstName = ? AND age = ?")
                 selectStatement.arguments = arguments
                 let row = Row.fetchOne(selectStatement)!
                 
@@ -121,7 +121,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 updateStatement.unsafeSetArguments(arguments)
                 try updateStatement.execute()
                 
-                let selectStatement = try db.selectStatement("SELECT * FROM persons WHERE firstName = ? AND age = ?")
+                let selectStatement = try db.makeSelectStatement("SELECT * FROM persons WHERE firstName = ? AND age = ?")
                 selectStatement.unsafeSetArguments(arguments)
                 let row = Row.fetchOne(selectStatement)!
                 
@@ -223,7 +223,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 updateStatement.arguments = arguments
                 try updateStatement.execute()
                 
-                let selectStatement = try db.selectStatement("SELECT * FROM persons WHERE firstName = :name AND age = :age")
+                let selectStatement = try db.makeSelectStatement("SELECT * FROM persons WHERE firstName = :name AND age = :age")
                 selectStatement.arguments = arguments
                 let row = Row.fetchOne(selectStatement)!
                 
@@ -245,7 +245,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 updateStatement.unsafeSetArguments(arguments)
                 try updateStatement.execute()
                 
-                let selectStatement = try db.selectStatement("SELECT * FROM persons WHERE firstName = :name AND age = :age")
+                let selectStatement = try db.makeSelectStatement("SELECT * FROM persons WHERE firstName = :name AND age = :age")
                 selectStatement.unsafeSetArguments(arguments)
                 let row = Row.fetchOne(selectStatement)!
                 
@@ -356,7 +356,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 updateStatement.arguments = arguments
                 try updateStatement.execute()
                 
-                let selectStatement = try db.selectStatement("SELECT * FROM persons WHERE firstName = :name AND lastName = :name AND age = :age")
+                let selectStatement = try db.makeSelectStatement("SELECT * FROM persons WHERE firstName = :name AND lastName = :name AND age = :age")
                 selectStatement.arguments = arguments
                 let row = Row.fetchOne(selectStatement)!
                 
@@ -378,7 +378,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 updateStatement.unsafeSetArguments(arguments)
                 try updateStatement.execute()
                 
-                let selectStatement = try db.selectStatement("SELECT * FROM persons WHERE firstName = :name AND lastName = :name AND age = :age")
+                let selectStatement = try db.makeSelectStatement("SELECT * FROM persons WHERE firstName = :name AND lastName = :name AND age = :age")
                 selectStatement.unsafeSetArguments(arguments)
                 let row = Row.fetchOne(selectStatement)!
                 

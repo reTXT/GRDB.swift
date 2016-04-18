@@ -6,6 +6,10 @@
 -    case Callback(BusyCallback)
 +    case callback(BusyCallback)
  }
+ class Database {
+-    func selectStatement(_ sql: String) throws -> SelectStatement
++    func makeSelectStatement(_ sql: String) throws -> SelectStatement
+ }
  struct DatabaseValue {
      enum Storage {
 -        case Null
