@@ -6,6 +6,20 @@
 -    case Callback(BusyCallback)
 +    case callback(BusyCallback)
  }
+ struct DatabaseValue {
+     enum Storage {
+-        case Null
++        case null
+-        case Int64(Swift.Int64)
++        case int64(Int64)
+-        case Double(Swift.Double)
++        case double(Double)
+-        case String(Swift.String)
++        case string(String)
+-        case Blob(NSData)
++        case blob(NSData)
+     }
+ }
  protocol MutablePersistable {
 -    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?)
 +    mutating func didInsert(with rowID: Int64, for column: String?)

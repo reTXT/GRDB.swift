@@ -6,6 +6,7 @@ import XCTest
 #endif
 
 enum SQLiteStorageClass {
+    // TODO: use lowercase
     case Null
     case Integer
     case Real
@@ -16,15 +17,15 @@ enum SQLiteStorageClass {
 extension DatabaseValue {
     var storageClass: SQLiteStorageClass {
         switch storage {
-        case .Null:
+        case .null:
             return .Null
-        case .Int64:
+        case .int64:
             return .Integer
-        case .Double:
+        case .double:
             return .Real
-        case .String:
+        case .string:
             return .Text
-        case .Blob:
+        case .blob:
             return .Blob
         }
     }
