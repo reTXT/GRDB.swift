@@ -254,7 +254,7 @@ class DatabasePoolConcurrencyTests: GRDBTestCase {
             
             let block1 = { () in
                 do {
-                    try dbPool.writeInTransaction(.Immediate) { db in
+                    try dbPool.writeInTransaction(.immediate) { db in
                         try db.execute("INSERT INTO items (id) VALUES (NULL)")
                         dispatch_semaphore_signal(s1)
                         dispatch_semaphore_wait(s2, DISPATCH_TIME_FOREVER)

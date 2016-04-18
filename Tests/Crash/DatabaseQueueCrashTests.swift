@@ -84,7 +84,7 @@ class DatabaseQueueCrashTests: GRDBCrashTestCase {
             queue.maxConcurrentOperationCount = 2
             queue.addOperation(NSBlockOperation {
                 do {
-                    try dbQueue1.inTransaction(.Exclusive) { db in
+                    try dbQueue1.inTransaction(.exclusive) { db in
                         sleep(2)    // let other queue try to read.
                         return .Commit
                     }
