@@ -111,7 +111,7 @@ public final class DatabasePool {
     /// more information.
     ///
     /// - parameter kind: The checkpoint mode (default passive)
-    public func checkpoint(kind: CheckpointMode = .passive) throws {
+    public func checkpoint(_ kind: CheckpointMode = .passive) throws {
         try writer.performSync { db in
             // TODO: read https://www.sqlite.org/c3ref/wal_checkpoint_v2.html and
             // check whether we need a busy handler on writer and/or readers
@@ -410,7 +410,7 @@ extension DatabasePool : DatabaseWriter {
     ///     - block: A block that executes SQL statements and return either
     ///       .commit or .rollback.
     /// - throws: The error thrown by the block.
-    public func writeInTransaction(kind: TransactionKind? = nil, _ block: (db: Database) throws -> TransactionCompletion) throws {
+    public func writeInTransaction(_ kind: TransactionKind? = nil, _ block: (db: Database) throws -> TransactionCompletion) throws {
         try writer.performSync { db in
             try db.inTransaction(kind) {
                 try block(db: db)
