@@ -1,3 +1,11 @@
+ enum BusyMode {
+-    case ImmediateError
++    case immediateError
+-    case Timeout(NSTimeInterval)
++    case timeout(NSTimeInterval)
+-    case Callback(BusyCallback)
++    case callback(BusyCallback)
+ }
  protocol MutablePersistable {
 -    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?)
 +    mutating func didInsert(with rowID: Int64, for column: String?)

@@ -21,7 +21,7 @@ class ConcurrencyTests: GRDBTestCase {
             }
         }
         
-        dbConfiguration.busyMode = .Callback(busyCallback)
+        dbConfiguration.busyMode = .callback(busyCallback)
     }
     
     func testWrappedReadWrite() {
