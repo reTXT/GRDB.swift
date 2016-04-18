@@ -238,7 +238,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
         // > NUMERIC affinity as the integer 300000, not as the floating point
         // > value 300000.0.
 
-        testNumericAffinity("numericAffinity")
+        testNumericAffinity(withColumn: "numericAffinity")
     }
     
     func testIntegerAffinity() {
@@ -248,7 +248,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
         // > with NUMERIC affinity. The difference between INTEGER and NUMERIC
         // > affinity is only evident in a CAST expression.
         
-        testNumericAffinity("integerAffinity")
+        testNumericAffinity(withColumn: "integerAffinity")
     }
     
     func testRealAffinity() {
@@ -681,7 +681,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
         }
     }
     
-    func testNumericAffinity(columnName: String) {
+    func testNumericAffinity(withColumn columnName: String) {
         // https://www.sqlite.org/datatype3.html
         //
         // > A column with NUMERIC affinity may contain values using all five
