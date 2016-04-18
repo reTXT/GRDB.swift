@@ -28,9 +28,9 @@ class DictionaryRowTests: GRDBTestCase {
         let dictionary: [String: DatabaseValueConvertible?] = ["a": 0, "b": 1, "c": 2]
         let row = Row(dictionary)
         
-        let aIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("a")!)
-        let bIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("b")!)
-        let cIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("c")!)
+        let aIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "a")!)
+        let bIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "b")!)
+        let cIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "c")!)
         
         // Int extraction, form 1
         XCTAssertEqual(row.value(atIndex: aIndex) as Int, 0)
@@ -111,11 +111,11 @@ class DictionaryRowTests: GRDBTestCase {
             let dictionary: [String: DatabaseValueConvertible?] = ["null": nil, "int64": 1, "double": 1.1, "string": "foo", "blob": "SQLite".dataUsingEncoding(NSUTF8StringEncoding)]
             let row = Row(dictionary)
             
-            let nullIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("null")!)
-            let int64Index = dictionary.startIndex.distance(to: dictionary.indexForKey("int64")!)
-            let doubleIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("double")!)
-            let stringIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("string")!)
-            let blobIndex = dictionary.startIndex.distance(to: dictionary.indexForKey("blob")!)
+            let nullIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "null")!)
+            let int64Index = dictionary.startIndex.distance(to: dictionary.index(forKey: "int64")!)
+            let doubleIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "double")!)
+            let stringIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "string")!)
+            let blobIndex = dictionary.startIndex.distance(to: dictionary.index(forKey: "blob")!)
             
             guard case .null = row.databaseValue(atIndex: nullIndex).storage else { XCTFail(); return }
             guard case .int64(let int64) = row.databaseValue(atIndex: int64Index).storage where int64 == 1 else { XCTFail(); return }
