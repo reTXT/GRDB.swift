@@ -73,7 +73,7 @@ class RawRepresentableTests: GRDBTestCase {
                     XCTAssertEqual(colors[3]!, Color32.Rose)
                 }
                 
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -107,7 +107,7 @@ class RawRepresentableTests: GRDBTestCase {
                     XCTAssertEqual(colors[3]!, Color64.Rose)
                 }
                 
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -141,7 +141,7 @@ class RawRepresentableTests: GRDBTestCase {
                     XCTAssertEqual(colors[3]!, Color.Rose)
                 }
                 
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -175,7 +175,7 @@ class RawRepresentableTests: GRDBTestCase {
                     XCTAssertEqual(grapes[3]!, Grape.Riesling)
                 }
                 
-                return .Rollback
+                return .rollback
             }
         }
     }

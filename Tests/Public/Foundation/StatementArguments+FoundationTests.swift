@@ -36,7 +36,7 @@ class StatementArgumentsFoundationTests: GRDBTestCase {
                     try statement.execute(arguments: StatementArguments(person)!)
                 }
                 
-                return .Commit
+                return .commit
             }
             
             dbQueue.inDatabase { db in
@@ -65,7 +65,7 @@ class StatementArgumentsFoundationTests: GRDBTestCase {
                     try statement.execute(arguments: StatementArguments(person)!)
                 }
                 
-                return .Commit
+                return .commit
             }
             
             dbQueue.inDatabase { db in

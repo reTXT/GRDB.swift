@@ -116,7 +116,7 @@ class PrimaryKeyRowIDTests: GRDBTestCase {
                         XCTFail("Missing column \(key) in fetched row")
                     }
                 }
-                return .Rollback
+                return .rollback
             }
             // This is debatable, actually.
             XCTAssertTrue(record.id != nil)
@@ -149,7 +149,7 @@ class PrimaryKeyRowIDTests: GRDBTestCase {
             try dbQueue.inTransaction { db in
                 try record.insert(db)
                 XCTAssertEqual(record.id!, 123456)
-                return .Rollback
+                return .rollback
             }
             XCTAssertEqual(record.id!, 123456)
         }

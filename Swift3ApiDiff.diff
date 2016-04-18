@@ -50,3 +50,10 @@
 -    case Exclusive
 +    case exclusive
  }
+
+ public enum TransactionCompletion {
+-    case Commit
++    case commit
+-    case Rollback
++    case rollback
+ }

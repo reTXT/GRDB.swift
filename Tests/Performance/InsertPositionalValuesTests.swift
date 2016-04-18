@@ -107,7 +107,7 @@ class InsertPositionalValuesTests: XCTestCase {
                 for i in 0..<insertedRowCount {
                     try statement.execute(arguments: [i, i, i, i, i, i, i, i, i, i])
                 }
-                return .Commit
+                return .commit
             }
         }
     }

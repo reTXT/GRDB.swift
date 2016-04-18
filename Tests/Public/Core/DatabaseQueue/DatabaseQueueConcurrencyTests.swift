@@ -79,7 +79,7 @@ class ConcurrencyTests: GRDBTestCase {
                         try db.execute("INSERT INTO stuffs (id) VALUES (NULL)")
                         dispatch_semaphore_signal(s3)
                         dispatch_semaphore_wait(s4, DISPATCH_TIME_FOREVER)
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -96,7 +96,7 @@ class ConcurrencyTests: GRDBTestCase {
                         dispatch_semaphore_signal(s2)
                         dispatch_semaphore_wait(s3, DISPATCH_TIME_FOREVER)
                         try db.execute("INSERT INTO stuffs (id) VALUES (NULL)")
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch let error as DatabaseError {
@@ -140,7 +140,7 @@ class ConcurrencyTests: GRDBTestCase {
                     try dbQueue1.inTransaction(.exclusive) { db in
                         dispatch_semaphore_signal(s1)
                         dispatch_semaphore_wait(s2, DISPATCH_TIME_FOREVER)
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -154,7 +154,7 @@ class ConcurrencyTests: GRDBTestCase {
                 do {
                     dispatch_semaphore_wait(s1, DISPATCH_TIME_FOREVER)
                     try dbQueue2.inTransaction(.exclusive) { db in
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch let error as DatabaseError {
@@ -198,7 +198,7 @@ class ConcurrencyTests: GRDBTestCase {
                     try dbQueue1.inTransaction(.immediate) { db in
                         dispatch_semaphore_signal(s1)
                         dispatch_semaphore_wait(s2, DISPATCH_TIME_FOREVER)
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -212,7 +212,7 @@ class ConcurrencyTests: GRDBTestCase {
                 do {
                     dispatch_semaphore_wait(s1, DISPATCH_TIME_FOREVER)
                     try dbQueue2.inTransaction(.immediate) { db in
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch let error as DatabaseError {
@@ -274,7 +274,7 @@ class ConcurrencyTests: GRDBTestCase {
                     try dbQueue1.inTransaction(.exclusive) { db in
                         dispatch_semaphore_signal(s1)
                         usleep(100_000) // 0.1s
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -287,7 +287,7 @@ class ConcurrencyTests: GRDBTestCase {
                 do {
                     dispatch_semaphore_wait(s1, DISPATCH_TIME_FOREVER)
                     try dbQueue2.inTransaction(.exclusive) { db in
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -340,7 +340,7 @@ class ConcurrencyTests: GRDBTestCase {
                         try db.execute("INSERT INTO stuffs (id) VALUES (NULL)")
                         dispatch_semaphore_signal(s1)
                         dispatch_semaphore_wait(s2, DISPATCH_TIME_FOREVER)
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -423,7 +423,7 @@ class ConcurrencyTests: GRDBTestCase {
                         try db.execute("INSERT INTO stuffs (id) VALUES (NULL)")
                         dispatch_semaphore_signal(s1)
                         dispatch_semaphore_wait(s2, DISPATCH_TIME_FOREVER)
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {
@@ -439,7 +439,7 @@ class ConcurrencyTests: GRDBTestCase {
                         _ = Row.fetchAll(db, "SELECT * FROM stuffs")
                         dispatch_semaphore_signal(s2)
                         usleep(100_000) // 0.1s
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch {

@@ -16,7 +16,7 @@ class DatabaseErrorTests: GRDBTestCase {
                     try db.execute("CREATE TABLE pets (masterId INTEGER NOT NULL REFERENCES persons(id), name TEXT)")
                     self.sqlQueries.removeAll()
                     try db.execute("INSERT INTO pets (masterId, name) VALUES (?, ?)", arguments: [1, "Bobby"])
-                    return .Commit
+                    return .commit
                 }
             } catch let error as DatabaseError {
                 XCTAssertEqual(error.code, 19) // SQLITE_CONSTRAINT

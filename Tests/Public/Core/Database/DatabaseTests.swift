@@ -270,7 +270,7 @@ class DatabaseTests : GRDBTestCase {
                 XCTAssertEqual(names2[0]!, "Arthur")
                 XCTAssertEqual(names2[1]!, "Barbara")
                 
-                return .Commit
+                return .commit
             }
         }
     }
@@ -292,7 +292,7 @@ class DatabaseTests : GRDBTestCase {
                 XCTAssertEqual(names2[0], "Arthur")
                 XCTAssertEqual(names2[1], "Barbara")
                 
-                return .Commit
+                return .commit
             }
         }
     }

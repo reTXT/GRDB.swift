@@ -189,7 +189,7 @@ extension PersonsViewController {
                 person.score = Person.randomScore()
                 try person.update(db)
             }
-            return .Commit
+            return .commit
         }
     }
     
@@ -225,7 +225,7 @@ extension PersonsViewController {
                             }
                         }
                     }
-                    return .Commit
+                    return .commit
                 }
             }
         }

@@ -80,7 +80,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "0")
                 XCTAssertEqual((dbv.value() as String), "0")
 
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Text
@@ -102,7 +102,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "0")
                 XCTAssertEqual((dbv.value() as String), "0")
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Text
@@ -124,7 +124,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "0")
                 XCTAssertEqual((dbv.value() as String), "0")
                 
-                return .Rollback
+                return .rollback
             }
             
             // Double is turned to Real
@@ -146,7 +146,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "0.0")
                 XCTAssertEqual((dbv.value() as String), "0.0")
                 
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Text
@@ -168,7 +168,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "3.0e+5")
                 XCTAssertEqual((dbv.value() as String), "3.0e+5")
 
-                return .Rollback
+                return .rollback
             }
             
             // "foo" is turned to Text
@@ -190,7 +190,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "foo")
                 XCTAssertEqual((dbv.value() as String), "foo")
                 
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -212,7 +212,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".dataUsingEncoding(NSUTF8StringEncoding)!))
                 
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -294,7 +294,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Real
@@ -324,7 +324,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Real
@@ -354,7 +354,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // 3.0e5 Double is turned to Real
@@ -384,7 +384,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, Double(300000))
                 XCTAssertEqual((dbv.value() as Double), Double(300000))
                 
-                return .Rollback
+                return .rollback
             }
             
             // 1.0e20 Double is turned to Real
@@ -405,7 +405,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 1e20)
                 XCTAssertEqual((dbv.value() as Double), 1e20)
 
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Real
@@ -435,7 +435,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, Double(300000))
                 XCTAssertEqual((dbv.value() as Double), Double(300000))
                 
-                return .Rollback
+                return .rollback
             }
             
             // "1.0e+20" is turned to Real
@@ -456,7 +456,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 1e20)
                 XCTAssertEqual((dbv.value() as Double), 1e20)
                 
-                return .Rollback
+                return .rollback
             }
             
             // "foo" is turned to Text
@@ -478,7 +478,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "foo")
                 XCTAssertEqual((dbv.value() as String), "foo")
                 
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -500,7 +500,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".dataUsingEncoding(NSUTF8StringEncoding)!))
                 
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -542,7 +542,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Integer
@@ -572,7 +572,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Integer
@@ -602,7 +602,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Double is turned to Real
@@ -632,7 +632,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Text
@@ -654,7 +654,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "3.0e+5")
                 XCTAssertEqual((dbv.value() as String), "3.0e+5")
                 
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -676,7 +676,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".dataUsingEncoding(NSUTF8StringEncoding)!))
                 
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -732,7 +732,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Integer
@@ -762,7 +762,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Integer
@@ -792,7 +792,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 0.0)
                 XCTAssertEqual((dbv.value() as Double), 0.0)
                 
-                return .Rollback
+                return .rollback
             }
             
             // 3.0e5 Double is turned to Integer
@@ -822,7 +822,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, Double(300000))
                 XCTAssertEqual((dbv.value() as Double), Double(300000))
                 
-                return .Rollback
+                return .rollback
             }
             
             // 1.0e20 Double is turned to Real
@@ -843,7 +843,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 1e20)
                 XCTAssertEqual((dbv.value() as Double), 1e20)
                 
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Integer
@@ -873,7 +873,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, Double(300000))
                 XCTAssertEqual((dbv.value() as Double), Double(300000))
                 
-                return .Rollback
+                return .rollback
             }
             
             // "1.0e+20" is turned to Real
@@ -894,7 +894,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as Double?)!, 1e20)
                 XCTAssertEqual((dbv.value() as Double), 1e20)
                 
-                return .Rollback
+                return .rollback
             }
             
             // "foo" is turned to Text
@@ -916,7 +916,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as String?)!, "foo")
                 XCTAssertEqual((dbv.value() as String), "foo")
                 
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -938,7 +938,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.value() as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".dataUsingEncoding(NSUTF8StringEncoding)!))
                 
-                return .Rollback
+                return .rollback
             }
         }
     }

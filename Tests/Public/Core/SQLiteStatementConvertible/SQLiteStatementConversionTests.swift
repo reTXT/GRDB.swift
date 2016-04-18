@@ -65,7 +65,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Text
@@ -98,7 +98,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Text
@@ -131,7 +131,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Double is turned to Text
@@ -164,7 +164,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Text
@@ -197,7 +197,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "foo" is turned to Text
@@ -230,7 +230,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -259,7 +259,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                 for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 }
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -356,7 +356,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Real
@@ -401,7 +401,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Real
@@ -446,7 +446,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // 3.0e5 Double is turned to Real
@@ -491,7 +491,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // 1.0e20 Double is turned to Real
@@ -518,7 +518,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Real
@@ -563,7 +563,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "1.0e+20" is turned to Real
@@ -590,7 +590,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "foo" is turned to Text
@@ -623,7 +623,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -652,7 +652,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                 for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 }
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -709,7 +709,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Integer
@@ -754,7 +754,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Integer
@@ -799,7 +799,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Double is turned to Real
@@ -844,7 +844,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Text
@@ -877,7 +877,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -906,7 +906,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                 for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 }
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -977,7 +977,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int64 is turned to Integer
@@ -1022,7 +1022,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Int32 is turned to Integer
@@ -1067,7 +1067,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // 3.0e5 Double is turned to Integer
@@ -1112,7 +1112,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // 1.0e20 Double is turned to Real
@@ -1139,7 +1139,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "3.0e+5" is turned to Integer
@@ -1184,7 +1184,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "1.0e+20" is turned to Real
@@ -1211,7 +1211,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // "foo" is turned to Text
@@ -1244,7 +1244,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
 //                for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
 //                    XCTAssertTrue((row.value(atIndex: 0) as NSData?) == nil)
 //                }
-                return .Rollback
+                return .rollback
             }
             
             // Blob is turned to Blob
@@ -1273,7 +1273,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                 for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
                 }
-                return .Rollback
+                return .rollback
             }
         }
     }

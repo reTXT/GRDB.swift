@@ -325,7 +325,7 @@
 //                XCTAssertEqual(reloadedRecord.data, "foo".dataUsingEncoding(NSUTF8StringEncoding))
 //                
 //                // ... until database commit:
-//                return .Commit
+//                return .commit
 //            }
 //            
 //            // We find our modified data after commit:
@@ -367,7 +367,7 @@
 //                    forbiddenRecord.managedData.controller = self.managedDataController
 //                    forbiddenRecord.data = "Bunny".dataUsingEncoding(NSUTF8StringEncoding)
 //                    try forbiddenRecord.save(db)
-//                    return .Commit
+//                    return .commit
 //                }
 //                XCTFail("Expected error")
 //            } catch let error as NSError {

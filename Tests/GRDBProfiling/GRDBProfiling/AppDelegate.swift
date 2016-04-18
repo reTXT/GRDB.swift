@@ -112,7 +112,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             for i in 0..<insertedRowCount {
                 try statement.execute(arguments: [i, i, i, i, i, i, i, i, i, i])
             }
-            return .Commit
+            return .commit
         }
     }
     
@@ -141,7 +141,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             for i in 0..<insertedRowCount {
                 try statement.execute(arguments: ["i0": i, "i1": i, "i2": i, "i3": i, "i4": i, "i5": i, "i6": i, "i7": i, "i8": i, "i9": i])
             }
-            return .Commit
+            return .commit
         }
     }
     
@@ -170,7 +170,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             for i in 0..<insertedRowCount {
                 try Item(i0: i, i1: i, i2: i, i3: i, i4: i, i5: i, i6: i, i7: i, i8: i, i9: i).insert(db)
             }
-            return .Commit
+            return .commit
         }
     }
 }

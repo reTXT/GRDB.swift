@@ -29,7 +29,7 @@ class UpdateStatementTests : GRDBTestCase {
                 try db.updateStatement("INSERT INTO persons (name) VALUES ('Barbara')\n \t").execute()
                 try db.updateStatement("INSERT INTO persons (name) VALUES ('Craig');").execute()
                 try db.updateStatement("INSERT INTO persons (name) VALUES ('Daniel');\n \t").execute()
-                return .Commit
+                return .commit
             }
             dbQueue.inDatabase { db in
                 let names = String.fetchAll(db, "SELECT name FROM persons ORDER BY name")
@@ -53,7 +53,7 @@ class UpdateStatementTests : GRDBTestCase {
                     try statement.execute(arguments: StatementArguments(person))
                 }
                 
-                return .Commit
+                return .commit
             }
             
             dbQueue.inDatabase { db in
@@ -83,7 +83,7 @@ class UpdateStatementTests : GRDBTestCase {
                     try statement.execute()
                 }
                 
-                return .Commit
+                return .commit
             }
             
             dbQueue.inDatabase { db in
@@ -112,7 +112,7 @@ class UpdateStatementTests : GRDBTestCase {
                     try statement.execute(arguments: StatementArguments(person))
                 }
                 
-                return .Commit
+                return .commit
             }
             
             dbQueue.inDatabase { db in
@@ -142,7 +142,7 @@ class UpdateStatementTests : GRDBTestCase {
                     try statement.execute()
                 }
                 
-                return .Commit
+                return .commit
             }
             
             dbQueue.inDatabase { db in
@@ -209,7 +209,7 @@ class UpdateStatementTests : GRDBTestCase {
                     "INSERT INTO persons (name, age) VALUES ('Arthur', :age2);",
                     arguments: ["age1": 41, "age2": 32])
                 XCTAssertEqual(Int.fetchAll(db, "SELECT age FROM persons ORDER BY age"), [32, 41])
-                return .Rollback
+                return .rollback
             }
             
             try dbQueue.inTransaction { db in
@@ -218,7 +218,7 @@ class UpdateStatementTests : GRDBTestCase {
                     "INSERT INTO persons (name, age) VALUES ('Arthur', :age2);",
                     arguments: [41, 32])
                 XCTAssertEqual(Int.fetchAll(db, "SELECT age FROM persons ORDER BY age"), [32, 41])
-                return .Rollback
+                return .rollback
             }
         }
     }
@@ -232,7 +232,7 @@ class UpdateStatementTests : GRDBTestCase {
                     "INSERT INTO persons (name, age) VALUES ('Arthur', :age);",
                     arguments: ["age": 41])
                 XCTAssertEqual(Int.fetchAll(db, "SELECT age FROM persons"), [41, 41])
-                return .Rollback
+                return .rollback
             }
             
 //            // The test below fails because 41 in consumed by the first statement,
@@ -245,7 +245,7 @@ class UpdateStatementTests : GRDBTestCase {
 //                    "INSERT INTO persons (name, age) VALUES ('Arthur', :age);",
 //                    arguments: [41])
 //                XCTAssertEqual(Int.fetchAll(db, "SELECT age FROM persons"), [41, 41])
-//                return .Rollback
+//                return .rollback
 //            }
         }
     }
@@ -259,7 +259,7 @@ class UpdateStatementTests : GRDBTestCase {
                     "INSERT INTO persons (name, age) VALUES ('Arthur', ?);",
                     arguments: [41, 32])
                 XCTAssertEqual(Int.fetchAll(db, "SELECT age FROM persons ORDER BY age"), [32, 41])
-                return .Rollback
+                return .rollback
             }
         }
     }

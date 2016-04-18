@@ -364,7 +364,7 @@ class TransactionObserverTests: GRDBTestCase {
                 XCTAssertEqual(observer.didRollbackCount, 0)
                 
                 observer.resetCounts()
-                return .Commit
+                return .commit
             }
             XCTAssertEqual(observer.didChangeCount, 0)
             XCTAssertEqual(observer.willCommitCount, 1)
@@ -415,7 +415,7 @@ class TransactionObserverTests: GRDBTestCase {
                 XCTAssertEqual(observer.didRollbackCount, 0)
                 
                 observer.resetCounts()
-                return .Commit
+                return .commit
             }
             XCTAssertEqual(observer.didChangeCount, 0)
             XCTAssertEqual(observer.willCommitCount, 1)
@@ -473,7 +473,7 @@ class TransactionObserverTests: GRDBTestCase {
                 try artwork2.save(db)
                 
                 observer.resetCounts()
-                return .Rollback
+                return .rollback
             }
             XCTAssertEqual(observer.didChangeCount, 0)
             XCTAssertEqual(observer.willCommitCount, 0)
@@ -533,7 +533,7 @@ class TransactionObserverTests: GRDBTestCase {
                         XCTAssertEqual(observer.didRollbackCount, 0)
                         throw error
                     }
-                    return .Commit
+                    return .commit
                 }
                 XCTFail("Expected Error")
             } catch let error as DatabaseError {
@@ -583,7 +583,7 @@ class TransactionObserverTests: GRDBTestCase {
                     } catch {
                         XCTFail("Unexpected Error")
                     }
-                    return .Commit
+                    return .commit
                 }
                 XCTFail("Expected Error")
             } catch let error as NSError {
@@ -650,7 +650,7 @@ class TransactionObserverTests: GRDBTestCase {
                         XCTAssertEqual(observer.didRollbackCount, 0)
                         throw error
                     }
-                    return .Commit
+                    return .commit
                 }
                 XCTFail("Expected Error")
             } catch let error as DatabaseError {
@@ -749,7 +749,7 @@ class TransactionObserverTests: GRDBTestCase {
                     } catch {
                         XCTFail("Unexpected Error")
                     }
-                    return .Commit
+                    return .commit
                 }
                 XCTFail("Expected Error")
             } catch let error as NSError {

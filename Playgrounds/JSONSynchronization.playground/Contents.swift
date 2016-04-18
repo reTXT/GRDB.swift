@@ -127,7 +127,7 @@ do {
         // INSERT INTO "persons" ("id","name") VALUES (2,'Barbara')
         // INSERT INTO "persons" ("id","name") VALUES (3,'Craig')
         try synchronizePersonsWithJSON(jsonString, inDatabase: db)
-        return .Commit
+        return .commit
     }
 }
 
@@ -146,6 +146,6 @@ do {
         // UPDATE "persons" SET "name"='Barbie' WHERE "id"=2
         // INSERT INTO "persons" ("id","name") VALUES (4,'Daniel')
         try synchronizePersonsWithJSON(jsonString, inDatabase: db)
-        return .Commit
+        return .commit
     }
 }

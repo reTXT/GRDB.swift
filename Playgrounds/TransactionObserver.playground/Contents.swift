@@ -70,7 +70,7 @@ print("-- Changes 2")
 try dbQueue.inTransaction { db in
     try db.execute("INSERT INTO persons (name) VALUES ('Arthur')").insertedRowID
     try db.execute("INSERT INTO persons (name) VALUES ('Barbara')").insertedRowID
-    return .Rollback
+    return .rollback
 }
 
 

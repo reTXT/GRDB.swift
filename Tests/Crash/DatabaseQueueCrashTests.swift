@@ -24,7 +24,7 @@ class DatabaseQueueCrashTests: GRDBCrashTestCase {
         assertCrash("Database methods are not reentrant.") {
             try dbQueue.inDatabase { db in
                 try self.dbQueue.inTransaction { db in
-                    return .Commit
+                    return .commit
                 }
             }
         }
@@ -34,9 +34,9 @@ class DatabaseQueueCrashTests: GRDBCrashTestCase {
         assertCrash("Database methods are not reentrant.") {
             try dbQueue.inTransaction { db in
                 try self.dbQueue.inTransaction { db in
-                    return .Commit
+                    return .commit
                 }
-                return .Commit
+                return .commit
             }
         }
     }
@@ -86,7 +86,7 @@ class DatabaseQueueCrashTests: GRDBCrashTestCase {
                 do {
                     try dbQueue1.inTransaction(.exclusive) { db in
                         sleep(2)    // let other queue try to read.
-                        return .Commit
+                        return .commit
                     }
                 }
                 catch is DatabaseError {

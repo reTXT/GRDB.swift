@@ -70,7 +70,7 @@ class PersonsViewController: UITableViewController {
         let person = persons[indexPath.row]
         try! dbQueue.inTransaction { db in
             try person.delete(db)
-            return .Commit
+            return .commit
         }
         persons.removeAtIndex(indexPath.row)
         tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)

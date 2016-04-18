@@ -20,7 +20,7 @@ class RecordFetchTests: GRDBTestCase {
             try dbQueue.inTransaction { db in
                 try Person(name: "Arthur", age: 41).insert(db)
                 try Person(name: "Barbara", age: 37).insert(db)
-                return .Commit
+                return .commit
             }
             
             try dbQueue.inDatabase { db in
@@ -50,7 +50,7 @@ class RecordFetchTests: GRDBTestCase {
                 XCTAssertEqual(names2[0]!, "Arthur")
                 XCTAssertEqual(names2[1]!, "Barbara")
                 
-                return .Commit
+                return .commit
             }
         }
     }
@@ -72,7 +72,7 @@ class RecordFetchTests: GRDBTestCase {
                 XCTAssertEqual(names2[0]!, "Arthur")
                 XCTAssertEqual(names2[1]!, "Barbara")
                 
-                return .Commit
+                return .commit
             }
         }
     }

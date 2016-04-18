@@ -261,7 +261,7 @@ class DatabasePoolConcurrencyTests: GRDBTestCase {
                         try db.execute("INSERT INTO items (id) VALUES (NULL)")
                         dispatch_semaphore_signal(s3)
                         dispatch_semaphore_wait(s4, DISPATCH_TIME_FOREVER)
-                        return .Commit
+                        return .commit
                     }
                     dispatch_semaphore_signal(s5)
                 } catch {
