@@ -110,11 +110,11 @@ class FunctionTests: GRDBTestCase {
         assertNoError {
             let dbQueue = try makeDatabaseQueue()
             let fn = DatabaseFunction("f", argumentCount: 0) { databaseValues in
-                return "foo".dataUsingEncoding(NSUTF8StringEncoding)
+                return "foo".data(using: NSUTF8StringEncoding)
             }
             dbQueue.addFunction(fn)
             dbQueue.inDatabase { db in
-                XCTAssertEqual(NSData.fetchOne(db, "SELECT f()")!, "foo".dataUsingEncoding(NSUTF8StringEncoding))
+                XCTAssertEqual(NSData.fetchOne(db, "SELECT f()")!, "foo".data(using: NSUTF8StringEncoding))
             }
         }
     }
@@ -146,7 +146,7 @@ class FunctionTests: GRDBTestCase {
                 XCTAssertFalse(Bool.fetchOne(db, "SELECT isNil(1)")!)
                 XCTAssertFalse(Bool.fetchOne(db, "SELECT isNil(1.1)")!)
                 XCTAssertFalse(Bool.fetchOne(db, "SELECT isNil('foo')")!)
-                XCTAssertFalse(Bool.fetchOne(db, "SELECT isNil(?)", arguments: ["foo".dataUsingEncoding(NSUTF8StringEncoding)])!)
+                XCTAssertFalse(Bool.fetchOne(db, "SELECT isNil(?)", arguments: ["foo".data(using: NSUTF8StringEncoding)])!)
             }
         }
     }
@@ -204,7 +204,7 @@ class FunctionTests: GRDBTestCase {
             dbQueue.addFunction(fn)
             dbQueue.inDatabase { db in
                 XCTAssertTrue(NSData.fetchOne(db, "SELECT asData(NULL)") == nil)
-                XCTAssertEqual(NSData.fetchOne(db, "SELECT asData(?)", arguments: ["foo".dataUsingEncoding(NSUTF8StringEncoding)])!, "foo".dataUsingEncoding(NSUTF8StringEncoding))
+                XCTAssertEqual(NSData.fetchOne(db, "SELECT asData(?)", arguments: ["foo".data(using: NSUTF8StringEncoding)])!, "foo".data(using: NSUTF8StringEncoding))
             }
         }
     }

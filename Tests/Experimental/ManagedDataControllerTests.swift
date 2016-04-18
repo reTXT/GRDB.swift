@@ -264,7 +264,7 @@
 //    var managedDataController: ManagedDataController!
 //    
 //    override var dbConfiguration: Configuration {
-//        managedDataController = ManagedDataController(path: "/tmp/ManagedDataController", forbiddenData: "Bunny".dataUsingEncoding(NSUTF8StringEncoding))
+//        managedDataController = ManagedDataController(path: "/tmp/ManagedDataController", forbiddenData: "Bunny".data(using: NSUTF8StringEncoding))
 //        var c = super.dbConfiguration
 //        c.transactionObserver = managedDataController
 //        return c
@@ -287,7 +287,7 @@
 //            try dbQueue.inDatabase { db in
 //                // TODO: this explicit line is a problem
 //                record.managedData.controller = self.managedDataController
-//                record.data = "foo".dataUsingEncoding(NSUTF8StringEncoding)
+//                record.data = "foo".data(using: NSUTF8StringEncoding)
 //                try record.save(db)
 //            }
 //            
@@ -295,7 +295,7 @@
 //            dbQueue.inDatabase { db in
 //                let reloadedRecord = RecordWithManagedData.fetchOne(db, key: record.id)!
 //                reloadedRecord.managedData.controller = self.managedDataController
-//                XCTAssertEqual(reloadedRecord.data, "foo".dataUsingEncoding(NSUTF8StringEncoding))
+//                XCTAssertEqual(reloadedRecord.data, "foo".data(using: NSUTF8StringEncoding))
 //            }
 //        }
 //    }
@@ -306,23 +306,23 @@
 //            let record = RecordWithManagedData()
 //            record.managedData.controller = self.managedDataController
 //            try dbQueue.inDatabase { db in
-//                record.data = "foo".dataUsingEncoding(NSUTF8StringEncoding)
+//                record.data = "foo".data(using: NSUTF8StringEncoding)
 //                try record.save(db)
 //            }
 //            
 //            try dbQueue.inTransaction { db in
 //                // ... and that changes...
-//                record.data = "bar".dataUsingEncoding(NSUTF8StringEncoding)
+//                record.data = "bar".data(using: NSUTF8StringEncoding)
 //                try record.save(db)
 //                
 //                // ... after changes...
-//                record.data = "baz".dataUsingEncoding(NSUTF8StringEncoding)
+//                record.data = "baz".data(using: NSUTF8StringEncoding)
 //                try record.save(db)
 //                
 //                // ... are not applied in the file system...
 //                let reloadedRecord = RecordWithManagedData.fetchOne(db, key: record.id)!
 //                reloadedRecord.managedData.controller = self.managedDataController
-//                XCTAssertEqual(reloadedRecord.data, "foo".dataUsingEncoding(NSUTF8StringEncoding))
+//                XCTAssertEqual(reloadedRecord.data, "foo".data(using: NSUTF8StringEncoding))
 //                
 //                // ... until database commit:
 //                return .commit
@@ -332,7 +332,7 @@
 //            dbQueue.inDatabase { db in
 //                let reloadedRecord = RecordWithManagedData.fetchOne(db, key: record.id)!
 //                reloadedRecord.managedData.controller = self.managedDataController
-//                XCTAssertEqual(reloadedRecord.data, "baz".dataUsingEncoding(NSUTF8StringEncoding))
+//                XCTAssertEqual(reloadedRecord.data, "baz".data(using: NSUTF8StringEncoding))
 //            }
 //        }
 //    }
@@ -343,29 +343,29 @@
 //            let record = RecordWithManagedData()
 //            record.managedData.controller = self.managedDataController
 //            try dbQueue.inDatabase { db in
-//                record.data = "foo".dataUsingEncoding(NSUTF8StringEncoding)
+//                record.data = "foo".data(using: NSUTF8StringEncoding)
 //                try record.save(db)
 //            }
 //            
 //            do {
 //                try dbQueue.inTransaction { db in
 //                    // ... and that changes...
-//                    record.data = "bar".dataUsingEncoding(NSUTF8StringEncoding)
+//                    record.data = "bar".data(using: NSUTF8StringEncoding)
 //                    try record.save(db)
 //                    
 //                    // ... after changes...
-//                    record.data = "baz".dataUsingEncoding(NSUTF8StringEncoding)
+//                    record.data = "baz".data(using: NSUTF8StringEncoding)
 //                    try record.save(db)
 //                    
 //                    // ... are not applied in the file system...
 //                    let reloadedRecord = RecordWithManagedData.fetchOne(db, key: record.id)!
 //                    reloadedRecord.managedData.controller = self.managedDataController
-//                    XCTAssertEqual(reloadedRecord.data, "foo".dataUsingEncoding(NSUTF8StringEncoding))
+//                    XCTAssertEqual(reloadedRecord.data, "foo".data(using: NSUTF8StringEncoding))
 //
 //                    // ... until database commit, which may fail:
 //                    let forbiddenRecord = RecordWithManagedData()
 //                    forbiddenRecord.managedData.controller = self.managedDataController
-//                    forbiddenRecord.data = "Bunny".dataUsingEncoding(NSUTF8StringEncoding)
+//                    forbiddenRecord.data = "Bunny".data(using: NSUTF8StringEncoding)
 //                    try forbiddenRecord.save(db)
 //                    return .commit
 //                }
@@ -378,7 +378,7 @@
 //            dbQueue.inDatabase { db in
 //                let reloadedRecord = RecordWithManagedData.fetchOne(db, key: record.id)!
 //                reloadedRecord.managedData.controller = self.managedDataController
-//                XCTAssertEqual(reloadedRecord.data, "foo".dataUsingEncoding(NSUTF8StringEncoding))
+//                XCTAssertEqual(reloadedRecord.data, "foo".data(using: NSUTF8StringEncoding))
 //            }
 //        }
 //    }

@@ -236,7 +236,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
             // Blob is turned to Blob
             
             try dbQueue.inTransaction { db in
-                try db.execute("INSERT INTO `values` (textAffinity) VALUES (?)", arguments: ["foo".dataUsingEncoding(NSUTF8StringEncoding)])
+                try db.execute("INSERT INTO `values` (textAffinity) VALUES (?)", arguments: ["foo".data(using: NSUTF8StringEncoding)])
                 // Check SQLite conversions from Blob storage:
                 for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as Bool?), false)     // incompatible with DatabaseValue conversion
@@ -257,7 +257,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                     XCTAssertEqual((row.value(atIndex: 0) as String?), "foo")   // incompatible with DatabaseValue conversion
                 }
                 for row in Row.fetch(db, "SELECT textAffinity FROM `values`") {
-                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
+                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 }
                 return .rollback
             }
@@ -629,7 +629,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
             // Blob is turned to Blob
             
             try dbQueue.inTransaction { db in
-                try db.execute("INSERT INTO `values` (realAffinity) VALUES (?)", arguments: ["foo".dataUsingEncoding(NSUTF8StringEncoding)])
+                try db.execute("INSERT INTO `values` (realAffinity) VALUES (?)", arguments: ["foo".data(using: NSUTF8StringEncoding)])
                 // Check SQLite conversions from Blob storage:
                 for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as Bool?), false)     // incompatible with DatabaseValue conversion
@@ -650,7 +650,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                     XCTAssertEqual((row.value(atIndex: 0) as String?), "foo")   // incompatible with DatabaseValue conversion
                 }
                 for row in Row.fetch(db, "SELECT realAffinity FROM `values`") {
-                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
+                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 }
                 return .rollback
             }
@@ -883,7 +883,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
             // Blob is turned to Blob
             
             try dbQueue.inTransaction { db in
-                try db.execute("INSERT INTO `values` (noneAffinity) VALUES (?)", arguments: ["foo".dataUsingEncoding(NSUTF8StringEncoding)])
+                try db.execute("INSERT INTO `values` (noneAffinity) VALUES (?)", arguments: ["foo".data(using: NSUTF8StringEncoding)])
                 // Check SQLite conversions from Blob storage
                 for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as Bool?), false)     // incompatible with DatabaseValue conversion
@@ -904,7 +904,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                     XCTAssertEqual((row.value(atIndex: 0) as String?), "foo")   // incompatible with DatabaseValue conversion
                 }
                 for row in Row.fetch(db, "SELECT noneAffinity FROM `values`") {
-                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
+                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 }
                 return .rollback
             }
@@ -1250,7 +1250,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
             // Blob is turned to Blob
             
             try dbQueue.inTransaction { db in
-                try db.execute("INSERT INTO `values` (\(columnName)) VALUES (?)", arguments: ["foo".dataUsingEncoding(NSUTF8StringEncoding)])
+                try db.execute("INSERT INTO `values` (\(columnName)) VALUES (?)", arguments: ["foo".data(using: NSUTF8StringEncoding)])
                 // Check SQLite conversions from Blob storage:
                 for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
                     XCTAssertEqual((row.value(atIndex: 0) as Bool?), false)     // incompatible with DatabaseValue conversion
@@ -1271,7 +1271,7 @@ class SQLiteStatementConversionTests : GRDBTestCase {
                     XCTAssertEqual((row.value(atIndex: 0) as String?), "foo")   // incompatible with DatabaseValue conversion
                 }
                 for row in Row.fetch(db, "SELECT \(columnName) FROM `values`") {
-                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".dataUsingEncoding(NSUTF8StringEncoding))
+                    XCTAssertEqual((row.value(atIndex: 0) as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 }
                 return .rollback
             }
