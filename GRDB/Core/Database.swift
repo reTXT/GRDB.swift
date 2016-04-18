@@ -299,7 +299,7 @@ extension Database {
     
     /// Creates a prepared statement that can be reused.
     ///
-    ///     let statement = try db.updateStatement("INSERT INTO persons (name) VALUES (?)")
+    ///     let statement = try db.makeUpdateStatement("INSERT INTO persons (name) VALUES (?)")
     ///     try statement.execute(arguments: ["Arthur"])
     ///     try statement.execute(arguments: ["Barbara"])
     ///

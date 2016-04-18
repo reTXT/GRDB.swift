@@ -216,7 +216,7 @@ class DatabaseQueueuReleaseMemoryTests: GRDBTestCase {
                         if let dbQueue = dbQueue {
                             do {
                                 try dbQueue.write { db in
-                                    statement = try db.updateStatement("CREATE TABLE items (id INTEGER PRIMARY KEY)")
+                                    statement = try db.makeUpdateStatement("CREATE TABLE items (id INTEGER PRIMARY KEY)")
                                     dispatch_semaphore_signal(s1)
                                 }
                             } catch {

@@ -396,10 +396,10 @@ public class DatabaseIterator<Element>: IteratorProtocol {
 
 /// A subclass of Statement that executes SQL queries.
 ///
-/// You create UpdateStatement with the Database.updateStatement() method:
+/// You create UpdateStatement with the Database.makeUpdateStatement() method:
 ///
 ///     try dbQueue.inTransaction { db in
-///         let statement = try db.updateStatement("INSERT INTO persons (name) VALUES (?)")
+///         let statement = try db.makeUpdateStatement("INSERT INTO persons (name) VALUES (?)")
 ///         try statement.execute(arguments: ["Arthur"])
 ///         try statement.execute(arguments: ["Barbara"])
 ///         return .commit

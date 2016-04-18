@@ -9,6 +9,8 @@
  class Database {
 -    func selectStatement(_ sql: String) throws -> SelectStatement
 +    func makeSelectStatement(_ sql: String) throws -> SelectStatement
+-    func updateStatement(_ sql: String) throws -> SelectStatement
++    func makeUpdateStatement(_ sql: String) throws -> SelectStatement
  }
  struct DatabaseValue {
      enum Storage {

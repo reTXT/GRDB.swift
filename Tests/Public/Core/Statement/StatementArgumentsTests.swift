@@ -25,7 +25,7 @@ class StatementArgumentsTests: GRDBTestCase {
         assertNoError {
             let dbQueue = try makeDatabaseQueue()
             try dbQueue.inDatabase { db in
-                let statement = try db.updateStatement("INSERT INTO persons (firstName, age) VALUES (?, ?)")
+                let statement = try db.makeUpdateStatement("INSERT INTO persons (firstName, age) VALUES (?, ?)")
                 
                 do {
                     // Correct number of arguments
@@ -95,7 +95,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 let age = 42
                 let arguments = StatementArguments([name, age] as [DatabaseValueConvertible?])
                 
-                let updateStatement = try db.updateStatement("INSERT INTO persons (firstName, age) VALUES (?, ?)")
+                let updateStatement = try db.makeUpdateStatement("INSERT INTO persons (firstName, age) VALUES (?, ?)")
                 updateStatement.arguments = arguments
                 try updateStatement.execute()
                 
@@ -117,7 +117,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 let age = 42
                 let arguments = StatementArguments([name, age] as [DatabaseValueConvertible?])
                 
-                let updateStatement = try db.updateStatement("INSERT INTO persons (firstName, age) VALUES (?, ?)")
+                let updateStatement = try db.makeUpdateStatement("INSERT INTO persons (firstName, age) VALUES (?, ?)")
                 updateStatement.unsafeSetArguments(arguments)
                 try updateStatement.execute()
                 
@@ -135,7 +135,7 @@ class StatementArgumentsTests: GRDBTestCase {
         assertNoError {
             let dbQueue = try makeDatabaseQueue()
             try dbQueue.inDatabase { db in
-                let statement = try db.updateStatement("INSERT INTO persons (firstName, age) VALUES (:firstName, :age)")
+                let statement = try db.makeUpdateStatement("INSERT INTO persons (firstName, age) VALUES (:firstName, :age)")
                 
                 do {
                     // Correct number of arguments
@@ -219,7 +219,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 let age = 42
                 let arguments = StatementArguments(["name": name, "age": age] as [String: DatabaseValueConvertible?])
                 
-                let updateStatement = try db.updateStatement("INSERT INTO persons (firstName, age) VALUES (:name, :age)")
+                let updateStatement = try db.makeUpdateStatement("INSERT INTO persons (firstName, age) VALUES (:name, :age)")
                 updateStatement.arguments = arguments
                 try updateStatement.execute()
                 
@@ -241,7 +241,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 let age = 42
                 let arguments = StatementArguments(["name": name, "age": age] as [String: DatabaseValueConvertible?])
                 
-                let updateStatement = try db.updateStatement("INSERT INTO persons (firstName, age) VALUES (:name, :age)")
+                let updateStatement = try db.makeUpdateStatement("INSERT INTO persons (firstName, age) VALUES (:name, :age)")
                 updateStatement.unsafeSetArguments(arguments)
                 try updateStatement.execute()
                 
@@ -259,7 +259,7 @@ class StatementArgumentsTests: GRDBTestCase {
         assertNoError {
             let dbQueue = try makeDatabaseQueue()
             try dbQueue.inDatabase { db in
-                let statement = try db.updateStatement("INSERT INTO persons (firstName, lastName, age) VALUES (:name, :name, :age)")
+                let statement = try db.makeUpdateStatement("INSERT INTO persons (firstName, lastName, age) VALUES (:name, :name, :age)")
                 
                 do {
                     try statement.execute(arguments: ["name": "foo", "age": 1])
@@ -352,7 +352,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 let age = 42
                 let arguments = StatementArguments(["name": name, "age": age] as [String: DatabaseValueConvertible?])
                 
-                let updateStatement = try db.updateStatement("INSERT INTO persons (firstName, lastName, age) VALUES (:name, :name, :age)")
+                let updateStatement = try db.makeUpdateStatement("INSERT INTO persons (firstName, lastName, age) VALUES (:name, :name, :age)")
                 updateStatement.arguments = arguments
                 try updateStatement.execute()
                 
@@ -374,7 +374,7 @@ class StatementArgumentsTests: GRDBTestCase {
                 let age = 42
                 let arguments = StatementArguments(["name": name, "age": age] as [String: DatabaseValueConvertible?])
                 
-                let updateStatement = try db.updateStatement("INSERT INTO persons (firstName, lastName, age) VALUES (:name, :name, :age)")
+                let updateStatement = try db.makeUpdateStatement("INSERT INTO persons (firstName, lastName, age) VALUES (:name, :name, :age)")
                 updateStatement.unsafeSetArguments(arguments)
                 try updateStatement.execute()
                 

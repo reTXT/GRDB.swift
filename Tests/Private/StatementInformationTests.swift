@@ -26,16 +26,16 @@ class StatementInformationTests : GRDBTestCase {
             let dbQueue = try makeDatabaseQueue()
             try dbQueue.inDatabase { db in
                 do {
-                    let statement = try db.updateStatement("CREATE TABLE foo (id INTEGER)")
+                    let statement = try db.makeUpdateStatement("CREATE TABLE foo (id INTEGER)")
                     XCTAssertFalse(statement.invalidatesDatabaseSchemaCache)
                     try statement.execute()
                 }
                 do {
-                    let statement = try db.updateStatement("ALTER TABLE foo ADD COLUMN name TEXT")
+                    let statement = try db.makeUpdateStatement("ALTER TABLE foo ADD COLUMN name TEXT")
                     XCTAssertTrue(statement.invalidatesDatabaseSchemaCache)
                 }
                 do {
-                    let statement = try db.updateStatement("DROP TABLE foo")
+                    let statement = try db.makeUpdateStatement("DROP TABLE foo")
                     XCTAssertTrue(statement.invalidatesDatabaseSchemaCache)
                 }
             }

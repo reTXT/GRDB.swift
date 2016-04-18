@@ -55,7 +55,7 @@ class DatabaseErrorTests: GRDBTestCase {
             // statement.execute(arguments)
             try dbQueue.inDatabase { db in
                 do {
-                    let statement = try db.updateStatement("INSERT INTO pets (masterId, name) VALUES (?, ?)")
+                    let statement = try db.makeUpdateStatement("INSERT INTO pets (masterId, name) VALUES (?, ?)")
                     try statement.execute(arguments: [1, "Bobby"])
                     XCTFail()
                 } catch let error as DatabaseError {
@@ -69,7 +69,7 @@ class DatabaseErrorTests: GRDBTestCase {
             // statement.execute()
             try dbQueue.inDatabase { db in
                 do {
-                    let statement = try db.updateStatement("INSERT INTO pets (masterId, name) VALUES (?, ?)")
+                    let statement = try db.makeUpdateStatement("INSERT INTO pets (masterId, name) VALUES (?, ?)")
                     statement.arguments = [1, "Bobby"]
                     try statement.execute()
                     XCTFail()
