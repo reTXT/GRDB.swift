@@ -210,7 +210,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.failableValue() as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 
                 XCTAssertEqual((dbv.value() as NSData?), "foo".data(using: NSUTF8StringEncoding))
-                XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".data(using: NSUTF8StringEncoding)!))
+                XCTAssertTrue((dbv.value() as NSData).isEqual(to: "foo".data(using: NSUTF8StringEncoding)!))
                 
                 return .rollback
             }
@@ -498,7 +498,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.failableValue() as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 
                 XCTAssertEqual((dbv.value() as NSData?), "foo".data(using: NSUTF8StringEncoding))
-                XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".data(using: NSUTF8StringEncoding)!))
+                XCTAssertTrue((dbv.value() as NSData).isEqual(to: "foo".data(using: NSUTF8StringEncoding)!))
                 
                 return .rollback
             }
@@ -674,7 +674,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.failableValue() as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 
                 XCTAssertEqual((dbv.value() as NSData?), "foo".data(using: NSUTF8StringEncoding))
-                XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".data(using: NSUTF8StringEncoding)!))
+                XCTAssertTrue((dbv.value() as NSData).isEqual(to: "foo".data(using: NSUTF8StringEncoding)!))
                 
                 return .rollback
             }
@@ -936,7 +936,7 @@ class DatabaseValueConversionTests : GRDBTestCase {
                 XCTAssertEqual((dbv.failableValue() as NSData?), "foo".data(using: NSUTF8StringEncoding))
                 
                 XCTAssertEqual((dbv.value() as NSData?), "foo".data(using: NSUTF8StringEncoding))
-                XCTAssertTrue((dbv.value() as NSData).isEqualToData("foo".data(using: NSUTF8StringEncoding)!))
+                XCTAssertTrue((dbv.value() as NSData).isEqual(to: "foo".data(using: NSUTF8StringEncoding)!))
                 
                 return .rollback
             }
