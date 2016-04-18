@@ -43,7 +43,7 @@ class CollationTests: GRDBTestCase {
     func testCollation() {
         assertNoError {
             let dbQueue = try makeDatabaseQueue()
-            let collation = DatabaseCollation("localized_standard") { (string1, string2) in
+            let collation = DatabaseCollation(name: "localized_standard") { (string1, string2) in
                 let length1 = string1.utf8.count
                 let length2 = string2.utf8.count
                 if length1 == length2 {

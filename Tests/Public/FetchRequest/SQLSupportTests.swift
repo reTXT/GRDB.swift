@@ -20,7 +20,7 @@ class SQLSupportTests: GRDBTestCase {
     var customFunction: DatabaseFunction!
     
     override func setUpDatabase(dbWriter: DatabaseWriter) throws {
-        collation = DatabaseCollation("localized_case_insensitive") { (lhs, rhs) in
+        collation = DatabaseCollation(name: "localized_case_insensitive") { (lhs, rhs) in
             return (lhs as NSString).localizedCaseInsensitiveCompare(rhs)
         }
         dbWriter.addCollation(collation)

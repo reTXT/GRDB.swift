@@ -6,12 +6,19 @@
 -    case Callback(BusyCallback)
 +    case callback(BusyCallback)
  }
+
+ final class DatabaseCollation {
+-    init(_ name: String, function: (String, String) -> NSComparisonResult)
++    init(name: String, function: (String, String) -> NSComparisonResult)
+ }
+
  class Database {
 -    func selectStatement(_ sql: String) throws -> SelectStatement
 +    func makeSelectStatement(_ sql: String) throws -> SelectStatement
 -    func updateStatement(_ sql: String) throws -> SelectStatement
 +    func makeUpdateStatement(_ sql: String) throws -> SelectStatement
  }
+
  struct DatabaseValue {
      enum Storage {
 -        case Null
@@ -26,13 +33,14 @@
 +        case blob(NSData)
      }
  }
+
  protocol MutablePersistable {
--    mutating func didInsertWithRowID(rowID: Int64, forColumn column: String?)
+-    mutating func didInsertWithRowID(_ rowID: Int64, forColumn column: String?)
 +    mutating func didInsert(with rowID: Int64, for column: String?)
  }
 
  protocol Persistable {
--    func didInsertWithRowID(rowID: Int64, forColumn column: String?)
+-    func didInsertWithRowID(_ rowID: Int64, forColumn column: String?)
 +    func didInsert(with rowID: Int64, for column: String?)
  }
 
@@ -44,7 +52,7 @@
  class Record {
 -    init(_ row: Row)
 +    init(row: Row)
--    func didInsertWithRowID(rowID: Int64, forColumn column: String?)
+-    func didInsertWithRowID(_ rowID: Int64, forColumn column: String?)
 +    func didInsert(with rowID: Int64, for column: String?)
  }
 

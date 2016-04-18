@@ -33,7 +33,7 @@ func setupDatabase() {
     //
     // See https://github.com/groue/GRDB.swift/#string-comparison
     
-    let collation = DatabaseCollation("localized_case_insensitive") { (lhs, rhs) in
+    let collation = DatabaseCollation(name: "localized_case_insensitive") { (lhs, rhs) in
         return (lhs as NSString).localizedCaseInsensitiveCompare(rhs)
     }
     
